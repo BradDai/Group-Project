@@ -25,4 +25,11 @@ public class LoginController {
 
         loginUseCaseInteractor.execute(loginInputData);
     }
+
+    /**
+     * Implements the cancel button in the login view, switching back to the signup
+     */
+    public void switchToSignupView() {
+        loginUseCaseInteractor.switchToSignupView();
+    }
 }
