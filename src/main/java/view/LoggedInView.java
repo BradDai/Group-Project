@@ -1,156 +1,156 @@
 package view;
 
-import interface_adapter.logged_in.ChangePasswordController;
-import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.logout.LogoutController;
+import interface_adapter.logged_in.ChangePasswordController;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-/**
- * The View for when the user is logged into the program.
- */
-public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
+public class LoggedInView extends JPanel implements PropertyChangeListener {
 
-    private final String viewName = "logged in";
+    public static final String VIEW_NAME = "logged in";
+
     private final LoggedInViewModel loggedInViewModel;
-    private final JLabel passwordErrorField = new JLabel();
-    private ChangePasswordController changePasswordController = null;
+
     private LogoutController logoutController;
+    private ChangePasswordController changePasswordController;
 
-    private final JLabel username;
+    private final JLabel userLabel = new JLabel("User");
 
-    private final JButton logOut;
+    private final JButton logoutButton = new JButton("Log out");
+    private final JButton changePasswordButton = new JButton("Change Password");
+    private final JButton createSubButton = new JButton("Create Subaccount");
+    private final JButton deleteSubButton = new JButton("Delete Subaccount");
 
-    private final JTextField passwordInputField = new JTextField(15);
-    private final JButton changePassword;
+    private final JButton buyAssetButton = new JButton("Buy Asset");
+    private final JButton sellAssetButton = new JButton("Sell Asset");
+    private final JButton convertCurrencyButton = new JButton("Convert Currency");
+    private final JButton transferMoneyButton = new JButton("Transfer Money");
+    private final JButton historyButton = new JButton("Show Transaction History");
+
+    private static final int MAX_SUBACCOUNTS = 5;
+
+    private final JPanel[] subAccountPanels = new JPanel[MAX_SUBACCOUNTS];
+    private final JLabel[] subAccountNameLabels = new JLabel[MAX_SUBACCOUNTS];
+    private final JLabel[] subAccountBalanceLabels = new JLabel[MAX_SUBACCOUNTS];
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInViewModel.addPropertyChangeListener(this);
 
-        final JLabel title = new JLabel("Logged In Screen");
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        final LabelTextPanel passwordInfo = new LabelTextPanel(
-                new JLabel("Password"), passwordInputField);
+        JPanel topPanel = new JPanel(new BorderLayout());
 
-        final JLabel usernameInfo = new JLabel("Currently logged in: ");
-        username = new JLabel();
+        JPanel leftTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        leftTop.add(userLabel);
 
-        final JPanel buttons = new JPanel();
-        logOut = new JButton("Log Out");
-        buttons.add(logOut);
+        JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        rightTop.add(logoutButton);
+        rightTop.add(changePasswordButton);
+        rightTop.add(createSubButton);
+        rightTop.add(deleteSubButton);
 
-        changePassword = new JButton("Change Password");
-        buttons.add(changePassword);
+        topPanel.add(leftTop, BorderLayout.WEST);
+        topPanel.add(rightTop, BorderLayout.CENTER);
 
-        logOut.addActionListener(
-                // This creates an anonymous subclass of ActionListener and instantiates it.
-                evt -> {
-                    if (evt.getSource().equals(logOut)) {
-                        final LoggedInState currentState = loggedInViewModel.getState();
-
-                        this.logoutController.execute(
-                        );
-                    }
-                }
-        );
+        add(topPanel, BorderLayout.NORTH);
 
 
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        JPanel accountsRow = new JPanel(new GridLayout(1, MAX_SUBACCOUNTS, 10, 0));
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        for (int i = 0; i < MAX_SUBACCOUNTS; i++) {
+            JPanel slot = new JPanel();
+            slot.setLayout(new BoxLayout(slot, BoxLayout.Y_AXIS));
+            slot.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
-        passwordInputField.getDocument().addDocumentListener(new DocumentListener() {
+            JLabel nameLabel;
+            JLabel balanceLabel;
 
-            private void documentListenerHelper() {
-                final LoggedInState currentState = loggedInViewModel.getState();
-                currentState.setPassword(passwordInputField.getText());
-                loggedInViewModel.setState(currentState);
+            if (i == 0) {
+                nameLabel = new JLabel("Main CAD Portfolio");
+                balanceLabel = new JLabel("CAD: $1,000,000.00");
+            } else {
+                nameLabel = new JLabel("Empty slot");
+                balanceLabel = new JLabel("CAD: -");
             }
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+            subAccountNameLabels[i] = nameLabel;
+            subAccountBalanceLabels[i] = balanceLabel;
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+            slot.add(Box.createVerticalStrut(5));
+            slot.add(nameLabel);
+            slot.add(Box.createVerticalStrut(5));
+            slot.add(balanceLabel);
+            slot.add(Box.createVerticalGlue());
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
+            accountsRow.add(slot);
+            subAccountPanels[i] = slot;
+        }
+
+        centerPanel.add(accountsRow, BorderLayout.CENTER);
+        add(centerPanel, BorderLayout.CENTER);
+
+
+        JPanel bottomPanel = new JPanel(new GridLayout(2, 3, 10, 10));
+
+        bottomPanel.add(buyAssetButton);
+        bottomPanel.add(sellAssetButton);
+        bottomPanel.add(convertCurrencyButton);
+
+        bottomPanel.add(transferMoneyButton);
+        bottomPanel.add(historyButton);
+        bottomPanel.add(new JLabel());
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
+
+    //button
+        // Logout
+        logoutButton.addActionListener(e -> {
+            if (logoutController != null) {
+                logoutController.execute();
+            } else {
+                showInfo("Logout controller not set yet.");
             }
         });
 
-        changePassword.addActionListener(
-                // This creates an anonymous subclass of ActionListener and instantiates it.
-                evt -> {
-                    if (evt.getSource().equals(changePassword)) {
-                        final LoggedInState currentState = loggedInViewModel.getState();
+        // later Use Case
+        changePasswordButton.addActionListener(e -> showInfo("Change password not implemented yet."));
+        createSubButton.addActionListener(e -> showInfo("Create subaccount not implemented yet."));
+        deleteSubButton.addActionListener(e -> showInfo("Delete subaccount not implemented yet."));
+        buyAssetButton.addActionListener(e -> showInfo("Buy asset not implemented yet."));
+        sellAssetButton.addActionListener(e -> showInfo("Sell asset not implemented yet."));
+        convertCurrencyButton.addActionListener(e -> showInfo("Convert currency not implemented yet."));
+        transferMoneyButton.addActionListener(e -> showInfo("Transfer money not implemented yet."));
+        historyButton.addActionListener(e -> showInfo("Transaction history not implemented yet."));
+    }
 
-                        this.changePasswordController.execute(
-                                currentState.getUsername(),
-                                currentState.getPassword()
-                        );
-                    }
-                }
+    private void showInfo(String message) {
+        JOptionPane.showMessageDialog(
+                this, message, "Info", JOptionPane.INFORMATION_MESSAGE
         );
-
-        this.add(title);
-        this.add(usernameInfo);
-        this.add(username);
-
-        this.add(passwordInfo);
-        this.add(passwordErrorField);
-        this.add(buttons);
-    }
-
-    /**
-     * React to a button click that results in evt.
-     * @param evt the ActionEvent to react to
-     */
-    public void actionPerformed(ActionEvent evt) {
-        System.out.println("Click " + evt.getActionCommand());
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("state")) {
-            final LoggedInState state = (LoggedInState) evt.getNewValue();
-            username.setText(state.getUsername());
-        }
-        else if (evt.getPropertyName().equals("password")) {
-            final LoggedInState state = (LoggedInState) evt.getNewValue();
-            if (state.getPasswordError() == null) {
-                JOptionPane.showMessageDialog(this, "password updated for " + state.getUsername());
-                passwordInputField.setText("");
-            }
-            else {
-                JOptionPane.showMessageDialog(this, state.getPasswordError());
-            }
-        }
-
     }
 
     public String getViewName() {
-        return viewName;
+        return VIEW_NAME;
+    }
+
+    public void setLogoutController(LogoutController logoutController) {
+        this.logoutController = logoutController;
     }
 
     public void setChangePasswordController(ChangePasswordController changePasswordController) {
         this.changePasswordController = changePasswordController;
     }
 
-    public void setLogoutController(LogoutController logoutController) {
-        this.logoutController = logoutController;
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+
     }
 }

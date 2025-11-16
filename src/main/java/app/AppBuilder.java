@@ -30,6 +30,8 @@ import view.LoggedInView;
 import view.LoginView;
 import view.SignupView;
 import view.ViewManager;
+import use_case.SubAccount.SubAccountDataAccessInterface;
+import data_access.InMemorySubAccountDataAccess;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,14 +87,12 @@ public class AppBuilder {
     }
 
     public AppBuilder addSignupUseCase() {
-        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(
-                viewManagerModel,
-                signupViewModel,
-                loginViewModel);
+        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
+                signupViewModel, loginViewModel);
+        final SubAccountDataAccessInterface subAccountDataAccess =
+                new InMemorySubAccountDataAccess();
         final SignupInputBoundary userSignupInteractor = new SignupInteractor(
-                userDataAccessObject,
-                signupOutputBoundary,
-                userFactory);
+                userDataAccessObject, signupOutputBoundary, userFactory, subAccountDataAccess);
 
         SignupController controller = new SignupController(userSignupInteractor);
         signupView.setSignupController(controller);
