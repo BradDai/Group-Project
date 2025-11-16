@@ -1,8 +1,10 @@
 package view;
 
+import interface_adapter.exchange.ExchangeController;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.logged_in.SwitchExchangeController;
 import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
@@ -24,6 +26,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JLabel passwordErrorField = new JLabel();
     private ChangePasswordController changePasswordController = null;
     private LogoutController logoutController;
+    private ExchangeController exchangeController;
+    private SwitchExchangeController switchExchangeController;
 
     private final JLabel username;
 
@@ -31,6 +35,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
+    private final JButton currencyExchange;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
@@ -46,11 +51,15 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         username = new JLabel();
 
         final JPanel buttons = new JPanel();
+
         logOut = new JButton("Log Out");
         buttons.add(logOut);
 
         changePassword = new JButton("Change Password");
         buttons.add(changePassword);
+
+        currencyExchange = new JButton("Currency Exchange");
+        buttons.add(currencyExchange);
 
         logOut.addActionListener(
                 // This creates an anonymous subclass of ActionListener and instantiates it.
@@ -63,8 +72,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                     }
                 }
         );
-
-
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -102,6 +109,17 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                                 currentState.getUsername(),
                                 currentState.getPassword()
                         );
+                    }
+                }
+        );
+
+        currencyExchange.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(currencyExchange)) {
+
+                        switchExchangeController.switchToExchangeView();
+                        //exchangeController.execute();
+
                     }
                 }
         );
@@ -151,6 +169,16 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     }
 
     public void setLogoutController(LogoutController logoutController) {
+
         this.logoutController = logoutController;
     }
+
+    public void setExchangeController(ExchangeController exchangeController) {
+        this.exchangeController = exchangeController;
+    }
+
+    public void setSwitchExchangeController(SwitchExchangeController switchExchangeController) {
+        this.switchExchangeController = switchExchangeController;
+    }
+
 }

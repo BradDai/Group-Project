@@ -9,10 +9,14 @@ public class Main {
                 .addLoginView()
                 .addSignupView()
                 .addLoggedInView()
+                .addExchangeView()
                 .addSignupUseCase()
                 .addLoginUseCase()
+                .addSwitchExchangeUseCase()
+                .addSwitchLoggedInUseCase()
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
+                .addExchangeUseCase()
                 .build();
 
         application.pack();

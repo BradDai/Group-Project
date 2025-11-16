@@ -3,9 +3,8 @@ package app;
 import data_access.FileUserDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
-import interface_adapter.logged_in.ChangePasswordController;
-import interface_adapter.logged_in.ChangePasswordPresenter;
-import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.exchange.*;
+import interface_adapter.logged_in.*;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
@@ -17,6 +16,9 @@ import interface_adapter.signup.SignupViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
+import use_case.exchange.ExchangeInputBoundary;
+import use_case.exchange.ExchangeInteractor;
+import use_case.exchange.ExchangeOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -26,10 +28,13 @@ import use_case.logout.LogoutOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import view.LoggedInView;
-import view.LoginView;
-import view.SignupView;
-import view.ViewManager;
+import use_case.switch_exchange.SwitchExchangeInputBoundary;
+import use_case.switch_exchange.SwitchExchangeInteractor;
+import use_case.switch_exchange.SwitchExchangeOutputBoundary;
+import use_case.switch_loggedin.SwitchLoggedInInputBoundary;
+import use_case.switch_loggedin.SwitchLoggedInInteractor;
+import use_case.switch_loggedin.SwitchLoggedInOutputBoundary;
+import view.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,6 +63,8 @@ public class AppBuilder {
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
+    private ExchangeViewModel exchangeViewModel;
+    private ExchangeView exchangeView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -81,6 +88,13 @@ public class AppBuilder {
         loggedInViewModel = new LoggedInViewModel();
         loggedInView = new LoggedInView(loggedInViewModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addExchangeView() {
+        exchangeViewModel = new ExchangeViewModel();
+        exchangeView = new ExchangeView(exchangeViewModel);
+        cardPanel.add(exchangeView, exchangeView.getViewName());
         return this;
     }
 
@@ -113,6 +127,32 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addSwitchExchangeUseCase() {
+        final SwitchExchangeOutputBoundary switchExchangeOutputBoundary = new SwitchExchangePresenter(
+                exchangeViewModel,
+                viewManagerModel);
+
+        final SwitchExchangeInputBoundary switchExchangeInteractor = new SwitchExchangeInteractor(
+                switchExchangeOutputBoundary);
+
+        SwitchExchangeController switchExchangeController = new SwitchExchangeController(switchExchangeInteractor);
+        loggedInView.setSwitchExchangeController(switchExchangeController);
+        return this;
+    }
+
+    public AppBuilder addSwitchLoggedInUseCase() {
+        final SwitchLoggedInOutputBoundary switchLoggedInOutputBoundary = new SwitchLoggedInPresenter(
+                loggedInViewModel,
+                viewManagerModel);
+
+        final SwitchLoggedInInputBoundary switchLoggedInInteractor = new SwitchLoggedInInteractor(
+                switchLoggedInOutputBoundary);
+
+        SwitchLoggedInController switchLoggedInController = new SwitchLoggedInController(switchLoggedInInteractor);
+        exchangeView.setSwitchLoggedInController(switchLoggedInController);
+        return this;
+    }
+
     public AppBuilder addChangePasswordUseCase() {
         final ChangePasswordOutputBoundary changePasswordOutputBoundary = new ChangePasswordPresenter(viewManagerModel,
                 loggedInViewModel);
@@ -139,6 +179,18 @@ public class AppBuilder {
         final LogoutController logoutController = new LogoutController(logoutInteractor);
         loggedInView.setLogoutController(logoutController);
         return this;
+    }
+
+    public AppBuilder addExchangeUseCase() {
+        final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel,
+                viewManagerModel);
+
+        final ExchangeInputBoundary exchangeInteractor = new ExchangeInteractor(exchangeOutputBoundary);
+
+        final ExchangeController exchangeController = new ExchangeController(exchangeInteractor);
+        loggedInView.setExchangeController(exchangeController);
+        return this;
+
     }
 
     public JFrame build() {
