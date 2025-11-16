@@ -3,7 +3,12 @@ package entity;
 
 public class Asset {
     private String type;
-    private String quantity;
+    private double quantity;
+
+    public Asset(String type, double quantity) {
+        this.type = type;
+        this.quantity = quantity;
+    }
 
     /**
      * Creates a new asset category if none was presented. with the given non-empty name and non-empty password.
@@ -12,7 +17,7 @@ public class Asset {
      * @throws IllegalArgumentException if the type of quantity are empty
      */
 
-    public Asset addNewAsset(String type, String quantity, String price) {
+    public Asset addNewAsset(String type, Double quantity, String price) {
         if ("".equals(type)) {
             throw new IllegalArgumentException("Type cannot be empty");
         }
@@ -28,7 +33,7 @@ public class Asset {
         return type;
     }
 
-    public String getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
