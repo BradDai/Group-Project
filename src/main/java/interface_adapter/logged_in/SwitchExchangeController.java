@@ -11,7 +11,6 @@ public class SwitchExchangeController {
     }
 
     public void switchToExchangeView() {
-
         switchExchangeUseCaseInteractor.switchToExchangeView();
     }
 

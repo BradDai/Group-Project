@@ -1,6 +1,5 @@
-package interface_adapter.exchange;
+package interface_adapter;
 
-import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import use_case.switch_loggedin.SwitchLoggedInOutputBoundary;
 

@@ -1,10 +1,7 @@
 package view;
 
 import interface_adapter.exchange.ExchangeController;
-import interface_adapter.logged_in.ChangePasswordController;
-import interface_adapter.logged_in.LoggedInState;
-import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.logged_in.SwitchExchangeController;
+import interface_adapter.logged_in.*;
 import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
@@ -28,6 +25,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private LogoutController logoutController;
     private ExchangeController exchangeController;
     private SwitchExchangeController switchExchangeController;
+    private SwitchTransferController switchTransferController;
+    private SwitchHistoryController switchHistoryController;
+    private SwitchBuyAssetController switchBuyAssetController;
+    private SwitchSellAssetController switchSellAssetController;
 
     private final JLabel username;
 
@@ -36,6 +37,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
     private final JButton currencyExchange;
+    private final JButton transfer;
+    private final JButton history;
+    private final JButton buyAsset;
+    private final JButton sellAsset;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
@@ -60,6 +65,18 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
         currencyExchange = new JButton("Currency Exchange");
         buttons.add(currencyExchange);
+
+        transfer = new JButton("Transfer Between Accounts");
+        buttons.add(transfer);
+
+        history = new JButton("Transaction History");
+        buttons.add(history);
+
+        buyAsset = new JButton("Buy Asset");
+        buttons.add(buyAsset);
+
+        sellAsset = new JButton("Sell Asset");
+        buttons.add(sellAsset);
 
         logOut.addActionListener(
                 // This creates an anonymous subclass of ActionListener and instantiates it.
@@ -124,6 +141,38 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 }
         );
 
+        transfer.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(transfer)) {
+                        switchTransferController.switchToTransferView();
+                    }
+                }
+        );
+
+        history.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(history)) {
+                        switchHistoryController.switchToHistoryView();
+                    }
+                }
+        );
+
+        buyAsset.addActionListener(
+                evt-> {
+                    if (evt.getSource().equals(buyAsset)) {
+                        switchBuyAssetController.switchToBuyAssetView();
+                    }
+                }
+        );
+
+        sellAsset.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(sellAsset)) {
+                        switchSellAssetController.switchToSellAssetView();
+                    }
+                }
+        );
+
         this.add(title);
         this.add(usernameInfo);
         this.add(username);
@@ -181,4 +230,19 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.switchExchangeController = switchExchangeController;
     }
 
+    public void setSwitchTransferController(SwitchTransferController switchTransferController) {
+        this.switchTransferController = switchTransferController;
+    }
+
+    public void setSwitchHistoryController(SwitchHistoryController switchHistoryController) {
+        this.switchHistoryController = switchHistoryController;
+    }
+
+    public void setSwitchBuyAssetController(SwitchBuyAssetController switchBuyAssetController) {
+        this.switchBuyAssetController = switchBuyAssetController;
+    }
+
+    public void setSwitchSellAssetController(SwitchSellAssetController switchSellAssetController) {
+        this.switchSellAssetController = switchSellAssetController;
+    }
 }
