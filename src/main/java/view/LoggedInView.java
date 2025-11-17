@@ -6,13 +6,14 @@ import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
 import java.awt.*;
-
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Logged-in portfolio screen with Subaccounts row + actions,
  * and keeps teammate's controllers / propertyChange logic.
  */
-public class LoggedInView extends JPanel{
+public class LoggedInView extends JPanel implements PropertyChangeListener {
 
     public static final String VIEW_NAME = "logged in";
 
@@ -207,7 +208,6 @@ public class LoggedInView extends JPanel{
         return VIEW_NAME;
     }
 
-    // --- controllers 的 setter（给 AppBuilder 用） ---
 
     public void setLogoutController(LogoutController logoutController) {
         this.logoutController = logoutController;
@@ -240,4 +240,22 @@ public class LoggedInView extends JPanel{
     public void setSwitchSellAssetController(SwitchSellAssetController switchSellAssetController) {
         this.switchSellAssetController = switchSellAssetController;
     }
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("state".equals(evt.getPropertyName())) {
+            LoggedInState state = (LoggedInState) evt.getNewValue();
+            userLabel.setText("User: " + state.getUsername());
+        } else if ("password".equals(evt.getPropertyName())) {
+            LoggedInState state = (LoggedInState) evt.getNewValue();
+            if (state.getPasswordError() == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Password updated for " + state.getUsername()
+                );
+            } else {
+                JOptionPane.showMessageDialog(this, state.getPasswordError());
+            }
+        }
+    }
+
 }
