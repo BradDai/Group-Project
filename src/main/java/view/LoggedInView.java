@@ -15,8 +15,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     public static final String VIEW_NAME = "logged in";
 
+    private final String viewName = "logged in";
     private final LoggedInViewModel loggedInViewModel;
-
+    private final JLabel passwordErrorField = new JLabel();
+    private ChangePasswordController changePasswordController = null;
     private LogoutController logoutController;
     private ChangePasswordController changePasswordController;
     private ExchangeController exchangeController;
@@ -54,16 +56,14 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel topPanel = new JPanel(new BorderLayout());
+        final JLabel usernameInfo = new JLabel("Currently logged in: ");
+        username = new JLabel();
 
         JPanel leftTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         leftTop.add(userLabel);
 
-        JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        rightTop.add(logoutButton);
-        rightTop.add(changePasswordButton);
-        rightTop.add(createSubButton);
-        rightTop.add(deleteSubButton);
+        changePassword = new JButton("Change Password");
+        buttons.add(changePassword);
 
         topPanel.add(leftTop, BorderLayout.WEST);
         topPanel.add(rightTop, BorderLayout.CENTER);
@@ -78,8 +78,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             slot.setLayout(new BoxLayout(slot, BoxLayout.Y_AXIS));
             slot.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
-            JLabel nameLabel;
-            JLabel balanceLabel;
+        passwordInputField.getDocument().addDocumentListener(new DocumentListener() {
 
             if (i == 0) {
                 nameLabel = new JLabel("Main USD Portfolio");
@@ -89,21 +88,35 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 balanceLabel = new JLabel("USD: -");
             }
 
-            subAccountNameLabels[i] = nameLabel;
-            subAccountBalanceLabels[i] = balanceLabel;
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
 
-            slot.add(Box.createVerticalStrut(5));
-            slot.add(nameLabel);
-            slot.add(Box.createVerticalStrut(5));
-            slot.add(balanceLabel);
-            slot.add(Box.createVerticalGlue());
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
 
-            accountsRow.add(slot);
-            subAccountPanels[i] = slot;
-        }
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
 
-        centerPanel.add(accountsRow, BorderLayout.CENTER);
-        add(centerPanel, BorderLayout.CENTER);
+        changePassword.addActionListener(
+                // This creates an anonymous subclass of ActionListener and instantiates it.
+                evt -> {
+                    if (evt.getSource().equals(changePassword)) {
+                        final LoggedInState currentState = loggedInViewModel.getState();
+
+                        this.changePasswordController.execute(
+                                currentState.getUsername(),
+                                currentState.getPassword()
+                        );
+                    }
+                }
+        );
 
         JPanel bottomPanel = new JPanel(new GridLayout(2, 3, 10, 10));
         bottomPanel.add(buyAssetButton);
@@ -198,10 +211,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         });
     }
 
-    private void showInfo(String message) {
-        JOptionPane.showMessageDialog(
-                this, message, "Info", JOptionPane.INFORMATION_MESSAGE
-        );
     }
 
     public String getViewName() {

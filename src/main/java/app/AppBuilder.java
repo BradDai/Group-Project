@@ -22,9 +22,7 @@ import interface_adapter.transfer.TransferViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.exchange.ExchangeInputBoundary;
-import use_case.exchange.ExchangeInteractor;
-import use_case.exchange.ExchangeOutputBoundary;
+import use_case.exchange.*;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -34,12 +32,6 @@ import use_case.logout.LogoutOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import view.LoggedInView;
-import view.LoginView;
-import view.SignupView;
-import view.ViewManager;
-import use_case.SubAccount.SubAccountDataAccessInterface;
-import data_access.InMemorySubAccountDataAccess;
 import use_case.switch_buyasset.SwitchBuyAssetInputBoundary;
 import use_case.switch_buyasset.SwitchBuyAssetInteractor;
 import use_case.switch_buyasset.SwitchBuyAssetOutputBoundary;
@@ -159,12 +151,14 @@ public class AppBuilder {
     }
 
     public AppBuilder addSignupUseCase() {
-        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
-                signupViewModel, loginViewModel);
-        final SubAccountDataAccessInterface subAccountDataAccess =
-                new InMemorySubAccountDataAccess();
+        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(
+                viewManagerModel,
+                signupViewModel,
+                loginViewModel);
         final SignupInputBoundary userSignupInteractor = new SignupInteractor(
-                userDataAccessObject, signupOutputBoundary, userFactory, subAccountDataAccess);
+                userDataAccessObject,
+                signupOutputBoundary,
+                userFactory);
 
         SignupController controller = new SignupController(userSignupInteractor);
         signupView.setSignupController(controller);
@@ -331,6 +325,16 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addExchangeUseCase() {
+        final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel);
+
+        final ExchangeInputBoundary ExchangeInteractor = new ExchangeInteractor(exchangeOutputBoundary);
+
+        ExchangeController exchangeController = new ExchangeController(ExchangeInteractor);
+        exchangeView.setExchangeController(exchangeController);
+        return this;
+    }
+
     /**
      * Adds the Logout Use Case to the application.
      * @return this builder
@@ -347,20 +351,9 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addExchangeUseCase() {
-        final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel,
-                viewManagerModel);
-
-        final ExchangeInputBoundary exchangeInteractor = new ExchangeInteractor(exchangeOutputBoundary);
-
-        final ExchangeController exchangeController = new ExchangeController(exchangeInteractor);
-        loggedInView.setExchangeController(exchangeController);
-        return this;
-
-    }
 
     public JFrame build() {
-        final JFrame application = new JFrame("User Login Example");
+        final JFrame application = new JFrame("Banking Simulation");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);
