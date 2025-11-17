@@ -149,6 +149,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         this.changePasswordController = changePasswordController;
     }
 
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
