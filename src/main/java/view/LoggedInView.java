@@ -5,23 +5,18 @@ import interface_adapter.logged_in.*;
 import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-/**
- * The View for when the user is logged into the program.
- */
 public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private final String viewName = "logged in";
+    public static final String VIEW_NAME = "logged in";
+
     private final LoggedInViewModel loggedInViewModel;
-    private final JLabel passwordErrorField = new JLabel();
-    private ChangePasswordController changePasswordController = null;
+
     private LogoutController logoutController;
     private ExchangeController exchangeController;
     private SwitchExchangeController switchExchangeController;
@@ -30,7 +25,15 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private SwitchBuyAssetController switchBuyAssetController;
     private SwitchSellAssetController switchSellAssetController;
 
-    private final JLabel username;
+
+    // show user
+    private final JLabel userLabel = new JLabel("User");
+
+    // top
+    private final JButton logoutButton = new JButton("Log out");
+    private final JButton changePasswordButton = new JButton("Change Password");
+    private final JButton createSubButton = new JButton("Create Subaccount");
+    private final JButton deleteSubButton = new JButton("Delete Subaccount");
 
     private final JButton logOut;
 
@@ -52,16 +55,18 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         final LabelTextPanel passwordInfo = new LabelTextPanel(
                 new JLabel("Password"), passwordInputField);
 
-        final JLabel usernameInfo = new JLabel("Currently logged in: ");
-        username = new JLabel();
+        JPanel topPanel = new JPanel(new BorderLayout());
 
         final JPanel buttons = new JPanel();
 
         logOut = new JButton("Log Out");
         buttons.add(logOut);
 
-        changePassword = new JButton("Change Password");
-        buttons.add(changePassword);
+        JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        rightTop.add(logoutButton);
+        rightTop.add(changePasswordButton);
+        rightTop.add(createSubButton);
+        rightTop.add(deleteSubButton);
 
         currencyExchange = new JButton("Currency Exchange");
         buttons.add(currencyExchange);
@@ -92,7 +97,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        passwordInputField.getDocument().addDocumentListener(new DocumentListener() {
+            JLabel nameLabel;
+            JLabel balanceLabel;
 
             private void documentListenerHelper() {
                 final LoggedInState currentState = loggedInViewModel.getState();
@@ -100,35 +106,21 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 loggedInViewModel.setState(currentState);
             }
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+            subAccountNameLabels[i] = nameLabel;
+            subAccountBalanceLabels[i] = balanceLabel;
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+            slot.add(Box.createVerticalStrut(5));
+            slot.add(nameLabel);
+            slot.add(Box.createVerticalStrut(5));
+            slot.add(balanceLabel);
+            slot.add(Box.createVerticalGlue());
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-        });
+            accountsRow.add(slot);
+            subAccountPanels[i] = slot;
+        }
 
-        changePassword.addActionListener(
-                // This creates an anonymous subclass of ActionListener and instantiates it.
-                evt -> {
-                    if (evt.getSource().equals(changePassword)) {
-                        final LoggedInState currentState = loggedInViewModel.getState();
-
-                        this.changePasswordController.execute(
-                                currentState.getUsername(),
-                                currentState.getPassword()
-                        );
-                    }
-                }
-        );
+        centerPanel.add(accountsRow, BorderLayout.CENTER);
+        add(centerPanel, BorderLayout.CENTER);
 
         currencyExchange.addActionListener(
                 evt -> {
@@ -207,6 +199,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
         }
 
+    private void showInfo(String message) {
+        JOptionPane.showMessageDialog(
+                this, message, "Info", JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     public String getViewName() {
