@@ -22,9 +22,7 @@ import interface_adapter.transfer.TransferViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.exchange.ExchangeInputBoundary;
-import use_case.exchange.ExchangeInteractor;
-import use_case.exchange.ExchangeOutputBoundary;
+import use_case.exchange.*;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -327,6 +325,16 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addExchangeUseCase() {
+        final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel);
+
+        final ExchangeInputBoundary ExchangeInteractor = new ExchangeInteractor(exchangeOutputBoundary);
+
+        ExchangeController exchangeController = new ExchangeController(ExchangeInteractor);
+        exchangeView.setExchangeController(exchangeController);
+        return this;
+    }
+
     /**
      * Adds the Logout Use Case to the application.
      * @return this builder
@@ -343,20 +351,9 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addExchangeUseCase() {
-        final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel,
-                viewManagerModel);
-
-        final ExchangeInputBoundary exchangeInteractor = new ExchangeInteractor(exchangeOutputBoundary);
-
-        final ExchangeController exchangeController = new ExchangeController(exchangeInteractor);
-        loggedInView.setExchangeController(exchangeController);
-        return this;
-
-    }
 
     public JFrame build() {
-        final JFrame application = new JFrame("User Login Example");
+        final JFrame application = new JFrame("Banking Simulation");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);
