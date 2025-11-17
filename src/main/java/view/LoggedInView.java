@@ -5,15 +5,16 @@ import interface_adapter.logged_in.*;
 import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-/**
- * Logged-in portfolio screen with Subaccounts row + actions,
- * and keeps teammate's controllers / propertyChange logic.
- */
-public class LoggedInView extends JPanel implements PropertyChangeListener {
+
+public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
 
     public static final String VIEW_NAME = "logged in";
 
@@ -83,11 +84,11 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             JLabel balanceLabel;
 
             if (i == 0) {
-                nameLabel = new JLabel("Main CAD Portfolio");
-                balanceLabel = new JLabel("CAD: $1,000,000.00");
+                nameLabel = new JLabel("Main USD Portfolio");
+                balanceLabel = new JLabel("USD: $1,000,000.00");
             } else {
                 nameLabel = new JLabel("Empty slot");
-                balanceLabel = new JLabel("CAD: -");
+                balanceLabel = new JLabel("USD: -");
             }
 
             subAccountNameLabels[i] = nameLabel;
@@ -113,7 +114,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         bottomPanel.add(transferMoneyButton);
         bottomPanel.add(historyButton);
-        bottomPanel.add(new JLabel()); // 占位
+        bottomPanel.add(new JLabel());
 
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -125,6 +126,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
                 showInfo("Logout controller not set yet.");
             }
         });
+
         changePasswordButton.addActionListener(e -> {
             if (changePasswordController == null) {
                 showInfo("ChangePassword controller not set yet.");
@@ -258,4 +260,8 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("Click " + e.getActionCommand());
+    }
 }
