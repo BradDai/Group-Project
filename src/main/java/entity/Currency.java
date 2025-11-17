@@ -3,9 +3,9 @@ package entity;
 public class Currency extends Asset{
     private String currencySymbol;
 
-    public Currency(String type, double quantity,  String companySymbol) {
+    public Currency(String type, double quantity,  String currencySymbol) {
         super(type, quantity);
-        this.currencySymbol = companySymbol;
+        this.currencySymbol = currencySymbol;
     }
     public String getCurrencySymbol() {
         return currencySymbol;
