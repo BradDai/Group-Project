@@ -29,6 +29,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private SwitchBuyAssetController switchBuyAssetController;
     private SwitchSellAssetController switchSellAssetController;
 
+
     // show user
     private final JLabel userLabel = new JLabel("User");
 
