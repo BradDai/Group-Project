@@ -1,6 +1,8 @@
 package view;
 
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.exchange.ExchangeController;
+import interface_adapter.logged_in.*;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logged_in.ChangePasswordController;
 
@@ -19,6 +21,12 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     private ChangePasswordController changePasswordController;
 
     private final JLabel userLabel = new JLabel("User");
+    private ExchangeController exchangeController;
+    private SwitchExchangeController switchExchangeController;
+    private SwitchTransferController switchTransferController;
+    private SwitchHistoryController switchHistoryController;
+    private SwitchBuyAssetController switchBuyAssetController;
+    private SwitchSellAssetController switchSellAssetController;
 
     private final JButton logoutButton = new JButton("Log out");
     private final JButton changePasswordButton = new JButton("Change Password");
@@ -36,6 +44,13 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     private final JPanel[] subAccountPanels = new JPanel[MAX_SUBACCOUNTS];
     private final JLabel[] subAccountNameLabels = new JLabel[MAX_SUBACCOUNTS];
     private final JLabel[] subAccountBalanceLabels = new JLabel[MAX_SUBACCOUNTS];
+    private final JTextField passwordInputField = new JTextField(15);
+    private final JButton changePassword;
+    private final JButton currencyExchange;
+    private final JButton transfer;
+    private final JButton history;
+    private final JButton buyAsset;
+    private final JButton sellAsset;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
@@ -48,6 +63,10 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         JPanel leftTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         leftTop.add(userLabel);
+        final JPanel buttons = new JPanel();
+
+        logOut = new JButton("Log Out");
+        buttons.add(logOut);
 
         JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         rightTop.add(logoutButton);
@@ -57,6 +76,26 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         topPanel.add(leftTop, BorderLayout.WEST);
         topPanel.add(rightTop, BorderLayout.CENTER);
+        currencyExchange = new JButton("Currency Exchange");
+        buttons.add(currencyExchange);
+
+        transfer = new JButton("Transfer Between Accounts");
+        buttons.add(transfer);
+
+        history = new JButton("Transaction History");
+        buttons.add(history);
+
+        buyAsset = new JButton("Buy Asset");
+        buttons.add(buyAsset);
+
+        sellAsset = new JButton("Sell Asset");
+        buttons.add(sellAsset);
+
+        logOut.addActionListener(
+                // This creates an anonymous subclass of ActionListener and instantiates it.
+                evt -> {
+                    if (evt.getSource().equals(logOut)) {
+                        final LoggedInState currentState = loggedInViewModel.getState();
 
         add(topPanel, BorderLayout.NORTH);
 
@@ -68,6 +107,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             JPanel slot = new JPanel();
             slot.setLayout(new BoxLayout(slot, BoxLayout.Y_AXIS));
             slot.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
             JLabel nameLabel;
             JLabel balanceLabel;
@@ -96,6 +136,52 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         centerPanel.add(accountsRow, BorderLayout.CENTER);
         add(centerPanel, BorderLayout.CENTER);
 
+        currencyExchange.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(currencyExchange)) {
+
+                        switchExchangeController.switchToExchangeView();
+                        //exchangeController.execute();
+
+                    }
+                }
+        );
+
+        transfer.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(transfer)) {
+                        switchTransferController.switchToTransferView();
+                    }
+                }
+        );
+
+        history.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(history)) {
+                        switchHistoryController.switchToHistoryView();
+                    }
+                }
+        );
+
+        buyAsset.addActionListener(
+                evt-> {
+                    if (evt.getSource().equals(buyAsset)) {
+                        switchBuyAssetController.switchToBuyAssetView();
+                    }
+                }
+        );
+
+        sellAsset.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(sellAsset)) {
+                        switchSellAssetController.switchToSellAssetView();
+                    }
+                }
+        );
+
+        this.add(title);
+        this.add(usernameInfo);
+        this.add(username);
 
         JPanel bottomPanel = new JPanel(new GridLayout(2, 3, 10, 10));
 
@@ -153,5 +239,34 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
+    }
+}
+    public void setLogoutController(LogoutController logoutController) {
+
+        this.logoutController = logoutController;
+    }
+
+    public void setExchangeController(ExchangeController exchangeController) {
+        this.exchangeController = exchangeController;
+    }
+
+    public void setSwitchExchangeController(SwitchExchangeController switchExchangeController) {
+        this.switchExchangeController = switchExchangeController;
+    }
+
+    public void setSwitchTransferController(SwitchTransferController switchTransferController) {
+        this.switchTransferController = switchTransferController;
+    }
+
+    public void setSwitchHistoryController(SwitchHistoryController switchHistoryController) {
+        this.switchHistoryController = switchHistoryController;
+    }
+
+    public void setSwitchBuyAssetController(SwitchBuyAssetController switchBuyAssetController) {
+        this.switchBuyAssetController = switchBuyAssetController;
+    }
+
+    public void setSwitchSellAssetController(SwitchSellAssetController switchSellAssetController) {
+        this.switchSellAssetController = switchSellAssetController;
     }
 }
