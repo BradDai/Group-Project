@@ -5,14 +5,11 @@ import interface_adapter.logged_in.*;
 import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 
 public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
 
