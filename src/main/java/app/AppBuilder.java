@@ -34,12 +34,6 @@ import use_case.logout.LogoutOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import view.LoggedInView;
-import view.LoginView;
-import view.SignupView;
-import view.ViewManager;
-import use_case.SubAccount.SubAccountDataAccessInterface;
-import data_access.InMemorySubAccountDataAccess;
 import use_case.switch_buyasset.SwitchBuyAssetInputBoundary;
 import use_case.switch_buyasset.SwitchBuyAssetInteractor;
 import use_case.switch_buyasset.SwitchBuyAssetOutputBoundary;
@@ -159,12 +153,14 @@ public class AppBuilder {
     }
 
     public AppBuilder addSignupUseCase() {
-        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
-                signupViewModel, loginViewModel);
-        final SubAccountDataAccessInterface subAccountDataAccess =
-                new InMemorySubAccountDataAccess();
+        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(
+                viewManagerModel,
+                signupViewModel,
+                loginViewModel);
         final SignupInputBoundary userSignupInteractor = new SignupInteractor(
-                userDataAccessObject, signupOutputBoundary, userFactory, subAccountDataAccess);
+                userDataAccessObject,
+                signupOutputBoundary,
+                userFactory);
 
         SignupController controller = new SignupController(userSignupInteractor);
         signupView.setSignupController(controller);
