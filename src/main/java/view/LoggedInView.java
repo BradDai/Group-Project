@@ -51,8 +51,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private static final int MAX_SUBACCOUNTS = 5;
     private final JPanel[] subAccountPanels = new JPanel[MAX_SUBACCOUNTS];
     private final JLabel[] subAccountNameLabels = new JLabel[MAX_SUBACCOUNTS];
-    private final JLabel[] subAccountBalanceLabels = new JLabel[MAX_SUBACCOUNTS];
-    private final JTextArea[] subAccountAssetsAreas = new JTextArea[MAX_SUBACCOUNTS];
+    private final JLabel[] subAccountCurrencyLabels = new JLabel[MAX_SUBACCOUNTS];
+    private final JLabel[] subAccountStockLabels = new JLabel[MAX_SUBACCOUNTS];
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
@@ -70,45 +70,50 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         topPanel.add(leftTop, BorderLayout.WEST);
         topPanel.add(rightTop, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
+
         JPanel centerPanel = new JPanel(new BorderLayout());
         JPanel accountsRow = new JPanel(new GridLayout(1, MAX_SUBACCOUNTS, 10, 0));
         for (int i = 0; i < MAX_SUBACCOUNTS; i++) {
             JPanel slot = new JPanel();
             slot.setLayout(new BoxLayout(slot, BoxLayout.Y_AXIS));
             slot.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-            JLabel nameLabel;
-            JLabel balanceLabel;
+
+            // === 三个 label：Name / Currency / Stock ===
+            JLabel nameLabel = new JLabel();
+            JLabel currencyLabel = new JLabel();
+            JLabel stockLabel = new JLabel();
+
             if (i == 0) {
-                nameLabel = new JLabel("Main USD Portfolio");
-                balanceLabel = new JLabel("USD: $1,000,000.00");
+                nameLabel.setText("Main USD Portfolio");
+                currencyLabel.setText("Currency  USD: 1,000,000.00");
+                stockLabel.setText("Stock: (none)");
             } else {
-                nameLabel = new JLabel("Empty slot");
-                balanceLabel = new JLabel("USD: -");
+                nameLabel.setText("Empty slot");
+                currencyLabel.setText("Currency  USD: -");
+                stockLabel.setText("Stock: (none)");
             }
 
             subAccountNameLabels[i] = nameLabel;
-            subAccountBalanceLabels[i] = balanceLabel;
-            JTextArea assetArea = new JTextArea();
-            assetArea.setEditable(false);
-            assetArea.setLineWrap(true);
-            assetArea.setWrapStyleWord(true);
-            assetArea.setOpaque(false);
-            assetArea.setBorder(null);
-            assetArea.setText("Assets: (none)");
-            subAccountAssetsAreas[i] = assetArea;
+            subAccountCurrencyLabels[i] = currencyLabel;
+            subAccountStockLabels[i] = stockLabel;
+
+            nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            currencyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            stockLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
             slot.add(Box.createVerticalStrut(5));
             slot.add(nameLabel);
+            slot.add(Box.createVerticalStrut(10));
+            slot.add(currencyLabel);
             slot.add(Box.createVerticalStrut(5));
-            slot.add(balanceLabel);
-            slot.add(Box.createVerticalStrut(5));
-            slot.add(assetArea);
+            slot.add(stockLabel);
             slot.add(Box.createVerticalGlue());
+
             accountsRow.add(slot);
             subAccountPanels[i] = slot;
-            nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            balanceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            assetArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         }
+        centerPanel.add(accountsRow, BorderLayout.CENTER);
+        add(centerPanel, BorderLayout.CENTER);
         centerPanel.add(accountsRow, BorderLayout.CENTER);
         add(centerPanel, BorderLayout.CENTER);
         JPanel bottomPanel = new JPanel(new GridLayout(2, 3, 10, 10));
@@ -307,17 +312,19 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         }
     }
     private void refreshSubAccounts(java.util.List<SubAccount> subs) {
-
         for (int i = 0; i < MAX_SUBACCOUNTS; i++) {
             if (i < subs.size()) {
                 SubAccount sa = subs.get(i);
+
                 subAccountNameLabels[i].setText(sa.getName());
-                subAccountBalanceLabels[i].setText("USD: $" + sa.getBalanceUSD());
-                subAccountAssetsAreas[i].setText(formatAssets(sa.getAssets()));
+                subAccountCurrencyLabels[i].setText(
+                        "Currency  USD: " + sa.getBalanceUSD()
+                );
+                subAccountStockLabels[i].setText("Stock: (none)");
             } else {
                 subAccountNameLabels[i].setText("Empty slot");
-                subAccountBalanceLabels[i].setText("USD: -");
-                subAccountAssetsAreas[i].setText("Assets: (none)");
+                subAccountCurrencyLabels[i].setText("Currency  USD: -");
+                subAccountStockLabels[i].setText("Stock: (none)");
             }
         }
         revalidate();

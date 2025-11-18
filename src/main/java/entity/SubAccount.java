@@ -3,6 +3,8 @@ package entity;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +13,7 @@ public class SubAccount {
     private final String name;
     private BigDecimal balanceUSD;
     private final boolean undeletable;
+    private final Map<String, BigDecimal> currencies = new HashMap<>();
     private final List<Asset> assets = new ArrayList<>();
     public SubAccount(String name, BigDecimal balanceUSD, boolean undeletable) {
         if (name == null || name.isBlank()) {
@@ -22,6 +25,7 @@ public class SubAccount {
         this.name = name.trim();
         this.balanceUSD = balanceUSD;
         this.undeletable = undeletable;
+        currencies.put("USD", balanceUSD);
     }
     public String getName() {
 
@@ -42,6 +46,24 @@ public class SubAccount {
             throw new IllegalArgumentException("balance must be >= 0");
         }
         this.balanceUSD = newBalance;
+    }
+    public Map<String, BigDecimal> getCurrencies() {
+        return currencies;
+    }
+    public BigDecimal getBalanceOf(String currencyCode) {
+        return currencies.getOrDefault(currencyCode, BigDecimal.ZERO);
+    }
+    public void setBalanceOf(String currencyCode, BigDecimal amount) {
+        if (currencyCode == null || currencyCode.isBlank()) {
+            throw new IllegalArgumentException("currencyCode required");
+        }
+        if (amount == null || amount.signum() < 0) {
+            throw new IllegalArgumentException("balance must be >= 0");
+        }
+        currencies.put(currencyCode.toUpperCase(), amount);
+        if ("USD".equalsIgnoreCase(currencyCode)) {
+            this.balanceUSD = amount;
+        }
     }
     public void addOrIncreaseAsset(Asset newAsset) {
         for (Asset asset : assets) {
@@ -68,7 +90,7 @@ public class SubAccount {
     }
     @Override
     public String toString() {
-        return "SubAccount{name='" + name + "', balanceUSD=" + balanceUSD +
+        return "SubAccount{name='" + name + ", currencies=" + currencies +
                 ", undeletable=" + undeletable + "}";
     }
 }
