@@ -11,5 +11,7 @@ public class LoggedInViewModel extends ViewModel<LoggedInState> {
         super("logged in");
         setState(new LoggedInState());
     }
+    public static final String SUBACCOUNTS_CHANGED = "subAccounts";
+    public static final String SUBACCOUNT_ERROR = "subAccountError";
 
 }
