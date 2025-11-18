@@ -1,5 +1,7 @@
 package interface_adapter.logged_in;
-
+import entity.SubAccount;
+import java.util.ArrayList;
+import java.util.List;
 /**
  * The State information representing the logged-in user.
  */
@@ -8,6 +10,8 @@ public class LoggedInState {
 
     private String password = "";
     private String passwordError;
+    private List<SubAccount> subAccounts = new ArrayList<>();
+    private String subAccountError;
 
     public LoggedInState(LoggedInState copy) {
         username = copy.username;
@@ -42,5 +46,21 @@ public class LoggedInState {
 
     public String getPasswordError() {
         return passwordError;
+    }
+
+    public List<SubAccount> getSubAccounts() {
+        return subAccounts;
+    }
+
+    public void setSubAccounts(List<SubAccount> subAccounts) {
+        this.subAccounts = subAccounts;
+    }
+
+    public String getSubAccountError() {
+        return subAccountError;
+    }
+
+    public void setSubAccountError(String subAccountError) {
+        this.subAccountError = subAccountError;
     }
 }
