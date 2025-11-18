@@ -14,6 +14,6 @@ public class TransactionHistoryController {
     public void loadHistory(String portfolio, String assetFilter) {
         TransactionHistoryInputData input =
                 new TransactionHistoryInputData(portfolio, assetFilter);
-        interactor.execute(input);
+        interactor.execute(input); //
     }
 }

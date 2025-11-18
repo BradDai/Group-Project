@@ -14,7 +14,7 @@ public class TransactionHistoryOutputData {
     }
 
     public List<HistoryState.Row> getRows() {
-        return rows;
+        return rows; //
     }
 
     public String getMessage() {

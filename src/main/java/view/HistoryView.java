@@ -62,7 +62,7 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         bottomPanel.add(messageLabel);
         this.add(bottomPanel);
 
-        // ----- listeners -----
+        // ----- listeners -----//
 
         // Back to logged-in view
         back.addActionListener(evt -> {

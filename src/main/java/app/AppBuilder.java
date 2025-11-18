@@ -151,7 +151,7 @@ public class AppBuilder {
         interface_adapter.transaction_history.TransactionHistoryController controller =
                 new interface_adapter.transaction_history.TransactionHistoryController(interactor);
 
-        historyView.setTransactionHistoryController(controller);
+        historyView.setTransactionHistoryController(controller); //
         return this;
     }
 

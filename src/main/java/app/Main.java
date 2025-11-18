@@ -29,7 +29,7 @@ public class Main {
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
                 .addExchangeUseCase()
-                .addTransactionHistoryUsecase()
+                .addTransactionHistoryUsecase()//
                 .build();
 
         application.pack();

@@ -23,7 +23,7 @@ public class HistoryState {
 
     // message
     public String getMessage() {
-        return message;
+        return message; //
     }
 
     public void setMessage(String message) {

@@ -14,6 +14,6 @@ public class TransactionHistoryInputData {
     }
 
     public String getAsset() {
-        return asset;
+        return asset; //
     }
 }

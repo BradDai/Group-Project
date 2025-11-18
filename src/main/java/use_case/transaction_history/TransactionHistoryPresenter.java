@@ -18,6 +18,6 @@ public class TransactionHistoryPresenter implements TransactionHistoryOutputBoun
         HistoryState state = viewModel.getState();
         state.setRows(outputData.getRows());
         state.setMessage(outputData.getMessage());
-        viewModel.setState(state);
+        viewModel.setState(state); //
     }
 }

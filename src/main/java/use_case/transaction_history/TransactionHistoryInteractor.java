@@ -41,6 +41,6 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
                         "Loaded demo history for portfolio: " + inputData.getPortfolio()
                 );
 
-        presenter.present(output);
+        presenter.present(output); //
     }
 }
