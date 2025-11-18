@@ -31,6 +31,7 @@ public class Main {
                 .addLogoutUseCase()
                 .addCreateSubAccountUseCase()
                 .addExchangeUseCase()
+                .addTransactionHistoryUsecase()//
                 .build();
 
         application.pack();
