@@ -16,6 +16,7 @@ public class Main {
                 .addSellAssetView()
                 .addSignupUseCase()
                 .addLoginUseCase()
+                .addSellAssetUseCase()
                 .addSwitchExchangeUseCase()
                 .addSwitchTransferUseCase()
                 .addSwitchHistoryUseCase()

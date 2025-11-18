@@ -1,7 +1,9 @@
 package view;
 
 import interface_adapter.SwitchLoggedInController;
-import interface_adapter.sellasset.SellAssetViewModel;
+import interface_adapter.sell_asset.SellAssetController;
+import interface_adapter.sell_asset.SellAssetState;
+import interface_adapter.sell_asset.SellAssetViewModel;
 
 
 import javax.swing.*;
@@ -18,6 +20,8 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
     private final JButton back;
     private final JButton confirm;
+
+    private SellAssetController sellAssetController;
 
     // variables for functionality
     private JComboBox<String> portfolioSelector;
@@ -72,10 +76,26 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        stockSelector.addActionListener(e -> {
-            String ticker = (String) stockSelector.getSelectedItem();
-            fetchAndDisplayPrice(ticker);
+        stockSelector.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String stockName = (String) stockSelector.getSelectedItem();
+                        sellAssetController.fetchPrice(stockName);
+                    }
         });
+
+        confirm.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String portfolioName =  (String) portfolioSelector.getSelectedItem();
+                        String stockName =  (String) stockSelector.getSelectedItem();
+                        double quantity = Double.parseDouble(quantityField.getText());
+                        sellAssetController.execute(portfolioName, stockName, quantity);
+                    }
+                }
+        );
 
         back.addActionListener(
                 evt -> {
@@ -96,56 +116,44 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
     private void updateTotal() {
         try {
             double qty = Double.parseDouble(quantityField.getText());
-            double total = qty * currentStockPrice;
-            totalPriceLabel.setText(String.format("%.2f", total));
+            double total = qty * sellAssetViewModel.getState().getCurrentPrice();
+            totalPriceLabel.setText("$" + String.format("%.2f", total));
         } catch (Exception ex) {
             totalPriceLabel.setText("—");
         }
     }
 
-    // fetch the price using API
-    private void fetchAndDisplayPrice(String ticker) {
-        // TODO: replace with real API key
-        String apiKey = "demo";
-
-        try {
-            String url = "https://api.twelvedata.com/price?symbol=" + ticker + "&apikey=" + apiKey;
-
-            java.net.URL requestUrl = new java.net.URL(url);
-            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) requestUrl.openConnection();
-            connection.setRequestMethod("GET");
-
-            java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) response.append(inputLine);
-            in.close();
-
-            org.json.JSONObject json = new org.json.JSONObject(response.toString());
-            currentStockPrice = json.getDouble("price");
-
-            stockPriceLabel.setText("$" + currentStockPrice);
-
-            updateTotal();
-
-        } catch (Exception e) {
-            stockPriceLabel.setText("API Error");
-            currentStockPrice = 0.0;
-            updateTotal();
-            e.printStackTrace();
-        }
-    }
-    // end of method
-
     public void actionPerformed(ActionEvent evt) { System.out.println("Click " + evt.getActionCommand()); }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        SellAssetState state = sellAssetViewModel.getState();
+        this.currentStockPrice = state.getCurrentPrice();
 
+        if (state.getPriceError() != null) {
+            stockPriceLabel.setText("Error: " + state.getPriceError());
+            totalPriceLabel.setText("—");
+            return;
+        }
+
+        // Update price label
+        stockPriceLabel.setText("$" + String.format("%.2f", state.getCurrentPrice()));
+
+        // Optionally recompute total if qty entered
+        try {
+            double qty = Double.parseDouble(quantityField.getText());
+            double total = qty * state.getCurrentPrice();
+            totalPriceLabel.setText(String.format("%.2f", total));
+        } catch (Exception ignored) {
+            totalPriceLabel.setText("—");
+        }
     }
 
     public String getViewName() { return viewName; }
+
+    public void setSellAssetController(SellAssetController sellAssetController) {
+        this.sellAssetController = sellAssetController;
+    }
 
     public void setSwitchLoggedInController(SwitchLoggedInController switchLoggedInController) {
         this.switchLoggedInController = switchLoggedInController;

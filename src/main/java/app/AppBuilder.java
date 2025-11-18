@@ -15,7 +15,9 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
-import interface_adapter.sellasset.SellAssetViewModel;
+import interface_adapter.sell_asset.SellAssetController;
+import interface_adapter.sell_asset.SellAssetPresenter;
+import interface_adapter.sell_asset.SellAssetViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -33,7 +35,10 @@ import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
 import use_case.SubAccount.SubAccountDataAccessInterface;
-import data_access.InMemorySubAccountDataAccess;
+import use_case.sell_asset.SellAssetInputBoundary;
+import use_case.sell_asset.SellAssetInteractor;
+import use_case.sell_asset.SellAssetOutputBoundary;
+import use_case.sell_asset.SellAssetPriceOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -55,7 +60,6 @@ import use_case.switch_sellasset.SwitchSellAssetOutputBoundary;
 import use_case.switch_transfer.SwitchTransferInputBoundary;
 import use_case.switch_transfer.SwitchTransferInteractor;
 import use_case.switch_transfer.SwitchTransferOutputBoundary;
-import use_case.SubAccount.SubAccountDataAccessInterface;
 import use_case.SubAccount.create.CreateSubAccountInputBoundary;
 import use_case.SubAccount.create.CreateSubAccountInteractor;
 import use_case.SubAccount.create.CreateSubAccountOutputBoundary;
@@ -186,6 +190,23 @@ public class AppBuilder {
 
         LoginController loginController = new LoginController(loginInteractor);
         loginView.setLoginController(loginController);
+        return this;
+    }
+
+    public AppBuilder addSellAssetUseCase() {
+        final SellAssetOutputBoundary sellAssetOutputBoundary =
+                new SellAssetPresenter(sellAssetViewModel);
+        final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary =
+                new SellAssetPresenter(sellAssetViewModel);
+
+        final SellAssetInputBoundary sellAssetInteractor =
+                new SellAssetInteractor(
+                        sellAssetOutputBoundary,
+                        sellAssetPriceOutputBoundary
+                );
+
+        final SellAssetController sellAssetController = new SellAssetController(sellAssetInteractor);
+        sellAssetView.setSellAssetController(sellAssetController);
         return this;
     }
 
