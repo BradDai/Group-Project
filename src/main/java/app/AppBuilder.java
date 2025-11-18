@@ -52,6 +52,9 @@ import use_case.switch_sellasset.SwitchSellAssetOutputBoundary;
 import use_case.switch_transfer.SwitchTransferInputBoundary;
 import use_case.switch_transfer.SwitchTransferInteractor;
 import use_case.switch_transfer.SwitchTransferOutputBoundary;
+import use_case.transaction_history.TransactionHistoryInputBoundary;
+import use_case.transaction_history.TransactionHistoryInteractor;
+import use_case.transaction_history.TransactionHistoryOutputBoundary;
 import view.*;
 
 import javax.swing.*;
@@ -135,6 +138,20 @@ public class AppBuilder {
         historyViewModel = new HistoryViewModel();
         historyView = new HistoryView(historyViewModel);
         cardPanel.add(historyView, historyView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addTransactionHistoryUsecase() {
+        TransactionHistoryOutputBoundary presenter =
+                new interface_adapter.transaction_history.TransactionHistoryPresenter(historyViewModel);  // HistoryViewModel
+
+        TransactionHistoryInputBoundary interactor =
+                new TransactionHistoryInteractor(presenter);
+
+        interface_adapter.transaction_history.TransactionHistoryController controller =
+                new interface_adapter.transaction_history.TransactionHistoryController(interactor);
+
+        historyView.setTransactionHistoryController(controller);
         return this;
     }
 
