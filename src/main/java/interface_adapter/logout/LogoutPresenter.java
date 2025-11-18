@@ -40,8 +40,9 @@ public class LogoutPresenter implements LogoutOutputBoundary {
         final LoggedInState loggedInState = loggedInViewModel.getState();
         String name = loggedInState.getUsername();
         loggedInState.setUsername("");
+        loggedInState.setSubAccounts(new java.util.ArrayList<>()); // ⭐ 清空 subAccounts
+        loggedInState.setSubAccountError(null);                    // ⭐ 清空错误信息（可选）
         loggedInViewModel.firePropertyChange();
-
         // 1. get the LoginState out of the appropriate View Model,
         // 2. set the username in the state to be the username of the user that just logged out,
         // 3. firePropertyChanged so that the View that is listening is updated.
