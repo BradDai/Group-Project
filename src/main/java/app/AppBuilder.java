@@ -1,6 +1,7 @@
 package app;
 
 import data_access.FileUserDataAccessObject;
+import data_access.FileSubAccountDataAccess;
 import entity.UserFactory;
 import interface_adapter.SwitchLoggedInController;
 import interface_adapter.SwitchLoggedInPresenter;
@@ -19,18 +20,20 @@ import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
 import interface_adapter.transfer.TransferViewModel;
+import interface_adapter.subaccount.create.CreateSubAccountController;
+import interface_adapter.subaccount.create.CreateSubAccountPresenter;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.exchange.ExchangeInputBoundary;
-import use_case.exchange.ExchangeInteractor;
-import use_case.exchange.ExchangeOutputBoundary;
+import use_case.exchange.*;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
+import use_case.SubAccount.SubAccountDataAccessInterface;
+import data_access.InMemorySubAccountDataAccess;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -55,6 +58,10 @@ import use_case.switch_transfer.SwitchTransferOutputBoundary;
 import use_case.transaction_history.TransactionHistoryInputBoundary;
 import use_case.transaction_history.TransactionHistoryInteractor;
 import use_case.transaction_history.TransactionHistoryOutputBoundary;
+import use_case.SubAccount.SubAccountDataAccessInterface;
+import use_case.SubAccount.create.CreateSubAccountInputBoundary;
+import use_case.SubAccount.create.CreateSubAccountInteractor;
+import use_case.SubAccount.create.CreateSubAccountOutputBoundary;
 import view.*;
 
 import javax.swing.*;
@@ -74,8 +81,7 @@ public class AppBuilder {
 
     // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-
-    // DAO version using a shared external database
+    private final SubAccountDataAccessInterface subAccountDataAccess = new FileSubAccountDataAccess("subaccounts.csv");
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
     private SignupView signupView;
@@ -170,15 +176,13 @@ public class AppBuilder {
     }
 
     public AppBuilder addSignupUseCase() {
-        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(
-                viewManagerModel,
-                signupViewModel,
-                loginViewModel);
-        final SignupInputBoundary userSignupInteractor = new SignupInteractor(
-                userDataAccessObject,
-                signupOutputBoundary,
-                userFactory);
-
+        final SignupOutputBoundary signupOutputBoundary =
+                new SignupPresenter(viewManagerModel, signupViewModel, loginViewModel);
+        final SignupInputBoundary userSignupInteractor =
+                new SignupInteractor(userDataAccessObject,
+                        signupOutputBoundary,
+                        userFactory,
+                        subAccountDataAccess);
         SignupController controller = new SignupController(userSignupInteractor);
         signupView.setSignupController(controller);
         return this;
@@ -190,8 +194,12 @@ public class AppBuilder {
                 loggedInViewModel,
                 loginViewModel,
                 signupViewModel);
+
         final LoginInputBoundary loginInteractor = new LoginInteractor(
-                userDataAccessObject, loginOutputBoundary);
+                userDataAccessObject,
+                loginOutputBoundary,
+                subAccountDataAccess   // ⭐ 把同一个 SubAccount DAO 注入到 LoginInteractor
+        );
 
         LoginController loginController = new LoginController(loginInteractor);
         loginView.setLoginController(loginController);
@@ -344,6 +352,16 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addExchangeUseCase() {
+        final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel);
+
+        final ExchangeInputBoundary ExchangeInteractor = new ExchangeInteractor(exchangeOutputBoundary);
+
+        ExchangeController exchangeController = new ExchangeController(ExchangeInteractor);
+        exchangeView.setExchangeController(exchangeController);
+        return this;
+    }
+
     /**
      * Adds the Logout Use Case to the application.
      * @return this builder
@@ -360,20 +378,19 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addExchangeUseCase() {
-        final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel,
-                viewManagerModel);
-
-        final ExchangeInputBoundary exchangeInteractor = new ExchangeInteractor(exchangeOutputBoundary);
-
-        final ExchangeController exchangeController = new ExchangeController(exchangeInteractor);
-        loggedInView.setExchangeController(exchangeController);
+    public AppBuilder addCreateSubAccountUseCase() {
+        final CreateSubAccountOutputBoundary outputBoundary =
+                new CreateSubAccountPresenter(loggedInViewModel);
+        final CreateSubAccountInputBoundary interactor =
+                new CreateSubAccountInteractor(subAccountDataAccess, outputBoundary);
+        final CreateSubAccountController controller =
+                new CreateSubAccountController(interactor);
+        loggedInView.setCreateSubAccountController(controller);
         return this;
-
     }
 
     public JFrame build() {
-        final JFrame application = new JFrame("User Login Example");
+        final JFrame application = new JFrame("Banking Simulation");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);

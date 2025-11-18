@@ -1,6 +1,5 @@
 package use_case.exchange;
 
 public interface ExchangeInputBoundary {
-
-    void execute();
+    void fetchExchangeRate(ExchangeInputData inputData);
 }

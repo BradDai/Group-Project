@@ -28,6 +28,7 @@ public class Main {
                 .addSwitchLoggedInUseCase5()
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
+                .addCreateSubAccountUseCase()
                 .addExchangeUseCase()
                 .addTransactionHistoryUsecase()//
                 .build();
