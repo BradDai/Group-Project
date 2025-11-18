@@ -15,7 +15,6 @@ public class SubAccount {
         if (balanceUSD == null || balanceUSD.signum() < 0) {
             throw new IllegalArgumentException("balance must be >= 0");
         }
-
         this.name = name.trim();
         this.balanceUSD = balanceUSD;
         this.undeletable = undeletable;
@@ -40,7 +39,6 @@ public class SubAccount {
         if (this == o) return true;
         if (!(o instanceof SubAccount)) return false;
         SubAccount that = (SubAccount) o;
-        // 这里默认：在同一个用户内部，名字唯一，所以只按 name 比较
         return name.equalsIgnoreCase(that.name);
     }
     @Override

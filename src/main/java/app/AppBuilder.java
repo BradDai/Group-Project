@@ -1,7 +1,7 @@
 package app;
 
 import data_access.FileUserDataAccessObject;
-import data_access.InMemorySubAccountDataAccess;
+import data_access.FileSubAccountDataAccess;
 import entity.UserFactory;
 import interface_adapter.SwitchLoggedInController;
 import interface_adapter.SwitchLoggedInPresenter;
@@ -78,7 +78,7 @@ public class AppBuilder {
 
     // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-    private final SubAccountDataAccessInterface subAccountDataAccess = new InMemorySubAccountDataAccess();
+    private final SubAccountDataAccessInterface subAccountDataAccess = new FileSubAccountDataAccess("subaccounts.csv");
     // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
     private SignupView signupView;
