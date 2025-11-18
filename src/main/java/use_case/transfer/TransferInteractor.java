@@ -1,11 +1,7 @@
-package interface_adapter.transfer;
+package use_case.transfer;
 
-import entity.*;
-import entity.transaction.Transaction;
 import entity.transaction.TransferTransaction;
 import entity.transaction.TransferTransactionBuilder;
-import interface_adapter.transfer.*;
-import use_case.transfer.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
