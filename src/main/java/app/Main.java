@@ -30,6 +30,7 @@ public class Main {
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
                 .addCreateSubAccountUseCase()
+                .addDeleteSubAccountUseCase()
                 .addExchangeUseCase()
                 .addTransactionHistoryUsecase()//
                 .build();

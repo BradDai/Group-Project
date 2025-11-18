@@ -1,10 +1,12 @@
 package view;
 
+import entity.Asset;
 import entity.SubAccount;
 import interface_adapter.exchange.ExchangeController;
 import interface_adapter.logged_in.*;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.subaccount.create.CreateSubAccountController;
+import interface_adapter.subaccount.delete.DeleteSubAccountController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +29,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private SwitchHistoryController switchHistoryController;
     private SwitchBuyAssetController switchBuyAssetController;
     private SwitchSellAssetController switchSellAssetController;
-
+    private DeleteSubAccountController deleteSubAccountController;
 
     // show user
     private final JLabel userLabel = new JLabel("User");
@@ -50,6 +52,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JPanel[] subAccountPanels = new JPanel[MAX_SUBACCOUNTS];
     private final JLabel[] subAccountNameLabels = new JLabel[MAX_SUBACCOUNTS];
     private final JLabel[] subAccountBalanceLabels = new JLabel[MAX_SUBACCOUNTS];
+    private final JTextArea[] subAccountAssetsAreas = new JTextArea[MAX_SUBACCOUNTS];
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
@@ -85,15 +88,26 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
             subAccountNameLabels[i] = nameLabel;
             subAccountBalanceLabels[i] = balanceLabel;
-
+            JTextArea assetArea = new JTextArea();
+            assetArea.setEditable(false);
+            assetArea.setLineWrap(true);
+            assetArea.setWrapStyleWord(true);
+            assetArea.setOpaque(false);
+            assetArea.setBorder(null);
+            assetArea.setText("Assets: (none)");
+            subAccountAssetsAreas[i] = assetArea;
             slot.add(Box.createVerticalStrut(5));
             slot.add(nameLabel);
             slot.add(Box.createVerticalStrut(5));
             slot.add(balanceLabel);
+            slot.add(Box.createVerticalStrut(5));
+            slot.add(assetArea);
             slot.add(Box.createVerticalGlue());
-
             accountsRow.add(slot);
             subAccountPanels[i] = slot;
+            nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            balanceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            assetArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         }
         centerPanel.add(accountsRow, BorderLayout.CENTER);
         add(centerPanel, BorderLayout.CENTER);
@@ -134,7 +148,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
-        // TODO: Delete Subaccount
         createSubButton.addActionListener(e -> {
             if (createSubAccountController == null) {
                 showInfo("CreateSubAccount controller not set yet.");
@@ -153,9 +166,22 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
-        deleteSubButton.addActionListener(e ->
-                showInfo("Delete subaccount Use Case not wired yet.")
-        );
+        deleteSubButton.addActionListener(e -> {
+            if (deleteSubAccountController == null) {
+                showInfo("DeleteSubAccount controller not set yet.");
+                return;
+            }
+            String name = JOptionPane.showInputDialog(
+                    this,
+                    "Enter subaccount name to delete:",
+                    "Delete Subaccount",
+                    JOptionPane.PLAIN_MESSAGE);
+            if (name != null && !name.isBlank()) {
+                String username = loggedInViewModel.getState().getUsername();
+                deleteSubAccountController.execute(username, name.trim());
+            }
+
+        });
 
         // TODO: Currency Exchange
         convertCurrencyButton.addActionListener(e -> {
@@ -226,6 +252,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.createSubAccountController = controller;
     }
 
+    public void setDeleteSubAccountController(DeleteSubAccountController controller) {
+        this.deleteSubAccountController = controller;
+    }
+
     public void setExchangeController(ExchangeController exchangeController) {
         this.exchangeController = exchangeController;
     }
@@ -283,14 +313,29 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 SubAccount sa = subs.get(i);
                 subAccountNameLabels[i].setText(sa.getName());
                 subAccountBalanceLabels[i].setText("USD: $" + sa.getBalanceUSD());
+                subAccountAssetsAreas[i].setText(formatAssets(sa.getAssets()));
             } else {
                 subAccountNameLabels[i].setText("Empty slot");
                 subAccountBalanceLabels[i].setText("USD: -");
+                subAccountAssetsAreas[i].setText("Assets: (none)");
             }
         }
-
         revalidate();
         repaint();
+    }
+    private String formatAssets(java.util.List<Asset> assets) {
+        if (assets == null || assets.isEmpty()) {
+            return "Assets: (none)";
+        }
+        StringBuilder sb = new StringBuilder("Assets:\n");
+        for (Asset a : assets) {
+            sb.append("- ")
+                    .append(a.getType())
+                    .append(" x ")
+                    .append(a.getQuantity())
+                    .append("\n");
+        }
+        return sb.toString();
     }
     @Override
     public void actionPerformed(ActionEvent e) {

@@ -21,9 +21,14 @@ import interface_adapter.sell_asset.SellAssetViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.subaccount.delete.DeleteSubAccountController;
+import interface_adapter.subaccount.delete.DeleteSubAccountPresenter;
 import interface_adapter.transfer.TransferViewModel;
 import interface_adapter.subaccount.create.CreateSubAccountController;
 import interface_adapter.subaccount.create.CreateSubAccountPresenter;
+import use_case.SubAccount.delete.DeleteSubAccountInputBoundary;
+import use_case.SubAccount.delete.DeleteSubAccountInteractor;
+import use_case.SubAccount.delete.DeleteSubAccountOutputBoundary;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -381,6 +386,17 @@ public class AppBuilder {
 
         ExchangeController exchangeController = new ExchangeController(ExchangeInteractor);
         exchangeView.setExchangeController(exchangeController);
+        return this;
+    }
+
+    public AppBuilder addDeleteSubAccountUseCase() {
+        final DeleteSubAccountOutputBoundary presenter =
+                new DeleteSubAccountPresenter(loggedInViewModel);
+        final DeleteSubAccountInputBoundary interactor =
+                new DeleteSubAccountInteractor(subAccountDataAccess, presenter);
+        final DeleteSubAccountController controller =
+                new DeleteSubAccountController(interactor);
+        loggedInView.setDeleteSubAccountController(controller);
         return this;
     }
 
