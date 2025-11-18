@@ -29,6 +29,7 @@ public class Main {
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
                 .addCreateSubAccountUseCase()
+                .addDeleteSubAccountUseCase()
                 .addExchangeUseCase()
                 .build();
 
