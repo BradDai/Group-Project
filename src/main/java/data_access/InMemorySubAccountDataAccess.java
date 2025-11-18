@@ -28,4 +28,12 @@ public class InMemorySubAccountDataAccess implements SubAccountDataAccessInterfa
     public int countByUser(String username) {
         return data.getOrDefault(username, List.of()).size();
     }
+    @Override
+    public void delete(String username, String subName) {
+        List<SubAccount> list = data.get(username);
+        if (list == null) {
+            return;
+        }
+        list.removeIf(sa -> sa.getName().equalsIgnoreCase(subName));
+    }
 }
