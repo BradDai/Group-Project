@@ -43,15 +43,22 @@ public class ViewModel<T> {
 
     /**
      * Fires a property changed event for the state of this ViewModel, which
-     * allows the user to specify a different propertyName. This can be useful
-     * when a class is listening for multiple kinds of property changes.
-     * <p/>
-     * For example, the LoggedInView listens for two kinds of property changes;
-     * it can use the property name to distinguish which property has changed.
+     * allows the user to specify a different propertyName.
      * @param propertyName the label for the property that was changed
      */
     public void firePropertyChange(String propertyName) {
         this.support.firePropertyChange(propertyName, null, this.state);
+    }
+
+    /**
+     * Fires a property changed event with specific old and new values.
+     *
+     * @param propertyName The programmatic name of the property that was changed.
+     * @param oldValue     The old value of the property.
+     * @param newValue     The new value of the property.
+     */
+    public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        this.support.firePropertyChange(propertyName, oldValue, newValue);
     }
 
     /**

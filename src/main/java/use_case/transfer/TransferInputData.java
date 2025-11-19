@@ -4,19 +4,25 @@ package use_case.transfer;
  * Input Data for the Transfer Use Case.
  */
 public class TransferInputData {
+    private final String username; // Added
     private final String fromPortfolio;
     private final String toPortfolio;
     private final String transferType;
     private final String assetSymbol;
     private final double amount;
 
-    public TransferInputData(String fromPortfolio, String toPortfolio,
+    public TransferInputData(String username, String fromPortfolio, String toPortfolio,
                              String transferType, String assetSymbol, double amount) {
+        this.username = username;
         this.fromPortfolio = fromPortfolio;
         this.toPortfolio = toPortfolio;
         this.transferType = transferType;
         this.assetSymbol = assetSymbol;
         this.amount = amount;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getFromPortfolio() {

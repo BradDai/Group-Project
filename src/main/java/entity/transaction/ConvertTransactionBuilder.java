@@ -6,7 +6,7 @@ import java.time.LocalDateTime; /**
 public class ConvertTransactionBuilder {
     private String transactionId;
     private LocalDateTime date;
-    private int portfolio;
+    private String portfolio;
     private String fromCurrency;
     private String toCurrency;
     private double fromAmount;
@@ -22,7 +22,7 @@ public class ConvertTransactionBuilder {
         return this;
     }
 
-    public ConvertTransactionBuilder setPortfolio(int portfolio) {
+    public ConvertTransactionBuilder setPortfolio(String portfolio) {
         this.portfolio = portfolio;
         return this;
     }

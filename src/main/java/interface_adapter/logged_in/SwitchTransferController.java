@@ -10,8 +10,7 @@ public class SwitchTransferController {
         this.switchTransferUseCaseInteractor = switchTransferUseCaseInteractor;
     }
 
-    public void switchToTransferView() {
-
-        switchTransferUseCaseInteractor.switchToTransferView();
+    public void switchToTransferView(String username) {
+        switchTransferUseCaseInteractor.switchToTransferView(username);
     }
 }

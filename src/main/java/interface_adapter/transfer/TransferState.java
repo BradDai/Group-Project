@@ -6,6 +6,7 @@ import java.util.Map;
  * The State for the Transfer View.
  */
 public class TransferState {
+    private String username = "";
     private String fromPortfolio = "";
     private String toPortfolio = "";
     private String transferType = "Stock";
@@ -20,6 +21,7 @@ public class TransferState {
     }
 
     public TransferState(TransferState copy) {
+        this.username = copy.username;
         this.fromPortfolio = copy.fromPortfolio;
         this.toPortfolio = copy.toPortfolio;
         this.transferType = copy.transferType;
@@ -29,6 +31,14 @@ public class TransferState {
         this.stockPrices = copy.stockPrices;
         this.currencyBalances = copy.currencyBalances;
         this.error = copy.error;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFromPortfolio() {

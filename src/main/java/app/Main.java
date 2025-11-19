@@ -19,6 +19,7 @@ public class Main {
                 .addSellAssetUseCase()
                 .addSwitchExchangeUseCase()
                 .addSwitchTransferUseCase()
+                .addTransferUseCase()
                 .addSwitchHistoryUseCase()
                 .addSwitchBuyAssetUseCase()
                 .addSwitchSellAssetUseCase()
@@ -32,7 +33,7 @@ public class Main {
                 .addCreateSubAccountUseCase()
                 .addDeleteSubAccountUseCase()
                 .addExchangeUseCase()
-                .addTransactionHistoryUsecase()//
+                .addTransactionHistoryUsecase()
                 .build();
 
         application.pack();
