@@ -1,0 +1,24 @@
+{
+  "users": {
+    "user1": {
+      "account1": {
+        "USD": 100,
+        "CAD": 100
+      },
+      "account2" : {
+        "EUR": 50,
+        "TRY": 50
+      }
+    },
+    "user2": {
+      "account1": {
+        "AUD": 30,
+        "AWG": 30
+      },
+      "account2": {
+        "BAM": 10,
+        "BBD": 10
+      }
+    }
+  }
+}

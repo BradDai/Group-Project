@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class ExchangeInteractor implements ExchangeInputBoundary {
 
@@ -21,7 +22,7 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
     @Override
     public void fetchExchangeRate(ExchangeInputData inputData) {
         try {
-            HashMap<String, Double> rates = getRates(inputData.getFrom());
+            Map<String, Double> rates = getRates(inputData.getFrom());
             Double rate = rates.get(inputData.getTo());
 
             if (rate == null) {
@@ -44,7 +45,7 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
 
     }
 
-    public HashMap<String, Double> getRates(String currency) {
+    public Map<String, Double> getRates(String currency) {
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
