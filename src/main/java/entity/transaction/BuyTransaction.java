@@ -23,7 +23,7 @@ public class BuyTransaction extends Transaction {
      * @param pricePerUnit price per unit of asset
      */
     public BuyTransaction(String transactionId, LocalDateTime date,
-                          Integer toPortfolio, String assetType, String assetSymbol,
+                          String toPortfolio, String assetType, String assetSymbol,
                           double quantity, double pricePerUnit) {
         super(transactionId, date, null, toPortfolio);
         if (quantity <= 0) {

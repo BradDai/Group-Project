@@ -7,68 +7,48 @@ import entity.transaction.Transaction;
  */
 public interface TransferDataAccessInterface {
     /**
-     * Checks if a portfolio exists.
-     * @param portfolioId the portfolio identifier
-     * @return true if the portfolio exists, false otherwise
+     * Checks if a portfolio exists for the user.
      */
-    boolean portfolioExists(String portfolioId);
+    boolean portfolioExists(String username, String portfolioId);
 
     /**
      * Checks if a portfolio contains a specific asset.
-     * @param portfolioId the portfolio identifier
-     * @param assetSymbol the asset symbol
-     * @return true if the portfolio has the asset, false otherwise
      */
-    boolean hasAsset(String portfolioId, String assetSymbol);
+    boolean hasAsset(String username, String portfolioId, String assetSymbol);
 
     /**
      * Gets the balance of a specific asset in a portfolio.
-     * @param portfolioId the portfolio identifier
-     * @param assetSymbol the asset symbol
-     * @return the balance of the asset
      */
-    double getAssetBalance(String portfolioId, String assetSymbol);
+    double getAssetBalance(String username, String portfolioId, String assetSymbol);
 
     /**
      * Transfers an asset between portfolios.
-     * @param fromPortfolio source portfolio
-     * @param toPortfolio destination portfolio
-     * @param assetSymbol asset to transfer
-     * @param amount amount to transfer
      */
-    void transferAsset(String fromPortfolio, String toPortfolio,
+    void transferAsset(String username, String fromPortfolio, String toPortfolio,
                        String assetSymbol, double amount);
 
     /**
      * Saves a transaction to the transaction history.
-     * @param transaction the transaction to save
      */
-    void saveTransaction(entity.transaction.Transaction transaction);
+    void saveTransaction(Transaction transaction);
 
     /**
      * Gets all available portfolios for the current user.
-     * @return array of portfolio identifiers
      */
-    String[] getAvailablePortfolios();
+    String[] getAvailablePortfolios(String username);
 
     /**
      * Gets all stock symbols available in a portfolio.
-     * @param portfolioId the portfolio identifier
-     * @return array of stock symbols
      */
-    String[] getAvailableStocks(String portfolioId);
+    String[] getAvailableStocks(String username, String portfolioId);
 
     /**
      * Gets all currency types available in a portfolio.
-     * @param portfolioId the portfolio identifier
-     * @return array of currency symbols
      */
-    String[] getAvailableCurrencies(String portfolioId);
+    String[] getAvailableCurrencies(String username, String portfolioId);
 
     /**
      * Gets the current price of a stock.
-     * @param symbol the stock symbol
-     * @return the current price per share
      */
     double getStockPrice(String symbol);
 }

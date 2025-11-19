@@ -1,13 +1,13 @@
 package entity.transaction;
 
-import java.time.LocalDateTime; /**
- * Builder for creating TransferTransaction objects.
- */
+import java.time.LocalDateTime;
+
 public class TransferTransactionBuilder {
     private String transactionId;
     private LocalDateTime date;
-    private int fromPortfolio;
-    private int toPortfolio;
+    // CHANGED: Integer -> String
+    private String fromPortfolio;
+    private String toPortfolio;
     private String assetType;
     private String assetSymbol;
     private double quantity;
@@ -22,12 +22,14 @@ public class TransferTransactionBuilder {
         return this;
     }
 
-    public TransferTransactionBuilder setFromPortfolio(int fromPortfolio) {
+    // CHANGED: Accepts String
+    public TransferTransactionBuilder setFromPortfolio(String fromPortfolio) {
         this.fromPortfolio = fromPortfolio;
         return this;
     }
 
-    public TransferTransactionBuilder setToPortfolio(int toPortfolio) {
+    // CHANGED: Accepts String
+    public TransferTransactionBuilder setToPortfolio(String toPortfolio) {
         this.toPortfolio = toPortfolio;
         return this;
     }
@@ -48,7 +50,6 @@ public class TransferTransactionBuilder {
     }
 
     public TransferTransaction build() {
-        return new TransferTransaction(transactionId, date, fromPortfolio,
-                toPortfolio, assetType, assetSymbol, quantity);
+        return new TransferTransaction(transactionId, date, fromPortfolio, toPortfolio, assetType, assetSymbol, quantity);
     }
 }

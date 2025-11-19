@@ -9,4 +9,6 @@ public interface TransferInputBoundary {
      * @param transferInputData the input data
      */
     void execute(TransferInputData transferInputData);
+
+    void checkBalances(String username, String fromPortfolio, String toPortfolio, String assetSymbol);
 }

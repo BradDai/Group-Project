@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class BuyTransactionBuilder {
     private String transactionId;
     private LocalDateTime date;
-    private int toPortfolio;
+    private String toPortfolio;
     private String assetType;
     private String assetSymbol;
     private double quantity;
@@ -24,7 +24,7 @@ public class BuyTransactionBuilder {
         return this;
     }
 
-    public BuyTransactionBuilder setToPortfolio(int toPortfolio) {
+    public BuyTransactionBuilder setToPortfolio(String toPortfolio) {
         this.toPortfolio = toPortfolio;
         return this;
     }

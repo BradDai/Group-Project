@@ -23,7 +23,7 @@ public class ConvertTransaction extends Transaction {
      * @param exchangeRate conversion rate
      */
     public ConvertTransaction(String transactionId, LocalDateTime date,
-                              Integer portfolio, String fromCurrency,
+                              String portfolio, String fromCurrency,
                               String toCurrency, double fromAmount,
                               double exchangeRate) {
         super(transactionId, date, portfolio, portfolio);

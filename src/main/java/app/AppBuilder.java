@@ -2,13 +2,14 @@ package app;
 
 import data_access.FileSubAccountDataAccessJSON;
 import data_access.FileUserDataAccessObject;
-import data_access.FileSubAccountDataAccess;
 import entity.UserFactory;
 import interface_adapter.SwitchLoggedInController;
 import interface_adapter.SwitchLoggedInPresenter;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.buyasset.BuyAssetViewModel;
-import interface_adapter.exchange.*;
+import interface_adapter.exchange.ExchangeController;
+import interface_adapter.exchange.ExchangePresenter;
+import interface_adapter.exchange.ExchangeViewModel;
 import interface_adapter.history.HistoryViewModel;
 import interface_adapter.logged_in.*;
 import interface_adapter.login.LoginController;
@@ -22,25 +23,32 @@ import interface_adapter.sell_asset.SellAssetViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
-import interface_adapter.subaccount.delete.DeleteSubAccountController;
-import interface_adapter.subaccount.delete.DeleteSubAccountPresenter;
-import interface_adapter.transfer.TransferViewModel;
 import interface_adapter.subaccount.create.CreateSubAccountController;
 import interface_adapter.subaccount.create.CreateSubAccountPresenter;
+import interface_adapter.subaccount.delete.DeleteSubAccountController;
+import interface_adapter.subaccount.delete.DeleteSubAccountPresenter;
+import interface_adapter.transfer.TransferController;
+import interface_adapter.transfer.TransferPresenter;
+import interface_adapter.transfer.TransferViewModel;
+import use_case.SubAccount.SubAccountDataAccessInterface;
+import use_case.SubAccount.create.CreateSubAccountInputBoundary;
+import use_case.SubAccount.create.CreateSubAccountInteractor;
+import use_case.SubAccount.create.CreateSubAccountOutputBoundary;
 import use_case.SubAccount.delete.DeleteSubAccountInputBoundary;
 import use_case.SubAccount.delete.DeleteSubAccountInteractor;
 import use_case.SubAccount.delete.DeleteSubAccountOutputBoundary;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.exchange.*;
+import use_case.exchange.ExchangeInputBoundary;
+import use_case.exchange.ExchangeInteractor;
+import use_case.exchange.ExchangeOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
-import use_case.SubAccount.SubAccountDataAccessInterface;
 import use_case.sell_asset.SellAssetInputBoundary;
 import use_case.sell_asset.SellAssetInteractor;
 import use_case.sell_asset.SellAssetOutputBoundary;
@@ -69,10 +77,9 @@ import use_case.switch_transfer.SwitchTransferOutputBoundary;
 import use_case.transaction_history.TransactionHistoryInputBoundary;
 import use_case.transaction_history.TransactionHistoryInteractor;
 import use_case.transaction_history.TransactionHistoryOutputBoundary;
-import use_case.SubAccount.SubAccountDataAccessInterface;
-import use_case.SubAccount.create.CreateSubAccountInputBoundary;
-import use_case.SubAccount.create.CreateSubAccountInteractor;
-import use_case.SubAccount.create.CreateSubAccountOutputBoundary;
+import use_case.transfer.TransferInputBoundary;
+import use_case.transfer.TransferInteractor;
+import use_case.transfer.TransferOutputBoundary;
 import view.*;
 
 import javax.swing.*;
@@ -84,14 +91,8 @@ public class AppBuilder {
     final UserFactory userFactory = new UserFactory();
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
-
-    // set which data access implementation to use, can be any
-    // of the classes from the data_access package
-
-    // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-    private final SubAccountDataAccessInterface subAccountDataAccess =
-            new FileSubAccountDataAccessJSON("subaccounts.json");    // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
+    private final FileSubAccountDataAccessJSON subAccountDataAccess = new FileSubAccountDataAccessJSON("subaccounts.json");
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -158,7 +159,7 @@ public class AppBuilder {
 
     public AppBuilder addTransactionHistoryUsecase() {
         TransactionHistoryOutputBoundary presenter =
-                new interface_adapter.transaction_history.TransactionHistoryPresenter(historyViewModel);  // HistoryViewModel
+                new interface_adapter.transaction_history.TransactionHistoryPresenter(historyViewModel);
 
         TransactionHistoryInputBoundary interactor =
                 new TransactionHistoryInteractor(presenter);
@@ -166,7 +167,7 @@ public class AppBuilder {
         interface_adapter.transaction_history.TransactionHistoryController controller =
                 new interface_adapter.transaction_history.TransactionHistoryController(interactor);
 
-        historyView.setTransactionHistoryController(controller); //
+        historyView.setTransactionHistoryController(controller);
         return this;
     }
 
@@ -251,10 +252,22 @@ public class AppBuilder {
                 viewManagerModel);
 
         final SwitchTransferInputBoundary switchTransferInteractor = new SwitchTransferInteractor(
-                switchTransferOutputBoundary);
+                switchTransferOutputBoundary, subAccountDataAccess);
 
         SwitchTransferController switchTransferController = new SwitchTransferController(switchTransferInteractor);
         loggedInView.setSwitchTransferController(switchTransferController);
+        return this;
+    }
+
+    public AppBuilder addTransferUseCase() {
+        final TransferOutputBoundary transferOutputBoundary = new TransferPresenter(
+                transferViewModel, loggedInViewModel, viewManagerModel);
+
+        final TransferInputBoundary transferInteractor = new TransferInteractor(
+                subAccountDataAccess, transferOutputBoundary);
+
+        TransferController transferController = new TransferController(transferInteractor);
+        transferView.setTransferController(transferController);
         return this;
     }
 
@@ -399,10 +412,6 @@ public class AppBuilder {
         return this;
     }
 
-    /**
-     * Adds the Logout Use Case to the application.
-     * @return this builder
-     */
     public AppBuilder addLogoutUseCase() {
         final LogoutOutputBoundary logoutOutputBoundary = new LogoutPresenter(viewManagerModel,
                 loggedInViewModel, loginViewModel);
@@ -437,6 +446,4 @@ public class AppBuilder {
 
         return application;
     }
-
-
 }
