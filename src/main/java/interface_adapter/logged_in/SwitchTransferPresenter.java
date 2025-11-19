@@ -22,6 +22,10 @@ public class SwitchTransferPresenter implements SwitchTransferOutputBoundary {
         state.setAvailablePortfolios(portfolios);
         state.setError("");
 
+        // --- FIX: Clear amount on entry ---
+        state.setAmount("");
+        // ----------------------------------
+
         if (portfolios != null && portfolios.length > 0) {
             state.setFromPortfolio(portfolios[0]);
             state.setToPortfolio(portfolios[0]);

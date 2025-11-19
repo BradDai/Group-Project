@@ -1,8 +1,11 @@
 package use_case.transfer;
 
+import entity.SubAccount;
 import entity.transaction.TransferTransaction;
 import entity.transaction.TransferTransactionBuilder;
+
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public class TransferInteractor implements TransferInputBoundary {
@@ -64,10 +67,15 @@ public class TransferInteractor implements TransferInputBoundary {
                     .build();
 
             transferDataAccess.saveTransaction(transaction);
+
+            List<SubAccount> updatedAccounts = transferDataAccess.getSubAccountsOf(username);
+
+            // Pass updated accounts to Output Data
             final TransferOutputData outputData = new TransferOutputData(
-                    transactionId, fromPortfolio, toPortfolio, assetSymbol, amount, true);
+                    transactionId, fromPortfolio, toPortfolio, assetSymbol, amount, true, updatedAccounts);
 
             transferPresenter.prepareSuccessView(outputData);
+
         } catch (Exception e) {
             transferPresenter.prepareFailView("Transfer failed: " + e.getMessage());
         }

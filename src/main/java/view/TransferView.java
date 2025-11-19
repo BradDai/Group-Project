@@ -36,7 +36,7 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
     private final JTextField currencyAmountField;
     private final JLabel currencyErrorLabel;
 
-    // Labels for Balances (Moved inside Currency Panel)
+    // Labels for Balances
     private final JLabel fromBalanceLabel;
     private final JLabel toBalanceLabel;
 
@@ -50,12 +50,10 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
         this.transferViewModel = transferViewModel;
         this.transferViewModel.addPropertyChangeListener(this);
 
-        // Identify this view for the ViewManager
         this.setName(viewName);
-
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // --- TOP SECTION: Account Selection ---
+        // Subaccount selection
         final JPanel fromPortfolioPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         fromPortfolioPanel.add(new JLabel("Transfer from Portfolio:"));
         fromPortfolioDropdown = new JComboBox<>();
@@ -76,7 +74,7 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
 
         this.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // --- STOCK PANEL ---
+        // Stock panel
         stockPanel = new JPanel();
         stockPanel.setLayout(new BoxLayout(stockPanel, BoxLayout.Y_AXIS));
         stockPanel.setBorder(BorderFactory.createTitledBorder("Stock Transfer Details"));
@@ -99,19 +97,19 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
         stockPanel.add(stockValuePanel);
         this.add(stockPanel);
 
-        // --- CURRENCY PANEL ---
+        // Currency panel
         currencyPanel = new JPanel();
         currencyPanel.setLayout(new BoxLayout(currencyPanel, BoxLayout.Y_AXIS));
         currencyPanel.setBorder(BorderFactory.createTitledBorder("Currency Transfer Details"));
 
-        // 1. Currency Selection
+        // Currency Selection
         JPanel currencyTypePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         currencyTypePanel.add(new JLabel("Currency:"));
         currencyTypeDropdown = new JComboBox<>();
         currencyTypePanel.add(currencyTypeDropdown);
         currencyPanel.add(currencyTypePanel);
 
-        // 2. Balance Info (Moved Here)
+        // Balance Info
         JPanel balanceInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         Box balanceBox = Box.createVerticalBox();
 
@@ -127,14 +125,14 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
         balanceInfoPanel.add(balanceBox);
         currencyPanel.add(balanceInfoPanel);
 
-        // 3. Amount Input
+        // Amount Input
         JPanel currencyAmountPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         currencyAmountPanel.add(new JLabel("Amount:"));
         currencyAmountField = new JTextField(15);
         currencyAmountPanel.add(currencyAmountField);
         currencyPanel.add(currencyAmountPanel);
 
-        // 4. Error Label
+        // Error Label
         currencyErrorLabel = new JLabel("");
         currencyErrorLabel.setForeground(Color.RED);
         currencyErrorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -145,7 +143,7 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
 
         this.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // --- BUTTONS ---
+        // Buttons
         final JPanel buttonsPanel = new JPanel();
         confirmButton = new JButton("Confirm Transfer");
         cancelButton = new JButton("Cancel");
@@ -161,14 +159,22 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
             if (!isUpdating) triggerBalanceCheck();
         };
 
-        fromPortfolioDropdown.addActionListener(updateBalancesListener);
+        fromPortfolioDropdown.addActionListener(e -> {
+            if (isUpdating) return;
+            String selectedType = (String) transferTypeDropdown.getSelectedItem();
+            if ("Stock".equals(selectedType)) {
+                updateStockDropdowns();
+            } else {
+                updateCurrencyDropdowns();
+            }
+            triggerBalanceCheck();
+        });
+
         toPortfolioDropdown.addActionListener(updateBalancesListener);
 
-        // --- FIX: Auto-resize window when switching types ---
         transferTypeDropdown.addActionListener(evt -> {
             if (isUpdating) return;
             String selectedType = (String) transferTypeDropdown.getSelectedItem();
-
             if ("Stock".equals(selectedType)) {
                 stockPanel.setVisible(true);
                 currencyPanel.setVisible(false);
@@ -178,20 +184,13 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
                 currencyPanel.setVisible(true);
                 updateCurrencyDropdowns();
             }
-
             triggerBalanceCheck();
+            revalidate();
+            repaint();
 
-            // This forces the layout to recalculate
-            this.revalidate();
-            this.repaint();
-
-            // This forces the Main Window to resize to fit the new panel size
             Window window = SwingUtilities.getWindowAncestor(this);
-            if (window != null) {
-                window.pack();
-            }
+            if (window != null) window.pack();
         });
-        // ----------------------------------------------------
 
         stockSymbolDropdown.addActionListener(e -> {
             if (isUpdating) return;
@@ -338,29 +337,52 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
 
             isUpdating = true;
 
-            String[] portfolios = state.getAvailablePortfolios();
+            String[] newPortfolios = state.getAvailablePortfolios();
+            boolean listsDiffer = false;
 
-            boolean structureChanged = false;
+            // Check if the portfolio list in State differs from the Dropdown items
+            if (newPortfolios == null) {
+                if (fromPortfolioDropdown.getItemCount() > 0) listsDiffer = true;
+            } else if (fromPortfolioDropdown.getItemCount() != newPortfolios.length) {
+                listsDiffer = true;
+            } else {
+                for (int i = 0; i < newPortfolios.length; i++) {
+                    if (!newPortfolios[i].equals(fromPortfolioDropdown.getItemAt(i))) {
+                        listsDiffer = true;
+                        break;
+                    }
+                }
+            }
 
-            if (fromPortfolioDropdown.getItemCount() == 0 && portfolios != null) {
-                for (String p : portfolios) {
+            // If list changed (like item deleted), repopulate dropdowns
+            if (listsDiffer && newPortfolios != null) {
+                fromPortfolioDropdown.removeAllItems();
+                toPortfolioDropdown.removeAllItems();
+
+                for (String p : newPortfolios) {
                     fromPortfolioDropdown.addItem(p);
                     toPortfolioDropdown.addItem(p);
                 }
+
+                // Set defaults
+                if (fromPortfolioDropdown.getItemCount() > 0) fromPortfolioDropdown.setSelectedIndex(0);
                 if (toPortfolioDropdown.getItemCount() > 1) toPortfolioDropdown.setSelectedIndex(1);
 
-                structureChanged = true;
+                // Trigger update since we changed selection
                 SwingUtilities.invokeLater(() -> triggerBalanceCheck());
+                this.revalidate();
             }
 
+            // Update labels
             fromBalanceLabel.setText("Sender Balance: " + state.getFromBalance());
             toBalanceLabel.setText("Receiver Balance: " + state.getToBalance());
 
-            isUpdating = false;
-
-            if (structureChanged) {
-                this.revalidate();
+            // Update amount if changed
+            if (!currencyAmountField.getText().equals(state.getAmount())) {
+                currencyAmountField.setText(state.getAmount());
             }
+
+            isUpdating = false;
             this.repaint();
 
         } else if ("error".equals(evt.getPropertyName())) {
