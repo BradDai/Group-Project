@@ -1,5 +1,6 @@
 package app;
 
+import data_access.FileSubAccountDataAccessJSON;
 import data_access.FileUserDataAccessObject;
 import data_access.FileSubAccountDataAccess;
 import entity.UserFactory;
@@ -69,8 +70,6 @@ import view.*;
 import javax.swing.*;
 import java.awt.*;
 
-
-
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -83,8 +82,8 @@ public class AppBuilder {
 
     // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-    private final SubAccountDataAccessInterface subAccountDataAccess = new FileSubAccountDataAccess("subaccounts.csv");
-    // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
+    private final SubAccountDataAccessInterface subAccountDataAccess =
+            new FileSubAccountDataAccessJSON("subaccounts.json");    // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -186,7 +185,7 @@ public class AppBuilder {
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject,
                 loginOutputBoundary,
-                subAccountDataAccess   // ⭐ 把同一个 SubAccount DAO 注入到 LoginInteractor
+                subAccountDataAccess
         );
 
         LoginController loginController = new LoginController(loginInteractor);

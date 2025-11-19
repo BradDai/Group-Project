@@ -40,15 +40,17 @@ public class SubAccount {
         return undeletable;
     }
     public List<Asset> getAssets() {
-        return Collections.unmodifiableList(assets);}
+        return Collections.unmodifiableList(assets);
+    }
     public void setBalanceUSD(BigDecimal newBalance) {
         if (newBalance == null || newBalance.signum() < 0) {
             throw new IllegalArgumentException("balance must be >= 0");
         }
         this.balanceUSD = newBalance;
+        currencies.put("USD", newBalance);
     }
     public Map<String, BigDecimal> getCurrencies() {
-        return currencies;
+        return Collections.unmodifiableMap(currencies);
     }
     public BigDecimal getBalanceOf(String currencyCode) {
         return currencies.getOrDefault(currencyCode, BigDecimal.ZERO);
@@ -69,7 +71,10 @@ public class SubAccount {
         for (Asset asset : assets) {
             if (asset.getClass().equals(newAsset.getClass())
                     && asset.getType().equalsIgnoreCase(newAsset.getType())) {
+
                 double newQuantity = asset.getQuantity() + newAsset.getQuantity();
+                asset.setQuantity(newQuantity);
+                return;
             }
         }
         assets.add(newAsset);
@@ -90,7 +95,7 @@ public class SubAccount {
     }
     @Override
     public String toString() {
-        return "SubAccount{name='" + name + ", currencies=" + currencies +
+        return "SubAccount{name='" + name + "', currencies=" + currencies +
                 ", undeletable=" + undeletable + "}";
     }
 }
