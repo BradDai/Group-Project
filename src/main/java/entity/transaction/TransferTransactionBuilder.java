@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 public class TransferTransactionBuilder {
     private String transactionId;
     private LocalDateTime date;
-    // CHANGED: Integer -> String
     private String fromPortfolio;
     private String toPortfolio;
     private String assetType;
@@ -22,13 +21,11 @@ public class TransferTransactionBuilder {
         return this;
     }
 
-    // CHANGED: Accepts String
     public TransferTransactionBuilder setFromPortfolio(String fromPortfolio) {
         this.fromPortfolio = fromPortfolio;
         return this;
     }
 
-    // CHANGED: Accepts String
     public TransferTransactionBuilder setToPortfolio(String toPortfolio) {
         this.toPortfolio = toPortfolio;
         return this;

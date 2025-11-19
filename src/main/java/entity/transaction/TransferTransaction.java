@@ -7,7 +7,6 @@ public class TransferTransaction extends Transaction {
     private final String assetSymbol;
     private final double quantity;
 
-    // CHANGED: Constructor accepts String for portfolios
     public TransferTransaction(String transactionId, LocalDateTime date, String fromPortfolio, String toPortfolio,
                                String assetType, String assetSymbol, double quantity) {
         super(transactionId, date, fromPortfolio, toPortfolio);

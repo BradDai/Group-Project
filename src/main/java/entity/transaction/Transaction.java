@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public abstract class Transaction {
     private final String transactionId;
     private final LocalDateTime date;
-    // CHANGED: Integer -> String
     private final String fromPortfolio;
     private final String toPortfolio;
 
@@ -33,7 +32,6 @@ public abstract class Transaction {
         return date;
     }
 
-    // CHANGED: Return type Integer -> String
     public String getFromPortfolio() {
         return fromPortfolio;
     }

@@ -9,6 +9,11 @@ public class TransferState {
     private String transferType = "Currency";
     private String fromBalance = "0.00";
     private String toBalance = "0.00";
+
+    // --- NEW FIELD ---
+    private String amount = "";
+    // -----------------
+
     private String[] availablePortfolios = new String[0];
     private String[] availableStocks = new String[0];
     private String[] availableCurrencies = new String[]{"USD"};
@@ -26,6 +31,7 @@ public class TransferState {
         this.transferType = copy.transferType;
         this.fromBalance = copy.fromBalance;
         this.toBalance = copy.toBalance;
+        this.amount = copy.amount; // Copy new field
         this.availablePortfolios = copy.availablePortfolios;
         this.availableStocks = copy.availableStocks;
         this.availableCurrencies = copy.availableCurrencies;
@@ -33,6 +39,10 @@ public class TransferState {
         this.currencyBalances = copy.currencyBalances;
         this.error = copy.error;
     }
+
+    // --- Getters and Setters ---
+    public String getAmount() { return amount; }
+    public void setAmount(String amount) { this.amount = amount; }
 
     public String getFromBalance() { return fromBalance; }
     public void setFromBalance(String fromBalance) { this.fromBalance = fromBalance; }

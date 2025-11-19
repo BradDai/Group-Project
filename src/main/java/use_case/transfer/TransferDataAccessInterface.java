@@ -1,6 +1,9 @@
 package use_case.transfer;
 
+import entity.SubAccount;
 import entity.transaction.Transaction;
+
+import java.util.List;
 
 /**
  * DAO for the Transfer Use Case.
@@ -51,4 +54,6 @@ public interface TransferDataAccessInterface {
      * Gets the current price of a stock.
      */
     double getStockPrice(String symbol);
+
+    List<SubAccount> getSubAccountsOf(String username);
 }
