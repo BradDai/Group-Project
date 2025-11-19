@@ -34,4 +34,8 @@ public class TransferController {
 
         transferInteractor.execute(transferInputData);
     }
+
+    public void checkBalances(String username, String fromPortfolio, String toPortfolio, String assetSymbol) {
+        transferInteractor.checkBalances(username, fromPortfolio, toPortfolio, assetSymbol);
+    }
 }

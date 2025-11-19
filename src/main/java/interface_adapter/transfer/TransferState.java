@@ -2,17 +2,16 @@ package interface_adapter.transfer;
 
 import java.util.Map;
 
-/**
- * The State for the Transfer View.
- */
 public class TransferState {
     private String username = "";
     private String fromPortfolio = "";
     private String toPortfolio = "";
-    private String transferType = "Stock";
+    private String transferType = "Currency";
+    private String fromBalance = "0.00";
+    private String toBalance = "0.00";
     private String[] availablePortfolios = new String[0];
     private String[] availableStocks = new String[0];
-    private String[] availableCurrencies = new String[0];
+    private String[] availableCurrencies = new String[]{"USD"};
     private Map<String, Double> stockPrices;
     private Map<String, Double> currencyBalances;
     private String error = "";
@@ -25,6 +24,8 @@ public class TransferState {
         this.fromPortfolio = copy.fromPortfolio;
         this.toPortfolio = copy.toPortfolio;
         this.transferType = copy.transferType;
+        this.fromBalance = copy.fromBalance;
+        this.toBalance = copy.toBalance;
         this.availablePortfolios = copy.availablePortfolios;
         this.availableStocks = copy.availableStocks;
         this.availableCurrencies = copy.availableCurrencies;
@@ -33,97 +34,49 @@ public class TransferState {
         this.error = copy.error;
     }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getFromBalance() { return fromBalance; }
+    public void setFromBalance(String fromBalance) { this.fromBalance = fromBalance; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getToBalance() { return toBalance; }
+    public void setToBalance(String toBalance) { this.toBalance = toBalance; }
 
-    public String getFromPortfolio() {
-        return fromPortfolio;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public void setFromPortfolio(String fromPortfolio) {
-        this.fromPortfolio = fromPortfolio;
-    }
+    public String getFromPortfolio() { return fromPortfolio; }
+    public void setFromPortfolio(String fromPortfolio) { this.fromPortfolio = fromPortfolio; }
 
-    public String getToPortfolio() {
-        return toPortfolio;
-    }
+    public String getToPortfolio() { return toPortfolio; }
+    public void setToPortfolio(String toPortfolio) { this.toPortfolio = toPortfolio; }
 
-    public void setToPortfolio(String toPortfolio) {
-        this.toPortfolio = toPortfolio;
-    }
+    public String getTransferType() { return transferType; }
+    public void setTransferType(String transferType) { this.transferType = transferType; }
 
-    public String getTransferType() {
-        return transferType;
-    }
+    public String[] getAvailablePortfolios() { return availablePortfolios; }
+    public void setAvailablePortfolios(String[] availablePortfolios) { this.availablePortfolios = availablePortfolios; }
 
-    public void setTransferType(String transferType) {
-        this.transferType = transferType;
-    }
+    public String[] getAvailableStocks() { return availableStocks; }
+    public void setAvailableStocks(String[] availableStocks) { this.availableStocks = availableStocks; }
 
-    public String[] getAvailablePortfolios() {
-        return availablePortfolios;
-    }
+    public String[] getAvailableCurrencies() { return availableCurrencies; }
+    public void setAvailableCurrencies(String[] availableCurrencies) { this.availableCurrencies = availableCurrencies; }
 
-    public void setAvailablePortfolios(String[] availablePortfolios) {
-        this.availablePortfolios = availablePortfolios;
-    }
-
-    public String[] getAvailableStocks() {
-        return availableStocks;
-    }
-
-    public void setAvailableStocks(String[] availableStocks) {
-        this.availableStocks = availableStocks;
-    }
-
-    public String[] getAvailableCurrencies() {
-        return availableCurrencies;
-    }
-
-    public void setAvailableCurrencies(String[] availableCurrencies) {
-        this.availableCurrencies = availableCurrencies;
-    }
-
-    public Map<String, Double> getStockPrices() {
-        return stockPrices;
-    }
-
-    public void setStockPrices(Map<String, Double> stockPrices) {
-        this.stockPrices = stockPrices;
-    }
+    public Map<String, Double> getStockPrices() { return stockPrices; }
+    public void setStockPrices(Map<String, Double> stockPrices) { this.stockPrices = stockPrices; }
 
     public double getStockPrice(String symbol) {
-        if (stockPrices == null || !stockPrices.containsKey(symbol)) {
-            return 0.0;
-        }
+        if (stockPrices == null || !stockPrices.containsKey(symbol)) { return 0.0; }
         return stockPrices.get(symbol);
     }
 
-    public Map<String, Double> getCurrencyBalances() {
-        return currencyBalances;
-    }
-
-    public void setCurrencyBalances(Map<String, Double> currencyBalances) {
-        this.currencyBalances = currencyBalances;
-    }
+    public Map<String, Double> getCurrencyBalances() { return currencyBalances; }
+    public void setCurrencyBalances(Map<String, Double> currencyBalances) { this.currencyBalances = currencyBalances; }
 
     public double getCurrencyBalance(String currency) {
-        if (currencyBalances == null || !currencyBalances.containsKey(currency)) {
-            return 0.0;
-        }
+        if (currencyBalances == null || !currencyBalances.containsKey(currency)) { return 0.0; }
         return currencyBalances.get(currency);
     }
 
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
+    public String getError() { return error; }
+    public void setError(String error) { this.error = error; }
 }

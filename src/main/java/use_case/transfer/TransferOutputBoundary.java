@@ -15,4 +15,6 @@ public interface TransferOutputBoundary {
      * @param errorMessage the explanation of the failure
      */
     void prepareFailView(String errorMessage);
+
+    void presentBalances(double fromBalance, double toBalance);
 }

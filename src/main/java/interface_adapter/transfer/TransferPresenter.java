@@ -29,7 +29,6 @@ public class TransferPresenter implements TransferOutputBoundary {
         viewManagerModel.firePropertyChange();
 
         String message = "Transfer successful!";
-
         loggedInViewModel.firePropertyChange("notification", null, message);
     }
 
@@ -39,5 +38,15 @@ public class TransferPresenter implements TransferOutputBoundary {
         state.setError(errorMessage);
         transferViewModel.setState(state);
         transferViewModel.firePropertyChanged("error");
+    }
+
+    @Override
+    public void presentBalances(double fromBalance, double toBalance) {
+        TransferState state = transferViewModel.getState();
+        state.setFromBalance(String.format("%.2f", fromBalance));
+        state.setToBalance(String.format("%.2f", toBalance));
+
+        transferViewModel.setState(state);
+        transferViewModel.firePropertyChanged();
     }
 }

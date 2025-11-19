@@ -2,7 +2,6 @@ package use_case.transfer;
 
 import entity.transaction.TransferTransaction;
 import entity.transaction.TransferTransactionBuilder;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,17 +30,14 @@ public class TransferInteractor implements TransferInputBoundary {
             transferPresenter.prepareFailView("Source portfolio does not exist: " + fromPortfolio);
             return;
         }
-
         if (!transferDataAccess.portfolioExists(username, toPortfolio)) {
             transferPresenter.prepareFailView("Destination portfolio does not exist: " + toPortfolio);
             return;
         }
-
         if (fromPortfolio.equals(toPortfolio)) {
             transferPresenter.prepareFailView("Cannot transfer to the same portfolio");
             return;
         }
-
         if (!transferDataAccess.hasAsset(username, fromPortfolio, assetSymbol)) {
             transferPresenter.prepareFailView("Source portfolio does not contain asset: " + assetSymbol);
             return;
@@ -49,9 +45,7 @@ public class TransferInteractor implements TransferInputBoundary {
 
         double availableBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
         if (availableBalance < amount) {
-            transferPresenter.prepareFailView(
-                    String.format("Insufficient balance. Available: %.2f, Requested: %.2f",
-                            availableBalance, amount));
+            transferPresenter.prepareFailView(String.format("Insufficient balance. Available: %.2f", availableBalance));
             return;
         }
 
@@ -59,7 +53,6 @@ public class TransferInteractor implements TransferInputBoundary {
             transferDataAccess.transferAsset(username, fromPortfolio, toPortfolio, assetSymbol, amount);
 
             String transactionId = UUID.randomUUID().toString();
-
             TransferTransaction transaction = transactionBuilder
                     .setTransactionId(transactionId)
                     .setDate(LocalDateTime.now())
@@ -71,14 +64,28 @@ public class TransferInteractor implements TransferInputBoundary {
                     .build();
 
             transferDataAccess.saveTransaction(transaction);
-
             final TransferOutputData outputData = new TransferOutputData(
                     transactionId, fromPortfolio, toPortfolio, assetSymbol, amount, true);
 
             transferPresenter.prepareSuccessView(outputData);
-
         } catch (Exception e) {
             transferPresenter.prepareFailView("Transfer failed: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void checkBalances(String username, String fromPortfolio, String toPortfolio, String assetSymbol) {
+        double fromBalance = 0.0;
+        double toBalance = 0.0;
+
+        if (transferDataAccess.portfolioExists(username, fromPortfolio)) {
+            fromBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
+        }
+
+        if (transferDataAccess.portfolioExists(username, toPortfolio)) {
+            toBalance = transferDataAccess.getAssetBalance(username, toPortfolio, assetSymbol);
+        }
+
+        transferPresenter.presentBalances(fromBalance, toBalance);
     }
 }

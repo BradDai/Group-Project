@@ -215,7 +215,6 @@ public class FileSubAccountDataAccessJSON implements SubAccountDataAccessInterfa
     @Override
     public String[] getAvailablePortfolios(String username) {
         List<SubAccount> accounts = getSubAccountsOf(username);
-        System.out.println("Fetching portfolios for user [" + username + "]. Found: " + accounts.size());
         String[] names = new String[accounts.size()];
         for (int i = 0; i < accounts.size(); i++) {
             names[i] = accounts.get(i).getName();

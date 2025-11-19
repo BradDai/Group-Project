@@ -184,7 +184,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             JOptionPane.showMessageDialog(this, state.getSubAccountError());
         }
         else if ("notification".equals(propName)) {
-            System.out.println("DEBUG: LoggedInView received notification event");
             String msg = (String) evt.getNewValue();
             Component parent = this.isShowing() ? this : null;
             JOptionPane.showMessageDialog(parent, msg, "Notification", JOptionPane.INFORMATION_MESSAGE);
