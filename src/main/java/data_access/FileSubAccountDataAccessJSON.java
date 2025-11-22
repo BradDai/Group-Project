@@ -6,6 +6,7 @@ import entity.SubAccount;
 import entity.transaction.Transaction;
 import use_case.SubAccount.SubAccountDataAccessInterface;
 import use_case.transfer.TransferDataAccessInterface;
+import use_case.exchange.ExchangeDataAccessInterface;     // ➕ ADDED
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,7 +19,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class FileSubAccountDataAccessJSON implements SubAccountDataAccessInterface, TransferDataAccessInterface {
+public class FileSubAccountDataAccessJSON implements
+        SubAccountDataAccessInterface,
+        TransferDataAccessInterface,
+        ExchangeDataAccessInterface {    // ➕ ADDED
     private final Path filePath;
     private final Map<String, List<SubAccount>> data = new HashMap<>();
 
@@ -60,7 +64,7 @@ public class FileSubAccountDataAccessJSON implements SubAccountDataAccessInterfa
                             try {
                                 BigDecimal amt = new BigDecimal(amtStr);
                                 sa.setBalanceOf(code, amt);
-                            } catch (NumberFormatException e) {}
+                            } catch (NumberFormatException ignored) {}
                         }
                     }
                     if (saJson.has("Stock")) {
@@ -121,6 +125,10 @@ public class FileSubAccountDataAccessJSON implements SubAccountDataAccessInterfa
             throw new UncheckedIOException(e);
         }
     }
+
+    // ======================================================
+    //  EXISTING METHODS (UNCHANGED BELOW)
+    // ======================================================
 
     @Override
     public boolean exists(String username, String subName) {
@@ -209,8 +217,7 @@ public class FileSubAccountDataAccessJSON implements SubAccountDataAccessInterfa
     }
 
     @Override
-    public void saveTransaction(Transaction transaction) {
-    }
+    public void saveTransaction(Transaction transaction) {}
 
     @Override
     public String[] getAvailablePortfolios(String username) {
@@ -235,5 +242,46 @@ public class FileSubAccountDataAccessJSON implements SubAccountDataAccessInterfa
     @Override
     public double getStockPrice(String symbol) {
         return 0.0;
+    }
+
+    @Override
+    public Map<String, Double> getCurrencies(String username, String accountName) {
+        List<SubAccount> list = data.get(username);
+        if (list == null)
+            throw new RuntimeException("User not found: " + username);
+
+        for (SubAccount sa : list) {
+            if (sa.getName().equals(accountName)) {
+
+                Map<String, Double> map = new HashMap<>();
+                for (Map.Entry<String, BigDecimal> e : sa.getCurrencies().entrySet()) {
+                    map.put(e.getKey(), e.getValue().doubleValue());
+                }
+                return map;
+            }
+        }
+        throw new RuntimeException("Account not found: " + accountName);
+    }
+
+    @Override
+    public void saveCurrencies(String username, String accountName, Map<String, Double> currencies) {
+
+        List<SubAccount> list = data.get(username);
+        if (list == null)
+            throw new RuntimeException("User not found: " + username);
+
+        for (SubAccount sa : list) {
+            if (sa.getName().equals(accountName)) {
+
+                for (Map.Entry<String, Double> e : currencies.entrySet()) {
+                    sa.setBalanceOf(e.getKey(), BigDecimal.valueOf(e.getValue()));
+                }
+
+                saveToFile();
+                return;
+            }
+        }
+
+        throw new RuntimeException("Account not found: " + accountName);
     }
 }

@@ -30,7 +30,6 @@ import interface_adapter.subaccount.delete.DeleteSubAccountPresenter;
 import interface_adapter.transfer.TransferController;
 import interface_adapter.transfer.TransferPresenter;
 import interface_adapter.transfer.TransferViewModel;
-import use_case.SubAccount.SubAccountDataAccessInterface;
 import use_case.SubAccount.create.CreateSubAccountInputBoundary;
 import use_case.SubAccount.create.CreateSubAccountInteractor;
 import use_case.SubAccount.create.CreateSubAccountOutputBoundary;
@@ -394,9 +393,10 @@ public class AppBuilder {
     public AppBuilder addExchangeUseCase() {
         final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel);
 
-        final ExchangeInputBoundary ExchangeInteractor = new ExchangeInteractor(exchangeOutputBoundary);
+        final ExchangeInputBoundary exchangeInteractor =
+                new ExchangeInteractor(exchangeOutputBoundary, subAccountDataAccess);
 
-        ExchangeController exchangeController = new ExchangeController(ExchangeInteractor);
+        ExchangeController exchangeController = new ExchangeController(exchangeInteractor);
         exchangeView.setExchangeController(exchangeController);
         return this;
     }
