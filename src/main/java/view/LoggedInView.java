@@ -132,7 +132,12 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             if (name != null && !name.isBlank()) deleteSubAccountController.execute(loggedInViewModel.getState().getUsername(), name.trim());
         });
 
-        convertCurrencyButton.addActionListener(e -> { if (switchExchangeController != null) switchExchangeController.switchToExchangeView(); });
+        convertCurrencyButton.addActionListener(e -> {
+            if (switchExchangeController != null) {
+                String username = loggedInViewModel.getState().getUsername();
+                switchExchangeController.switchToExchangeView(username);
+            }
+        });
 
         transferMoneyButton.addActionListener(e -> {
             if (switchTransferController != null) {
