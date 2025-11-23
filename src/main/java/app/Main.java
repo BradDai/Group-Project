@@ -16,8 +16,10 @@ public class Main {
                 .addSellAssetView()
                 .addSignupUseCase()
                 .addLoginUseCase()
+                .addSellAssetUseCase()
                 .addSwitchExchangeUseCase()
                 .addSwitchTransferUseCase()
+                .addTransferUseCase()
                 .addSwitchHistoryUseCase()
                 .addSwitchBuyAssetUseCase()
                 .addSwitchSellAssetUseCase()
@@ -29,8 +31,9 @@ public class Main {
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
                 .addCreateSubAccountUseCase()
+                .addDeleteSubAccountUseCase()
                 .addExchangeUseCase()
-                .addTransactionHistoryUsecase()//
+                .addTransactionHistoryUsecase()
                 .build();
 
         application.pack();

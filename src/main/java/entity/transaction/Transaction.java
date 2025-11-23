@@ -8,17 +8,10 @@ import java.time.LocalDateTime;
 public abstract class Transaction {
     private final String transactionId;
     private final LocalDateTime date;
-    private final Integer fromPortfolio;
-    private final Integer toPortfolio;
+    private final String fromPortfolio;
+    private final String toPortfolio;
 
-    /**
-     * Creates a new transaction.
-     * @param transactionId unique identifier for the transaction
-     * @param date the date and time of the transaction
-     * @param fromPortfolio the source portfolio number (can be null for buy transactions)
-     * @param toPortfolio the destination portfolio number (can be null for sell transactions)
-     */
-    protected Transaction(String transactionId, LocalDateTime date, Integer fromPortfolio, Integer toPortfolio) {
+    protected Transaction(String transactionId, LocalDateTime date, String fromPortfolio, String toPortfolio) {
         if (transactionId == null || "".equals(transactionId)) {
             throw new IllegalArgumentException("Transaction ID cannot be empty");
         }
@@ -39,21 +32,15 @@ public abstract class Transaction {
         return date;
     }
 
-    public Integer getFromPortfolio() {
+    public String getFromPortfolio() {
         return fromPortfolio;
     }
 
-    public Integer getToPortfolio() {
+    public String getToPortfolio() {
         return toPortfolio;
     }
 
-    /**
-     * Returns the type of transaction (e.g., "BUY", "SELL", "TRANSFER", "CONVERT").
-     */
     public abstract String getTransactionType();
 
-    /**
-     * Returns a description of the transaction.
-     */
     public abstract String getDescription();
 }

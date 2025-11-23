@@ -7,7 +7,7 @@ public class SwitchExchangeInteractor implements SwitchExchangeInputBoundary {
     public SwitchExchangeInteractor(SwitchExchangeOutputBoundary switchExchangeOutputBoundary) {
         this.switchExchangePresenter = switchExchangeOutputBoundary;
     }
-    public void switchToExchangeView() {
-        switchExchangePresenter.switchToExchangeView();
+    public void switchToExchangeView(String username) {
+        switchExchangePresenter.switchToExchangeView(username);
     }
 }

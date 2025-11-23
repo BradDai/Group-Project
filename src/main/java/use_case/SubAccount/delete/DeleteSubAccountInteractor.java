@@ -1,6 +1,8 @@
 package use_case.SubAccount.delete;
 import entity.SubAccount;
 import use_case.SubAccount.SubAccountDataAccessInterface;
+
+import java.math.BigDecimal;
 import java.util.List;
 public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary{
     private final SubAccountDataAccessInterface subAccountDataAccess;
@@ -33,6 +35,10 @@ public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary
         }
         if (target.isUndeletable()) {
             presenter.prepareFailView("This subaccount cannot be deleted.");
+            return;
+        }
+        if (target.getBalanceUSD().compareTo(BigDecimal.ZERO) != 0) {
+            presenter.prepareFailView("Can't delete a subaccount with non-zero balance.");
             return;
         }
         subAccountDataAccess.delete(username, name);
