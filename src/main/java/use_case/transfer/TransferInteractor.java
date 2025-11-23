@@ -41,6 +41,7 @@ public class TransferInteractor implements TransferInputBoundary {
             transferPresenter.prepareFailView("Cannot transfer to the same portfolio");
             return;
         }
+
         if (!transferDataAccess.hasAsset(username, fromPortfolio, assetSymbol)) {
             transferPresenter.prepareFailView("Source portfolio does not contain asset: " + assetSymbol);
             return;
@@ -67,10 +68,7 @@ public class TransferInteractor implements TransferInputBoundary {
                     .build();
 
             transferDataAccess.saveTransaction(transaction);
-
             List<SubAccount> updatedAccounts = transferDataAccess.getSubAccountsOf(username);
-
-            // Pass updated accounts to Output Data
             final TransferOutputData outputData = new TransferOutputData(
                     transactionId, fromPortfolio, toPortfolio, assetSymbol, amount, true, updatedAccounts);
 
@@ -85,15 +83,18 @@ public class TransferInteractor implements TransferInputBoundary {
     public void checkBalances(String username, String fromPortfolio, String toPortfolio, String assetSymbol) {
         double fromBalance = 0.0;
         double toBalance = 0.0;
+        String[] currencies = new String[]{"USD"};
 
         if (transferDataAccess.portfolioExists(username, fromPortfolio)) {
             fromBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
+            currencies = transferDataAccess.getAvailableCurrencies(username, fromPortfolio);
         }
 
         if (transferDataAccess.portfolioExists(username, toPortfolio)) {
             toBalance = transferDataAccess.getAssetBalance(username, toPortfolio, assetSymbol);
         }
 
-        transferPresenter.presentBalances(fromBalance, toBalance);
+        // Pass the currencies to the presenter
+        transferPresenter.presentBalances(fromBalance, toBalance, currencies);
     }
 }

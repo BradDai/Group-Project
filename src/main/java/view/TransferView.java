@@ -13,7 +13,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class TransferView extends JPanel implements ActionListener, PropertyChangeListener {
-
     private final String viewName = "transfer";
     private final TransferViewModel transferViewModel;
     private SwitchLoggedInController switchLoggedInController;
@@ -49,7 +48,6 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
     public TransferView(TransferViewModel transferViewModel) {
         this.transferViewModel = transferViewModel;
         this.transferViewModel.addPropertyChangeListener(this);
-
         this.setName(viewName);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -161,12 +159,6 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
 
         fromPortfolioDropdown.addActionListener(e -> {
             if (isUpdating) return;
-            String selectedType = (String) transferTypeDropdown.getSelectedItem();
-            if ("Stock".equals(selectedType)) {
-                updateStockDropdowns();
-            } else {
-                updateCurrencyDropdowns();
-            }
             triggerBalanceCheck();
         });
 
@@ -230,7 +222,7 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
             asset = (String) currencyTypeDropdown.getSelectedItem();
             if (asset == null) asset = "USD";
         } else {
-            asset = "USD";
+            asset = "USD"; // Default check for Stocks
         }
 
         transferController.checkBalances(username, from, to, asset);
@@ -254,12 +246,30 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
         if (from == null) return;
         TransferState state = transferViewModel.getState();
         state.setFromPortfolio(from);
+
         isUpdating = true;
+
+        // Save currently selected item to restore it if it still exists
+        Object currentSelection = currencyTypeDropdown.getSelectedItem();
+
         currencyTypeDropdown.removeAllItems();
         if (state.getAvailableCurrencies() != null) {
-            for (String c : state.getAvailableCurrencies()) currencyTypeDropdown.addItem(c);
+            for (String c : state.getAvailableCurrencies()) {
+                currencyTypeDropdown.addItem(c);
+            }
         }
         if (currencyTypeDropdown.getItemCount() == 0) currencyTypeDropdown.addItem("USD");
+
+        // Restore selection if possible
+        if (currentSelection != null) {
+            for(int i=0; i<currencyTypeDropdown.getItemCount(); i++) {
+                if(currencyTypeDropdown.getItemAt(i).equals(currentSelection)) {
+                    currencyTypeDropdown.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+
         isUpdating = false;
     }
 
@@ -330,6 +340,10 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
         System.out.println("Click " + e.getActionCommand());
     }
 
+    public String getViewName() { return viewName; }
+    public void setSwitchLoggedInController(SwitchLoggedInController c) { this.switchLoggedInController = c; }
+    public void setTransferController(TransferController c) { this.transferController = c; }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("state".equals(evt.getPropertyName())) {
@@ -337,10 +351,10 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
 
             isUpdating = true;
 
+            // Update Portfolios
             String[] newPortfolios = state.getAvailablePortfolios();
             boolean listsDiffer = false;
 
-            // Check if the portfolio list in State differs from the Dropdown items
             if (newPortfolios == null) {
                 if (fromPortfolioDropdown.getItemCount() > 0) listsDiffer = true;
             } else if (fromPortfolioDropdown.getItemCount() != newPortfolios.length) {
@@ -354,7 +368,6 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
                 }
             }
 
-            // If list changed (like item deleted), repopulate dropdowns
             if (listsDiffer && newPortfolios != null) {
                 fromPortfolioDropdown.removeAllItems();
                 toPortfolioDropdown.removeAllItems();
@@ -363,14 +376,36 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
                     fromPortfolioDropdown.addItem(p);
                     toPortfolioDropdown.addItem(p);
                 }
-
-                // Set defaults
                 if (fromPortfolioDropdown.getItemCount() > 0) fromPortfolioDropdown.setSelectedIndex(0);
                 if (toPortfolioDropdown.getItemCount() > 1) toPortfolioDropdown.setSelectedIndex(1);
 
-                // Trigger update since we changed selection
-                SwingUtilities.invokeLater(() -> triggerBalanceCheck());
-                this.revalidate();
+                // Since portfolios changed, trigger a balance check
+                SwingUtilities.invokeLater(this::triggerBalanceCheck);
+            }
+
+            // Update Currency Dropdown if the list in state is different
+            String[] newCurrencies = state.getAvailableCurrencies();
+            boolean currenciesDiffer = false;
+
+            if (newCurrencies == null) {
+                if (currencyTypeDropdown.getItemCount() > 0) currenciesDiffer = true;
+            } else if (currencyTypeDropdown.getItemCount() != newCurrencies.length) {
+                currenciesDiffer = true;
+            } else {
+                for (int i=0; i<newCurrencies.length; i++) {
+                    boolean found = false;
+                    for (int j=0; j<currencyTypeDropdown.getItemCount(); j++) {
+                        if (currencyTypeDropdown.getItemAt(j).equals(newCurrencies[i])) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) { currenciesDiffer = true; break; }
+                }
+            }
+
+            if (currenciesDiffer) {
+                updateCurrencyDropdowns();
             }
 
             // Update labels
@@ -392,8 +427,4 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
             }
         }
     }
-
-    public String getViewName() { return viewName; }
-    public void setSwitchLoggedInController(SwitchLoggedInController c) { this.switchLoggedInController = c; }
-    public void setTransferController(TransferController c) { this.transferController = c; }
 }
