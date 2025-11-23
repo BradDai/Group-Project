@@ -302,7 +302,7 @@ public class AppBuilder {
                 viewManagerModel);
 
         final SwitchSellAssetInputBoundary switchSellAssetInteractor = new SwitchSellAssetInteractor(
-                switchSellAssetOutputBoundary);
+                switchSellAssetOutputBoundary, subAccountDataAccess);
 
         SwitchSellAssetController switchSellAssetController = new SwitchSellAssetController(switchSellAssetInteractor);
         loggedInView.setSwitchSellAssetController(switchSellAssetController);

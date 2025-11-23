@@ -130,6 +130,11 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
         SellAssetState state = sellAssetViewModel.getState();
         this.currentStockPrice = state.getCurrentPrice();
 
+        // Update portfolio list if present
+        if (state.getPortfolios() != null) {
+            portfolioSelector.setModel(new DefaultComboBoxModel<>(state.getPortfolios()));
+        }
+
         if (state.getPriceError() != null) {
             stockPriceLabel.setText("Error: " + state.getPriceError());
             totalPriceLabel.setText("—");

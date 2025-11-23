@@ -5,6 +5,7 @@ import entity.Stock;
 import entity.SubAccount;
 import entity.transaction.Transaction;
 import use_case.SubAccount.SubAccountDataAccessInterface;
+import use_case.sell_asset.SellAssetDataAccessInterface;
 import use_case.transfer.TransferDataAccessInterface;
 import use_case.exchange.ExchangeDataAccessInterface;     // ➕ ADDED
 import org.json.JSONArray;
@@ -22,6 +23,7 @@ import java.util.*;
 public class FileSubAccountDataAccessJSON implements
         SubAccountDataAccessInterface,
         TransferDataAccessInterface,
+        SellAssetDataAccessInterface,
         ExchangeDataAccessInterface {    // ➕ ADDED
     private final Path filePath;
     private final Map<String, List<SubAccount>> data = new HashMap<>();
