@@ -21,28 +21,21 @@ public class TransferPresenter implements TransferOutputBoundary {
 
     @Override
     public void prepareSuccessView(TransferOutputData outputData) {
-        // 1. Clear errors AND the Amount field
         TransferState state = transferViewModel.getState();
         state.setError(null);
-
-        // --- FIX: Clear the amount here ---
         state.setAmount("");
-        // ----------------------------------
 
         transferViewModel.setState(state);
         transferViewModel.firePropertyChanged();
 
-        // 2. Update LoggedIn State with NEW data
         LoggedInState loggedInState = loggedInViewModel.getState();
         loggedInState.setSubAccounts(outputData.getUpdatedAccounts());
         loggedInViewModel.setState(loggedInState);
-        loggedInViewModel.firePropertyChange(); // This refreshes the UI panels
+        loggedInViewModel.firePropertyChange();
 
-        // 3. Switch View
         viewManagerModel.setState(loggedInViewModel.getViewName());
         viewManagerModel.firePropertyChange();
 
-        // 4. Send Notification
         String message = "Transfer successful!";
         loggedInViewModel.firePropertyChange("notification", null, message);
     }
@@ -56,11 +49,13 @@ public class TransferPresenter implements TransferOutputBoundary {
     }
 
     @Override
-    public void presentBalances(double fromBalance, double toBalance) {
+    public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
         TransferState state = transferViewModel.getState();
         state.setFromBalance(String.format("%.2f", fromBalance));
         state.setToBalance(String.format("%.2f", toBalance));
+        state.setAvailableCurrencies(availableCurrencies);
+
         transferViewModel.setState(state);
-        transferViewModel.firePropertyChanged();
+        transferViewModel.firePropertyChanged(); // This triggers the View
     }
 }
