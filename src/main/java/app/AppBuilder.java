@@ -20,6 +20,10 @@ import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
 import interface_adapter.transfer.TransferViewModel;
+import interface_adapter.history.HistoryViewModel;
+import interface_adapter.history.TransactionHistoryController;
+import interface_adapter.history.TransactionHistoryPresenter;
+
 import interface_adapter.subaccount.create.CreateSubAccountController;
 import interface_adapter.subaccount.create.CreateSubAccountPresenter;
 import use_case.change_password.ChangePasswordInputBoundary;
@@ -33,7 +37,6 @@ import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
 import use_case.SubAccount.SubAccountDataAccessInterface;
-import data_access.InMemorySubAccountDataAccess;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -58,7 +61,6 @@ import use_case.switch_transfer.SwitchTransferOutputBoundary;
 import use_case.transaction_history.TransactionHistoryInputBoundary;
 import use_case.transaction_history.TransactionHistoryInteractor;
 import use_case.transaction_history.TransactionHistoryOutputBoundary;
-import use_case.SubAccount.SubAccountDataAccessInterface;
 import use_case.SubAccount.create.CreateSubAccountInputBoundary;
 import use_case.SubAccount.create.CreateSubAccountInteractor;
 import use_case.SubAccount.create.CreateSubAccountOutputBoundary;
@@ -149,17 +151,18 @@ public class AppBuilder {
 
     public AppBuilder addTransactionHistoryUsecase() {
         TransactionHistoryOutputBoundary presenter =
-                new interface_adapter.transaction_history.TransactionHistoryPresenter(historyViewModel);  // HistoryViewModel
+                new TransactionHistoryPresenter(historyViewModel);
 
         TransactionHistoryInputBoundary interactor =
                 new TransactionHistoryInteractor(presenter);
 
-        interface_adapter.transaction_history.TransactionHistoryController controller =
-                new interface_adapter.transaction_history.TransactionHistoryController(interactor);
+        TransactionHistoryController controller =
+                new TransactionHistoryController(interactor);
 
-        historyView.setTransactionHistoryController(controller); //
+        historyView.setTransactionHistoryController(controller);
         return this;
     }
+
 
     public AppBuilder addBuyAssetView() {
         buyAssetViewModel = new BuyAssetViewModel();
