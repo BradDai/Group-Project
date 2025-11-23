@@ -148,7 +148,12 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
         historyButton.addActionListener(e -> { if (switchHistoryController != null) switchHistoryController.switchToHistoryView(); });
         buyAssetButton.addActionListener(e -> { if (switchBuyAssetController != null) switchBuyAssetController.switchToBuyAssetView(); });
-        sellAssetButton.addActionListener(e -> { if (switchSellAssetController != null) switchSellAssetController.switchToSellAssetView(); });
+        sellAssetButton.addActionListener(e -> {
+            if (switchSellAssetController != null) {
+                String username = loggedInViewModel.getState().getUsername();
+                switchSellAssetController.switchToSellAssetView(username);
+            }
+        });
     }
 
     // Setters

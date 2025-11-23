@@ -3,6 +3,6 @@ package use_case.sell_asset;
 import entity.User;
 
 public interface SellAssetDataAccessInterface {
-    User getUser(User user);
-    void saveUser(User user);
+    String[] getAvailablePortfolios(String username);
+    String[] getAvailableStocks(String username, String portfolioId);
 }

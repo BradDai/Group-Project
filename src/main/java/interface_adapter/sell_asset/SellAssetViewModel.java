@@ -7,7 +7,7 @@ import java.beans.PropertyChangeSupport;
 
 public class SellAssetViewModel extends ViewModel<SellAssetState> {
 
-    private SellAssetState sellAssetState = new SellAssetState();
+    private final SellAssetState sellAssetState = new SellAssetState();
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public SellAssetViewModel() {

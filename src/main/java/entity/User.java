@@ -7,7 +7,7 @@ public class User {
 
     private final String name;
     private final String password;
-    private Portfolio[] portfolios;
+    private SubAccount[] subaccounts;
 
     /**
      * Creates a new user with the given non-empty name and non-empty password.
@@ -24,7 +24,7 @@ public class User {
         }
         this.name = name;
         this.password = password;
-        this.portfolios = null;
+        this.subaccounts = null;
     }
 
     public String getName() {
@@ -35,7 +35,7 @@ public class User {
         return password;
     }
 
-    public Portfolio[] getPortfolios() {
-        return portfolios;
+    public SubAccount[] getSubaccounts() {
+        return subaccounts;
     }
 }
