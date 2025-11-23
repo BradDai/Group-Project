@@ -6,7 +6,7 @@ import java.time.LocalDateTime; /**
 public class SellTransactionBuilder {
     private String transactionId;
     private LocalDateTime date;
-    private int fromPortfolio;
+    private String fromPortfolio;
     private String assetType;
     private String assetSymbol;
     private double quantity;
@@ -22,7 +22,7 @@ public class SellTransactionBuilder {
         return this;
     }
 
-    public SellTransactionBuilder setFromPortfolio(int fromPortfolio) {
+    public SellTransactionBuilder setFromPortfolio(String fromPortfolio) {
         this.fromPortfolio = fromPortfolio;
         return this;
     }

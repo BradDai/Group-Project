@@ -23,7 +23,7 @@ public class SellTransaction extends Transaction {
      * @param pricePerUnit price per unit of asset
      */
     public SellTransaction(String transactionId, LocalDateTime date,
-                           Integer fromPortfolio, String assetType, String assetSymbol,
+                           String fromPortfolio, String assetType, String assetSymbol,
                            double quantity, double pricePerUnit) {
         super(transactionId, date, fromPortfolio, null);
         if (quantity <= 0) {

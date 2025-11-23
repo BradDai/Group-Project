@@ -1,13 +1,20 @@
 package use_case.switch_transfer;
 
+import use_case.transfer.TransferDataAccessInterface;
 
 public class SwitchTransferInteractor implements SwitchTransferInputBoundary {
 
     private final SwitchTransferOutputBoundary switchTransferPresenter;
-
-    public SwitchTransferInteractor(SwitchTransferOutputBoundary switchTransferOutputBoundary) {
+    private final TransferDataAccessInterface dataAccess;
+    public SwitchTransferInteractor(SwitchTransferOutputBoundary switchTransferOutputBoundary,
+                                    TransferDataAccessInterface dataAccess) {
         this.switchTransferPresenter = switchTransferOutputBoundary;
+        this.dataAccess = dataAccess;
     }
 
-    public void switchToTransferView() { switchTransferPresenter.switchToTransferView(); }
+    @Override
+    public void switchToTransferView(String username) {
+        String[] portfolios = dataAccess.getAvailablePortfolios(username);
+        switchTransferPresenter.presentTransferView(username, portfolios);
+    }
 }

@@ -1,7 +1,7 @@
 package interface_adapter.logged_in;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.sellasset.SellAssetViewModel;
+import interface_adapter.sell_asset.SellAssetViewModel;
 import use_case.switch_sellasset.SwitchSellAssetOutputBoundary;
 
 public class SwitchSellAssetPresenter implements SwitchSellAssetOutputBoundary {

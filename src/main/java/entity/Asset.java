@@ -37,6 +37,9 @@ public class Asset {
         return quantity;
     }
 
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
     public Asset addAsset(Asset[] xxx, String type, int quantity) {
         for (Asset asset : xxx) {
             if (asset.type.equals(type)) {
