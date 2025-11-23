@@ -6,7 +6,7 @@ import entity.SubAccount;
 import entity.transaction.Transaction;
 import use_case.SubAccount.SubAccountDataAccessInterface;
 import use_case.transfer.TransferDataAccessInterface;
-import use_case.exchange.ExchangeDataAccessInterface;     // ➕ ADDED
+import use_case.exchange.ExchangeDataAccessInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,7 +22,8 @@ import java.util.*;
 public class FileSubAccountDataAccessJSON implements
         SubAccountDataAccessInterface,
         TransferDataAccessInterface,
-        ExchangeDataAccessInterface {    // ➕ ADDED
+        ExchangeDataAccessInterface {
+
     private final Path filePath;
     private final Map<String, List<SubAccount>> data = new HashMap<>();
 
@@ -126,10 +127,6 @@ public class FileSubAccountDataAccessJSON implements
         }
     }
 
-    // ======================================================
-    //  EXISTING METHODS (UNCHANGED BELOW)
-    // ======================================================
-
     @Override
     public boolean exists(String username, String subName) {
         return data.getOrDefault(username, List.of()).stream()
@@ -170,7 +167,15 @@ public class FileSubAccountDataAccessJSON implements
 
     @Override
     public boolean hasAsset(String username, String portfolioId, String assetSymbol) {
-        return true;
+        List<SubAccount> accounts = data.get(username);
+        if (accounts == null) return false;
+
+        for (SubAccount sa : accounts) {
+            if (sa.getName().equals(portfolioId)) {
+                return sa.getCurrencies().containsKey(assetSymbol);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -180,11 +185,7 @@ public class FileSubAccountDataAccessJSON implements
 
         for (SubAccount sa : accounts) {
             if (sa.getName().equalsIgnoreCase(portfolioId)) {
-                if ("USD".equalsIgnoreCase(assetSymbol)) {
-                    return sa.getBalanceUSD().doubleValue();
-                } else {
-                    return sa.getBalanceOf(assetSymbol).doubleValue();
-                }
+                return sa.getBalanceOf(assetSymbol).doubleValue();
             }
         }
         return 0.0;
@@ -203,17 +204,21 @@ public class FileSubAccountDataAccessJSON implements
 
         if (from == null || to == null) throw new IllegalArgumentException("Portfolio not found.");
 
-        if ("USD".equalsIgnoreCase(assetSymbol)) {
-            BigDecimal amt = BigDecimal.valueOf(amount);
-            if (from.getBalanceUSD().compareTo(amt) < 0) {
-                throw new IllegalArgumentException("Insufficient funds.");
-            }
-            from.setBalanceUSD(from.getBalanceUSD().subtract(amt));
-            to.setBalanceUSD(to.getBalanceUSD().add(amt));
-            saveToFile();
-        } else {
-            throw new UnsupportedOperationException("Only USD transfers are currently supported in JSON.");
+        BigDecimal amt = BigDecimal.valueOf(amount);
+        BigDecimal fromBalance = from.getBalanceOf(assetSymbol);
+
+        if (fromBalance.compareTo(amt) < 0) {
+            throw new IllegalArgumentException("Insufficient funds.");
         }
+
+        // Subtract from sender
+        from.setBalanceOf(assetSymbol, fromBalance.subtract(amt));
+
+        // Add to receiver
+        BigDecimal toBalance = to.getBalanceOf(assetSymbol);
+        to.setBalanceOf(assetSymbol, toBalance.add(amt));
+
+        saveToFile();
     }
 
     @Override
@@ -231,28 +236,49 @@ public class FileSubAccountDataAccessJSON implements
 
     @Override
     public String[] getAvailableStocks(String username, String portfolioId) {
+        List<SubAccount> accounts = data.get(username);
+        if (accounts != null) {
+            for (SubAccount sa : accounts) {
+                if (sa.getName().equals(portfolioId)) {
+                    List<String> symbols = new ArrayList<>();
+                    for(Asset a : sa.getAssets()) {
+                        if(a instanceof Stock) {
+                            symbols.add(((Stock) a).getCompanySymbol());
+                        }
+                    }
+                    return symbols.toArray(new String[0]);
+                }
+            }
+        }
         return new String[0];
     }
 
     @Override
     public String[] getAvailableCurrencies(String username, String portfolioId) {
+        List<SubAccount> accounts = data.get(username);
+        if (accounts != null) {
+            for (SubAccount sa : accounts) {
+                if (sa.getName().equals(portfolioId)) {
+                    Set<String> keys = sa.getCurrencies().keySet();
+                    return keys.toArray(new String[0]);
+                }
+            }
+        }
         return new String[]{"USD"};
     }
 
     @Override
     public double getStockPrice(String symbol) {
-        return 0.0;
+        return 100.0;
     }
 
     @Override
     public Map<String, Double> getCurrencies(String username, String accountName) {
         List<SubAccount> list = data.get(username);
-        if (list == null)
-            throw new RuntimeException("User not found: " + username);
+        if (list == null) throw new RuntimeException("User not found: " + username);
 
         for (SubAccount sa : list) {
             if (sa.getName().equals(accountName)) {
-
                 Map<String, Double> map = new HashMap<>();
                 for (Map.Entry<String, BigDecimal> e : sa.getCurrencies().entrySet()) {
                     map.put(e.getKey(), e.getValue().doubleValue());
@@ -265,23 +291,18 @@ public class FileSubAccountDataAccessJSON implements
 
     @Override
     public void saveCurrencies(String username, String accountName, Map<String, Double> currencies) {
-
         List<SubAccount> list = data.get(username);
-        if (list == null)
-            throw new RuntimeException("User not found: " + username);
+        if (list == null) throw new RuntimeException("User not found: " + username);
 
         for (SubAccount sa : list) {
             if (sa.getName().equals(accountName)) {
-
                 for (Map.Entry<String, Double> e : currencies.entrySet()) {
                     sa.setBalanceOf(e.getKey(), BigDecimal.valueOf(e.getValue()));
                 }
-
                 saveToFile();
                 return;
             }
         }
-
         throw new RuntimeException("Account not found: " + accountName);
     }
 }
