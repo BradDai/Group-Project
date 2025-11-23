@@ -23,6 +23,11 @@ import interface_adapter.sell_asset.SellAssetViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.transfer.TransferViewModel;
+import interface_adapter.history.HistoryViewModel;
+import interface_adapter.history.TransactionHistoryController;
+import interface_adapter.history.TransactionHistoryPresenter;
+
 import interface_adapter.subaccount.create.CreateSubAccountController;
 import interface_adapter.subaccount.create.CreateSubAccountPresenter;
 import interface_adapter.subaccount.delete.DeleteSubAccountController;
@@ -48,6 +53,7 @@ import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
+import use_case.SubAccount.SubAccountDataAccessInterface;
 import use_case.sell_asset.SellAssetInputBoundary;
 import use_case.sell_asset.SellAssetInteractor;
 import use_case.sell_asset.SellAssetOutputBoundary;
@@ -158,17 +164,18 @@ public class AppBuilder {
 
     public AppBuilder addTransactionHistoryUsecase() {
         TransactionHistoryOutputBoundary presenter =
-                new interface_adapter.transaction_history.TransactionHistoryPresenter(historyViewModel);
+                new TransactionHistoryPresenter(historyViewModel);
 
         TransactionHistoryInputBoundary interactor =
                 new TransactionHistoryInteractor(presenter);
 
-        interface_adapter.transaction_history.TransactionHistoryController controller =
-                new interface_adapter.transaction_history.TransactionHistoryController(interactor);
+        TransactionHistoryController controller =
+                new TransactionHistoryController(interactor);
 
         historyView.setTransactionHistoryController(controller);
         return this;
     }
+
 
     public AppBuilder addBuyAssetView() {
         buyAssetViewModel = new BuyAssetViewModel();
