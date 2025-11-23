@@ -21,6 +21,9 @@ public class SwitchSellAssetPresenter implements SwitchSellAssetOutputBoundary {
         state.setPortfolios(portfolios);
         state.setErrorMessage("");
 
+        sellAssetViewModel.setState(state);
+        sellAssetViewModel.firePropertyChanged();
+
         viewManagerModel.setState(sellAssetViewModel.getViewName());
         viewManagerModel.firePropertyChange();
     }
