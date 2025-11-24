@@ -167,7 +167,7 @@ public class AppBuilder {
 
     public AppBuilder addTransactionHistoryUsecase() {
         TransactionHistoryOutputBoundary presenter =
-                new interface_adapter.transaction_history.TransactionHistoryPresenter(historyViewModel);
+                new interface_adapter.history.TransactionHistoryPresenter(historyViewModel);
                 new TransactionHistoryPresenter(historyViewModel);
 
         TransactionHistoryInputBoundary interactor =
