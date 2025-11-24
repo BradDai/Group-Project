@@ -425,7 +425,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addExchangeUseCase() {
-        final ExchangeOutputBoundary exchangeOutputBoundary = new ExchangePresenter(exchangeViewModel);
+        final ExchangeOutputBoundary exchangeOutputBoundary =
+                new ExchangePresenter(exchangeViewModel, loggedInViewModel);
 
         final ExchangeInputBoundary exchangeInteractor =
                 new ExchangeInteractor(exchangeOutputBoundary, subAccountDataAccess);

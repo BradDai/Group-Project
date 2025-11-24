@@ -1,5 +1,10 @@
 package use_case.exchange;
 
+import entity.SubAccount;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ExchangeConversionOutputData {
 
     private final String accountName;
@@ -10,6 +15,7 @@ public class ExchangeConversionOutputData {
     private final double rateUsed;
     private final double fromBalanceAfter;
     private final double toBalanceAfter;
+    private final List<SubAccount> updatedAccounts;
 
     public ExchangeConversionOutputData(String accountName,
                                         String from,
@@ -18,7 +24,8 @@ public class ExchangeConversionOutputData {
                                         double amountReceived,
                                         double rateUsed,
                                         double fromBalanceAfter,
-                                        double toBalanceAfter) {
+                                        double toBalanceAfter,
+                                        List<SubAccount> updatedAccounts) {
         this.accountName = accountName;
         this.from = from;
         this.to = to;
@@ -27,6 +34,7 @@ public class ExchangeConversionOutputData {
         this.rateUsed = rateUsed;
         this.fromBalanceAfter = fromBalanceAfter;
         this.toBalanceAfter = toBalanceAfter;
+        this.updatedAccounts = updatedAccounts;
     }
 
     public String getAccountName() { return accountName; }
@@ -37,4 +45,5 @@ public class ExchangeConversionOutputData {
     public double getRateUsed() { return rateUsed; }
     public double getFromBalanceAfter() { return fromBalanceAfter; }
     public double getToBalanceAfter() { return toBalanceAfter; }
+    public List<SubAccount> getUpdatedSubAccounts() {return updatedAccounts;}
 }

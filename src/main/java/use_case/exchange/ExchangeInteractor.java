@@ -1,5 +1,6 @@
 package use_case.exchange;
 
+import entity.SubAccount;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class ExchangeInteractor implements ExchangeInputBoundary {
@@ -95,6 +97,8 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
                     inputData.getAccountName(),
                     currencies
             );
+            // Get entire updated subaccount list for the user
+            List<SubAccount> updatedSubAccounts = exchangeDataAccess.getSubAccountsOf(inputData.getUsername());
 
             // 4) Build output data for presenter
             ExchangeConversionOutputData outputData = new ExchangeConversionOutputData(
@@ -105,7 +109,8 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
                     amountReceived,
                     rate,
                     fromAfter,
-                    toAfter
+                    toAfter,
+                    updatedSubAccounts
             );
             exchangePresenter.presentConversionSuccess(outputData);
 
