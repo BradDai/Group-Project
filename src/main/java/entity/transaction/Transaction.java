@@ -139,7 +139,7 @@ public abstract class Transaction {
         return assetSymbol;
     }
 
-    public Double getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
@@ -147,7 +147,7 @@ public abstract class Transaction {
         return priceAtTime;
     }
 
-    public Double getTotalValue() {
+    public double getTotalValue() {
         return totalValue;
     }
 
