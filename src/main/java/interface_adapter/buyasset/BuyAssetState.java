@@ -7,5 +7,4 @@ public class BuyAssetState {
     public double total = 0.0;
     public String errorMessage = null;
     public String purchaseMessage = null;
-    public double balanceUSD = 0.0;
 }
