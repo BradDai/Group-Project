@@ -3,13 +3,17 @@ package interface_adapter.exchange;
 import use_case.exchange.ExchangeOutputBoundary;
 import use_case.exchange.ExchangeOutputData;
 import use_case.exchange.ExchangeConversionOutputData;
+import interface_adapter.logged_in.LoggedInState;
+import interface_adapter.logged_in.LoggedInViewModel;
 
 public class ExchangePresenter implements ExchangeOutputBoundary {
 
     private final ExchangeViewModel exchangeViewModel;
+    private final LoggedInViewModel loggedInViewModel;
 
-    public ExchangePresenter(ExchangeViewModel exchangeViewModel) {
+    public ExchangePresenter(ExchangeViewModel exchangeViewModel,LoggedInViewModel loggedInViewModel) {
         this.exchangeViewModel = exchangeViewModel;
+        this.loggedInViewModel = loggedInViewModel;
     }
 
     @Override
@@ -64,6 +68,10 @@ public class ExchangePresenter implements ExchangeOutputBoundary {
         state.setConversionMessage(msg);
         exchangeViewModel.setState(state);
         exchangeViewModel.firePropertyChangedState();
-
+        //
+        LoggedInState loggedState = loggedInViewModel.getState();
+        loggedState.setSubAccounts(outputData.getUpdatedSubAccounts());
+        loggedInViewModel.setState(loggedState);
+        loggedInViewModel.firePropertyChange("subAccounts", null, loggedState.getSubAccounts());
     }
 }
