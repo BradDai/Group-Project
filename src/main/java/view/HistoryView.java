@@ -269,7 +269,7 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
                 );
             }
             // presenter will update HistoryViewModel, and propertyChange()
-            // below will refresh the message label / table.
+            // below will refresh the message label
         });
 
         // Clear
