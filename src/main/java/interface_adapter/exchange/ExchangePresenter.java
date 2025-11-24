@@ -64,5 +64,6 @@ public class ExchangePresenter implements ExchangeOutputBoundary {
         state.setConversionMessage(msg);
         exchangeViewModel.setState(state);
         exchangeViewModel.firePropertyChangedState();
+
     }
 }
