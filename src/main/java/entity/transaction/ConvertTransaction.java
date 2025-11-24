@@ -26,20 +26,7 @@ public class ConvertTransaction extends Transaction {
                               String portfolio, String fromCurrency,
                               String toCurrency, double fromAmount,
                               double exchangeRate) {
-        super(
-                transactionId,
-                date,
-                portfolio,          // fromPortfolio
-                portfolio,          // toPortfolio
-                null,               // assetSymbol (N/A)
-                fromAmount,         // quantity
-                null,               // priceAtTime (N/A)
-                null,               // totalValue (N/A)
-                fromCurrency,
-                toCurrency,
-                exchangeRate,
-                fromAmount          // amount
-        );
+        super(transactionId, date, portfolio, portfolio);
         if (fromAmount <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }

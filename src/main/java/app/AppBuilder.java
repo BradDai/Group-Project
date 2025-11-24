@@ -2,9 +2,6 @@ package app;
 
 import data_access.FileSubAccountDataAccessJSON;
 import data_access.FileUserDataAccessObject;
-import data_access.TransactionDataAccessInterface;
-import data_access.FileTransactionDataAccess;
-
 import entity.UserFactory;
 import interface_adapter.SwitchLoggedInController;
 import interface_adapter.SwitchLoggedInPresenter;
@@ -86,9 +83,7 @@ import use_case.transfer.TransferInputBoundary;
 import use_case.transfer.TransferInteractor;
 import use_case.transfer.TransferOutputBoundary;
 import view.*;
-import use_case.transaction_history.TransactionHistoryInputBoundary;
-import use_case.transaction_history.TransactionHistoryInteractor;
-import use_case.transaction_history.TransactionHistoryOutputBoundary;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -100,8 +95,7 @@ public class AppBuilder {
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     private final FileSubAccountDataAccessJSON subAccountDataAccess = new FileSubAccountDataAccessJSON("subaccounts.json");
-    private final TransactionDataAccessInterface transactionDataAccessObject =
-            new FileTransactionDataAccess("data/transactions");
+
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -170,8 +164,7 @@ public class AppBuilder {
                 new TransactionHistoryPresenter(historyViewModel);
 
         TransactionHistoryInputBoundary interactor =
-                new TransactionHistoryInteractor(transactionDataAccessObject, presenter);
-
+                new TransactionHistoryInteractor(presenter);
 
         TransactionHistoryController controller =
                 new TransactionHistoryController(interactor);
