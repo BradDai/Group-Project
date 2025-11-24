@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,11 +34,13 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     private final JComboBox<String> gottenCurrency;
     private final JLabel givenCurrencyLabel;
     private final JLabel gottenCurrencyLabel;
+    private final JLabel balanceLabel;
     private final JLabel amountLabel;
     private final JLabel selectedAccountLabel;
     private final JButton confirmExchange;
     private final JLabel errorLabel;
     private final JLabel confirmationLabel;
+    private static final String ACCOUNT_DATA = "subaccounts.json";
 
     public ExchangeView(ExchangeViewModel exchangeViewModel) {
         this.exchangeViewModel = exchangeViewModel;
@@ -61,7 +64,8 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
 
         givenCurrencyLabel = new JLabel("Convert:");
         gottenCurrencyLabel = new JLabel("To:");
-        amountLabel = new JLabel("Amount:");
+        balanceLabel = new JLabel(" ");
+        amountLabel = new JLabel("Amount Of Currency To Be Converted:");
         amountField = new JTextField(15);
 
         errorLabel = new JLabel(" ");
@@ -72,6 +76,9 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         currencyPanel.add(firstCurrency);
         currencyPanel.add(new JLabel("To:"));
         currencyPanel.add(secondCurrency);
+
+        JPanel currencyBalancePanel = new JPanel();
+        currencyBalancePanel.add(balanceLabel);
 
         JPanel resultPanel = new JPanel();
         resultPanel.add(new JLabel("Rate:"));
@@ -95,6 +102,7 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         JPanel inputPanel = new JPanel();
         inputPanel.add(selectedAccountPanel);
         inputPanel.add(currencyInputPanel);
+        inputPanel.add(currencyBalancePanel);
         inputPanel.add(amountInputPanel);
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
 
@@ -121,6 +129,8 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         secondCurrency.addActionListener(updateSelection);
 
         confirmExchange.addActionListener(e -> handleConfirmExchange());
+        givenCurrency.addActionListener(e -> updateBalance());
+
     }
 
     private void loadGlobalCurrencies(JComboBox<String> first, JComboBox<String> second) {
@@ -146,7 +156,7 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         String username = exchangeViewModel.getExchangeState().getUsername();
 
         try {
-            String json = Files.readString(Paths.get("subaccounts.json"), StandardCharsets.UTF_8);
+            String json = Files.readString(Paths.get(ACCOUNT_DATA), StandardCharsets.UTF_8);
             JSONObject root = new JSONObject(json);
 
             if (!root.has(username)) return;
@@ -172,7 +182,7 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         if (accountName == null) return;
 
         try {
-            String json = Files.readString(Paths.get("subaccounts.json"), StandardCharsets.UTF_8);
+            String json = Files.readString(Paths.get(ACCOUNT_DATA), StandardCharsets.UTF_8);
             JSONObject root = new JSONObject(json);
 
             JSONArray accounts = root.getJSONArray(username);
@@ -254,6 +264,7 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
             errorLabel.setText(state.getErrorMessage());
             confirmationLabel.setText(state.getConversionMessage());
             amountField.setText(state.getAmountField());
+            balanceLabel.setText(state.getBalanceMessage());
             loadAccounts();
         }
     }
@@ -268,6 +279,46 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         this.exchangeController = exchangeController;
 
         triggerRateQuery();
+    }
+
+    private void updateBalance() {
+        balanceLabel.setText(" ");
+        String username = exchangeViewModel.getExchangeState().getUsername();
+        String accountName = (String) selectedAccount.getSelectedItem();
+        String currency = (String) givenCurrency.getSelectedItem();
+
+        if (accountName == null || currency == null) {
+            return;
+        }
+
+        try {
+            String json = Files.readString(Paths.get(ACCOUNT_DATA), StandardCharsets.UTF_8);
+            JSONObject root = new JSONObject(json);
+
+            if (!root.has(username)) {
+                return;
+            }
+
+            JSONArray accounts = root.getJSONArray(username);
+
+            for (int i = 0; i < accounts.length(); i++) {
+                JSONObject acc = accounts.getJSONObject(i);
+
+                if (acc.getString("name").equals(accountName)) {
+                    JSONObject ownedCurrencies = acc.getJSONObject("currencies");
+
+                    if (ownedCurrencies.has(currency)) {
+                        double balance = ownedCurrencies.getDouble(currency);
+                        balanceLabel.setText(currency + " Balance: " + String.format("%.3f", balance));
+                    }
+
+                    return;
+                }
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error reading subaccounts.json: " + e.getMessage());
+        }
     }
 
     @Override
