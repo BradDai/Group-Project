@@ -1,9 +1,9 @@
 package interface_adapter.sell_asset;
 
-import interface_adapter.ViewModel;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+
+import interface_adapter.ViewModel;
 
 public class SellAssetViewModel extends ViewModel<SellAssetState> {
 
@@ -19,7 +19,7 @@ public class SellAssetViewModel extends ViewModel<SellAssetState> {
         return sellAssetState;
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 

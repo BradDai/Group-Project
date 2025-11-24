@@ -47,26 +47,26 @@
 
 package use_case.transaction_history;
 
-import interface_adapter.history.HistoryState;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import interface_adapter.history.HistoryState;
 
 public class TransactionHistoryInteractor implements TransactionHistoryInputBoundary {
 
     private final TransactionHistoryOutputBoundary presenter;
 
-    public TransactionHistoryInteractor(TransactionHistoryOutputBoundary presenter) {
+    public TransactionHistoryInteractor(final TransactionHistoryOutputBoundary presenter) {
         this.presenter = presenter;
     }
 
     @Override
-    public void execute(TransactionHistoryInputData inputData) {
+    public void execute(final TransactionHistoryInputData inputData) {
 
         // ==== FAKE ROWS JUST FOR DEMO ====
-        List<HistoryState.Row> rows = new ArrayList<>();
+        final List<HistoryState.Row> rows = new ArrayList<>();
 
-        HistoryState.Row r1 = new HistoryState.Row();
+        final HistoryState.Row r1 = new HistoryState.Row();
         r1.id = "T1";
         r1.dateTime = "2025-11-02";
         r1.asset = "AAPL";
@@ -75,7 +75,7 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
         r1.totalValue = 1500;
         rows.add(r1);
 
-        HistoryState.Row r2 = new HistoryState.Row();
+        final HistoryState.Row r2 = new HistoryState.Row();
         r2.id = "T2";
         r2.dateTime = "2025-11-03";
         r2.asset = "TSLA";
@@ -91,13 +91,13 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
             msg += " from " + inputData.getStartDate() + " to " + inputData.getEndDate();
         }
 
-        TransactionHistoryOutputData output =
-                new TransactionHistoryOutputData(
-                        rows,
-                        msg,
-                        inputData.getStartDate(),
-                        inputData.getEndDate()
-                );
+        final TransactionHistoryOutputData output =
+            new TransactionHistoryOutputData(
+                rows,
+                msg,
+                inputData.getStartDate(),
+                inputData.getEndDate()
+            );
 
         presenter.present(output);
     }

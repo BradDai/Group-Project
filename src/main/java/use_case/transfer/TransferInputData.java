@@ -11,8 +11,8 @@ public class TransferInputData {
     private final String assetSymbol;
     private final double amount;
 
-    public TransferInputData(String username, String fromPortfolio, String toPortfolio,
-                             String transferType, String assetSymbol, double amount) {
+    public TransferInputData(final String username, final String fromPortfolio, final String toPortfolio,
+                             final String transferType, final String assetSymbol, final double amount) {
         this.username = username;
         this.fromPortfolio = fromPortfolio;
         this.toPortfolio = toPortfolio;

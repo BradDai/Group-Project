@@ -4,11 +4,11 @@ package use_case.logout;
  * The Logout Interactor.
  */
 public class LogoutInteractor implements LogoutInputBoundary {
-    private LogoutUserDataAccessInterface userDataAccessObject;
-    private LogoutOutputBoundary logoutPresenter;
+    private final LogoutUserDataAccessInterface userDataAccessObject;
+    private final LogoutOutputBoundary logoutPresenter;
 
-    public LogoutInteractor(LogoutUserDataAccessInterface userDataAccessInterface,
-                            LogoutOutputBoundary logoutOutputBoundary) {
+    public LogoutInteractor(final LogoutUserDataAccessInterface userDataAccessInterface,
+                            final LogoutOutputBoundary logoutOutputBoundary) {
         userDataAccessObject = userDataAccessInterface;
         logoutPresenter = logoutOutputBoundary;
     }
@@ -18,7 +18,7 @@ public class LogoutInteractor implements LogoutInputBoundary {
         // * set the current username to null in the DAO
         // * instantiate the `LogoutOutputData`, which needs to contain the username.
         // * tell the presenter to prepare a success view.
-        LogoutOutputData data = new LogoutOutputData(userDataAccessObject.getCurrentUsername());
+        final LogoutOutputData data = new LogoutOutputData(userDataAccessObject.getCurrentUsername());
         userDataAccessObject.setCurrentUsername(null);
         logoutPresenter.prepareSuccessView(data);
     }

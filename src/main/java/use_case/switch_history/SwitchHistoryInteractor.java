@@ -4,9 +4,11 @@ public class SwitchHistoryInteractor implements SwitchHistoryInputBoundary {
 
     private final SwitchHistoryOutputBoundary switchHistoryPresenter;
 
-    public SwitchHistoryInteractor(SwitchHistoryOutputBoundary switchHistoryOutputBoundary) {
+    public SwitchHistoryInteractor(final SwitchHistoryOutputBoundary switchHistoryOutputBoundary) {
         this.switchHistoryPresenter = switchHistoryOutputBoundary;
     }
 
-    public void switchToHistoryView() { switchHistoryPresenter.switchToHistoryView(); }
+    public void switchToHistoryView() {
+        switchHistoryPresenter.switchToHistoryView();
+    }
 }

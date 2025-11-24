@@ -6,11 +6,11 @@ public class SwitchTransferController {
 
     private final SwitchTransferInputBoundary switchTransferUseCaseInteractor;
 
-    public SwitchTransferController(SwitchTransferInputBoundary switchTransferUseCaseInteractor) {
+    public SwitchTransferController(final SwitchTransferInputBoundary switchTransferUseCaseInteractor) {
         this.switchTransferUseCaseInteractor = switchTransferUseCaseInteractor;
     }
 
-    public void switchToTransferView(String username) {
+    public void switchToTransferView(final String username) {
         switchTransferUseCaseInteractor.switchToTransferView(username);
     }
 }

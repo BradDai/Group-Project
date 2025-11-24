@@ -12,7 +12,7 @@ public class TransferState {
     private String amount = "";
     private String[] availablePortfolios = new String[0];
     private String[] availableStocks = new String[0];
-    private String[] availableCurrencies = new String[]{"USD"};
+    private String[] availableCurrencies = new String[] {"USD"};
     private Map<String, Double> stockPrices;
     private Map<String, Double> currencyBalances;
     private String error = "";
@@ -20,7 +20,7 @@ public class TransferState {
     public TransferState() {
     }
 
-    public TransferState(TransferState copy) {
+    public TransferState(final TransferState copy) {
         this.username = copy.username;
         this.fromPortfolio = copy.fromPortfolio;
         this.toPortfolio = copy.toPortfolio;
@@ -37,52 +37,121 @@ public class TransferState {
     }
 
     // Getters and Setters
-    public String getAmount() { return amount; }
-    public void setAmount(String amount) { this.amount = amount; }
+    public String getAmount() {
+        return amount;
+    }
 
-    public String getFromBalance() { return fromBalance; }
-    public void setFromBalance(String fromBalance) { this.fromBalance = fromBalance; }
+    public void setAmount(final String amount) {
+        this.amount = amount;
+    }
 
-    public String getToBalance() { return toBalance; }
-    public void setToBalance(String toBalance) { this.toBalance = toBalance; }
+    public String getFromBalance() {
+        return fromBalance;
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public void setFromBalance(final String fromBalance) {
+        this.fromBalance = fromBalance;
+    }
 
-    public String getFromPortfolio() { return fromPortfolio; }
-    public void setFromPortfolio(String fromPortfolio) { this.fromPortfolio = fromPortfolio; }
+    public String getToBalance() {
+        return toBalance;
+    }
 
-    public String getToPortfolio() { return toPortfolio; }
-    public void setToPortfolio(String toPortfolio) { this.toPortfolio = toPortfolio; }
+    public void setToBalance(final String toBalance) {
+        this.toBalance = toBalance;
+    }
 
-    public String getTransferType() { return transferType; }
-    public void setTransferType(String transferType) { this.transferType = transferType; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String[] getAvailablePortfolios() { return availablePortfolios; }
-    public void setAvailablePortfolios(String[] availablePortfolios) { this.availablePortfolios = availablePortfolios; }
+    public void setUsername(final String username) {
+        this.username = username;
+    }
 
-    public String[] getAvailableStocks() { return availableStocks; }
-    public void setAvailableStocks(String[] availableStocks) { this.availableStocks = availableStocks; }
+    public String getFromPortfolio() {
+        return fromPortfolio;
+    }
 
-    public String[] getAvailableCurrencies() { return availableCurrencies; }
-    public void setAvailableCurrencies(String[] availableCurrencies) { this.availableCurrencies = availableCurrencies; }
+    public void setFromPortfolio(final String fromPortfolio) {
+        this.fromPortfolio = fromPortfolio;
+    }
 
-    public Map<String, Double> getStockPrices() { return stockPrices; }
-    public void setStockPrices(Map<String, Double> stockPrices) { this.stockPrices = stockPrices; }
+    public String getToPortfolio() {
+        return toPortfolio;
+    }
 
-    public double getStockPrice(String symbol) {
-        if (stockPrices == null || !stockPrices.containsKey(symbol)) { return 0.0; }
+    public void setToPortfolio(final String toPortfolio) {
+        this.toPortfolio = toPortfolio;
+    }
+
+    public String getTransferType() {
+        return transferType;
+    }
+
+    public void setTransferType(final String transferType) {
+        this.transferType = transferType;
+    }
+
+    public String[] getAvailablePortfolios() {
+        return availablePortfolios;
+    }
+
+    public void setAvailablePortfolios(final String[] availablePortfolios) {
+        this.availablePortfolios = availablePortfolios;
+    }
+
+    public String[] getAvailableStocks() {
+        return availableStocks;
+    }
+
+    public void setAvailableStocks(final String[] availableStocks) {
+        this.availableStocks = availableStocks;
+    }
+
+    public String[] getAvailableCurrencies() {
+        return availableCurrencies;
+    }
+
+    public void setAvailableCurrencies(final String[] availableCurrencies) {
+        this.availableCurrencies = availableCurrencies;
+    }
+
+    public Map<String, Double> getStockPrices() {
+        return stockPrices;
+    }
+
+    public void setStockPrices(final Map<String, Double> stockPrices) {
+        this.stockPrices = stockPrices;
+    }
+
+    public double getStockPrice(final String symbol) {
+        if (stockPrices == null || !stockPrices.containsKey(symbol)) {
+            return 0.0;
+        }
         return stockPrices.get(symbol);
     }
 
-    public Map<String, Double> getCurrencyBalances() { return currencyBalances; }
-    public void setCurrencyBalances(Map<String, Double> currencyBalances) { this.currencyBalances = currencyBalances; }
+    public Map<String, Double> getCurrencyBalances() {
+        return currencyBalances;
+    }
 
-    public double getCurrencyBalance(String currency) {
-        if (currencyBalances == null || !currencyBalances.containsKey(currency)) { return 0.0; }
+    public void setCurrencyBalances(final Map<String, Double> currencyBalances) {
+        this.currencyBalances = currencyBalances;
+    }
+
+    public double getCurrencyBalance(final String currency) {
+        if (currencyBalances == null || !currencyBalances.containsKey(currency)) {
+            return 0.0;
+        }
         return currencyBalances.get(currency);
     }
 
-    public String getError() { return error; }
-    public void setError(String error) { this.error = error; }
+    public String getError() {
+        return error;
+    }
+
+    public void setError(final String error) {
+        this.error = error;
+    }
 }

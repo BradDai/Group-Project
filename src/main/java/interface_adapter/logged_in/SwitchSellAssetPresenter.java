@@ -10,13 +10,13 @@ public class SwitchSellAssetPresenter implements SwitchSellAssetOutputBoundary {
     private final SellAssetViewModel sellAssetViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public SwitchSellAssetPresenter(SellAssetViewModel sellAssetViewModel, ViewManagerModel viewManagerModel) {
+    public SwitchSellAssetPresenter(final SellAssetViewModel sellAssetViewModel, final ViewManagerModel viewManagerModel) {
         this.sellAssetViewModel = sellAssetViewModel;
         this.viewManagerModel = viewManagerModel;
     }
 
-    public void switchToSellAssetView(String username, String[] portfolios) {
-        SellAssetState state = sellAssetViewModel.getState();
+    public void switchToSellAssetView(final String username, final String[] portfolios) {
+        final SellAssetState state = sellAssetViewModel.getState();
         state.setUsername(username);
         state.setPortfolios(portfolios);
         state.setErrorMessage("");

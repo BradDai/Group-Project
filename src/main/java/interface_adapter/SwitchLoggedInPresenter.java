@@ -8,7 +8,7 @@ public class SwitchLoggedInPresenter implements SwitchLoggedInOutputBoundary {
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public SwitchLoggedInPresenter(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel) {
+    public SwitchLoggedInPresenter(final LoggedInViewModel loggedInViewModel, final ViewManagerModel viewManagerModel) {
         this.loggedInViewModel = loggedInViewModel;
         this.viewManagerModel = viewManagerModel;
     }

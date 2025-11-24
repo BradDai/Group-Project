@@ -10,18 +10,19 @@ public class LoginController {
 
     private final LoginInputBoundary loginUseCaseInteractor;
 
-    public LoginController(LoginInputBoundary loginUseCaseInteractor) {
+    public LoginController(final LoginInputBoundary loginUseCaseInteractor) {
         this.loginUseCaseInteractor = loginUseCaseInteractor;
     }
 
     /**
      * Executes the Login Use Case.
+     *
      * @param username the username of the user logging in
      * @param password the password of the user logging in
      */
-    public void execute(String username, String password) {
+    public void execute(final String username, final String password) {
         final LoginInputData loginInputData = new LoginInputData(
-                username, password);
+            username, password);
 
         loginUseCaseInteractor.execute(loginInputData);
     }

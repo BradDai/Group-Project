@@ -20,15 +20,15 @@ public class LoginState {
         return password;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
-    public void setLoginError(String usernameError) {
+    public void setLoginError(final String usernameError) {
         this.loginError = usernameError;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 

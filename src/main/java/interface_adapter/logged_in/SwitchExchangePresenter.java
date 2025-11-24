@@ -10,13 +10,13 @@ public class SwitchExchangePresenter implements SwitchExchangeOutputBoundary {
     private final ExchangeViewModel exchangeViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public SwitchExchangePresenter(ExchangeViewModel exchangeViewModel, ViewManagerModel viewManagerModel){
+    public SwitchExchangePresenter(final ExchangeViewModel exchangeViewModel, final ViewManagerModel viewManagerModel) {
         this.exchangeViewModel = exchangeViewModel;
         this.viewManagerModel = viewManagerModel;
     }
 
-    public void switchToExchangeView(String username) {
-        ExchangeState exchangeState = exchangeViewModel.getExchangeState();
+    public void switchToExchangeView(final String username) {
+        final ExchangeState exchangeState = exchangeViewModel.getExchangeState();
         exchangeState.setUsername(username);
 
         exchangeState.setErrorMessage("");

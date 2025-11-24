@@ -14,31 +14,32 @@ public class ConvertTransaction extends Transaction {
 
     /**
      * Creates a new convert transaction.
+     *
      * @param transactionId unique identifier
-     * @param date transaction date
-     * @param portfolio portfolio where conversion occurs
-     * @param fromCurrency source currency symbol
-     * @param toCurrency destination currency symbol
-     * @param fromAmount amount of source currency
-     * @param exchangeRate conversion rate
+     * @param date          transaction date
+     * @param portfolio     portfolio where conversion occurs
+     * @param fromCurrency  source currency symbol
+     * @param toCurrency    destination currency symbol
+     * @param fromAmount    amount of source currency
+     * @param exchangeRate  conversion rate
      */
-    public ConvertTransaction(String transactionId, LocalDateTime date,
-                              String portfolio, String fromCurrency,
-                              String toCurrency, double fromAmount,
-                              double exchangeRate) {
+    public ConvertTransaction(final String transactionId, final LocalDateTime date,
+                              final String portfolio, final String fromCurrency,
+                              final String toCurrency, final double fromAmount,
+                              final double exchangeRate) {
         super(
-                transactionId,
-                date,
-                portfolio,          // fromPortfolio
-                portfolio,          // toPortfolio
-                null,               // assetSymbol (N/A)
-                fromAmount,         // quantity
-                null,               // priceAtTime (N/A)
-                null,               // totalValue (N/A)
-                fromCurrency,
-                toCurrency,
-                exchangeRate,
-                fromAmount
+            transactionId,
+            date,
+            portfolio,          // fromPortfolio
+            portfolio,          // toPortfolio
+            null,               // assetSymbol (N/A)
+            fromAmount,         // quantity
+            null,               // priceAtTime (N/A)
+            null,               // totalValue (N/A)
+            fromCurrency,
+            toCurrency,
+            exchangeRate,
+            fromAmount
         );
         if (fromAmount <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
@@ -61,7 +62,7 @@ public class ConvertTransaction extends Transaction {
     @Override
     public String getDescription() {
         return String.format("Converted %.2f %s to %.2f %s (rate: %.4f)",
-                fromAmount, fromCurrency, toAmount, toCurrency, exchangeRate);
+            fromAmount, fromCurrency, toAmount, toCurrency, exchangeRate);
     }
 
     public String getFromCurrency() {

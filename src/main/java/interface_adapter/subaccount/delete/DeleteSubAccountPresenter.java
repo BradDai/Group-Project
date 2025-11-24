@@ -9,21 +9,21 @@ public class DeleteSubAccountPresenter implements DeleteSubAccountOutputBoundary
 
     private final LoggedInViewModel loggedInViewModel;
 
-    public DeleteSubAccountPresenter(LoggedInViewModel loggedInViewModel) {
+    public DeleteSubAccountPresenter(final LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
     }
 
     @Override
-    public void prepareSuccessView(DeleteSubAccountOutputData outputData) {
-        LoggedInState state = loggedInViewModel.getState();
+    public void prepareSuccessView(final DeleteSubAccountOutputData outputData) {
+        final LoggedInState state = loggedInViewModel.getState();
         state.setSubAccounts(outputData.getSubAccounts());
         state.setSubAccountError(null);
         loggedInViewModel.firePropertyChange("subAccounts");
     }
 
     @Override
-    public void prepareFailView(String errorMessage) {
-        LoggedInState state = loggedInViewModel.getState();
+    public void prepareFailView(final String errorMessage) {
+        final LoggedInState state = loggedInViewModel.getState();
         state.setSubAccountError(errorMessage);
         loggedInViewModel.firePropertyChange("subAccountError");
     }

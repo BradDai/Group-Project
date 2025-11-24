@@ -4,9 +4,11 @@ public class SwitchBuyAssetInteractor implements SwitchBuyAssetInputBoundary {
 
     private final SwitchBuyAssetOutputBoundary switchBuyAssetPresenter;
 
-    public SwitchBuyAssetInteractor(SwitchBuyAssetOutputBoundary switchBuyAssetOutputBoundary) {
+    public SwitchBuyAssetInteractor(final SwitchBuyAssetOutputBoundary switchBuyAssetOutputBoundary) {
         this.switchBuyAssetPresenter = switchBuyAssetOutputBoundary;
     }
 
-    public void switchToBuyAssetView() { switchBuyAssetPresenter.switchToBuyAssetView(); }
+    public void switchToBuyAssetView() {
+        switchBuyAssetPresenter.switchToBuyAssetView();
+    }
 }

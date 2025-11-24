@@ -2,7 +2,7 @@
 //
 //import java.time.LocalDateTime;
 //
-///**
+/// **
 // * Represents a buy transaction where an asset is purchased.
 // */
 //public class BuyTransaction extends Transaction {
@@ -95,27 +95,27 @@ public class BuyTransaction extends Transaction {
      * @param quantity amount purchased
      * @param pricePerUnit price per unit of asset
      */
-    public BuyTransaction(String transactionId, LocalDateTime date,
-                          String toPortfolio, String assetType, String assetSymbol,
-                          double quantity, double pricePerUnit) {
+    public BuyTransaction(final String transactionId, final LocalDateTime date,
+                          final String toPortfolio, final String assetType, final String assetSymbol,
+                          final double quantity, final double pricePerUnit) {
 
         // 🔴 OLD (wrong now, only 4 args):
         // super(transactionId, date, null, toPortfolio);
 
         // ✅ NEW: match Transaction constructor (12 args)
         super(
-                transactionId,
-                date,
-                null,                     // fromPortfolio
-                toPortfolio,              // toPortfolio
-                assetSymbol,              // assetSymbol
-                quantity,                 // quantity
-                pricePerUnit,             // priceAtTime
-                quantity * pricePerUnit,  // totalValue
-                null,                     // fromCurrency
-                null,                     // toCurrency
-                null,                     // rate
-                null
+            transactionId,
+            date,
+            null,                     // fromPortfolio
+            toPortfolio,              // toPortfolio
+            assetSymbol,              // assetSymbol
+            quantity,                 // quantity
+            pricePerUnit,             // priceAtTime
+            quantity * pricePerUnit,  // totalValue
+            null,                     // fromCurrency
+            null,                     // toCurrency
+            null,                     // rate
+            null
         );
 
         if (quantity <= 0) {
@@ -139,7 +139,7 @@ public class BuyTransaction extends Transaction {
     @Override
     public String getDescription() {
         return String.format("Bought %.2f %s (%s) at $%.2f per unit",
-                quantity, assetType, assetSymbol, pricePerUnit);
+            quantity, assetType, assetSymbol, pricePerUnit);
     }
 
     public String getAssetType() {

@@ -27,17 +27,17 @@ public class TransactionHistoryController {
 
     private final TransactionHistoryInputBoundary interactor;
 
-    public TransactionHistoryController(TransactionHistoryInputBoundary interactor) {
+    public TransactionHistoryController(final TransactionHistoryInputBoundary interactor) {
         this.interactor = interactor;
     }
 
-    public void loadHistory(String portfolio,
-                            String assetFilter,
-                            String startDate,
-                            String endDate) {
+    public void loadHistory(final String portfolio,
+                            final String assetFilter,
+                            final String startDate,
+                            final String endDate) {
 
-        TransactionHistoryInputData input =
-                new TransactionHistoryInputData(portfolio, assetFilter, startDate, endDate);
+        final TransactionHistoryInputData input =
+            new TransactionHistoryInputData(portfolio, assetFilter, startDate, endDate);
         interactor.execute(input);
     }
 }

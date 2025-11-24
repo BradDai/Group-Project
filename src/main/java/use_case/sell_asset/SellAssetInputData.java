@@ -6,7 +6,7 @@ public class SellAssetInputData {
     private final String assetName;
     private final Double quantityToSell;
 
-    public SellAssetInputData(String userName, String portfolioName, String assetName, Double quantityToSell) {
+    public SellAssetInputData(final String userName, final String portfolioName, final String assetName, final Double quantityToSell) {
         this.userName = userName;
         this.portfolioName = portfolioName;
         this.assetName = assetName;
@@ -16,12 +16,15 @@ public class SellAssetInputData {
     public String getUsername() {
         return userName;
     }
+
     public String getportfolioName() {
         return portfolioName;
     }
+
     public String getAssetName() {
         return assetName;
     }
+
     public Double getQuantityToSell() {
         return quantityToSell;
     }

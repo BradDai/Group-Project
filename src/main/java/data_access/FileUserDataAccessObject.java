@@ -1,5 +1,15 @@
 package data_access;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import entity.User;
 import entity.UserFactory;
 import use_case.change_password.ChangePasswordUserDataAccessInterface;
@@ -7,18 +17,13 @@ import use_case.login.LoginUserDataAccessInterface;
 import use_case.logout.LogoutUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * DAO for user data implemented using a File to persist the data.
  */
 public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
-                                                 LoginUserDataAccessInterface,
-                                                 ChangePasswordUserDataAccessInterface,
-                                                 LogoutUserDataAccessInterface {
+    LoginUserDataAccessInterface,
+    ChangePasswordUserDataAccessInterface,
+    LogoutUserDataAccessInterface {
 
     private static final String HEADER = "username,password";
 
@@ -30,11 +35,12 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
     /**
      * Construct this DAO for saving to and reading from a local file.
-     * @param csvPath the path of the file to save to
+     *
+     * @param csvPath     the path of the file to save to
      * @param userFactory factory for creating user objects
      * @throws RuntimeException if there is an IOException when accessing the file
      */
-    public FileUserDataAccessObject(String csvPath, UserFactory userFactory) {
+    public FileUserDataAccessObject(final String csvPath, final UserFactory userFactory) {
 
         csvFile = new File(csvPath);
         headers.put("username", 0);
@@ -45,7 +51,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         }
         else {
 
-            try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
+            try (final BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
                 final String header = reader.readLine();
 
                 if (!header.equals(HEADER)) {
@@ -61,7 +67,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                     accounts.put(username, user);
                 }
             }
-            catch (IOException ex) {
+            catch (final IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -74,9 +80,9 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
             writer.write(String.join(",", headers.keySet()));
             writer.newLine();
 
-            for (User user : accounts.values()) {
+            for (final User user : accounts.values()) {
                 final String line = String.format("%s,%s",
-                        user.getName(), user.getPassword());
+                    user.getName(), user.getPassword());
                 writer.write(line);
                 writer.newLine();
             }
@@ -84,24 +90,24 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
             writer.close();
 
         }
-        catch (IOException ex) {
+        catch (final IOException ex) {
             throw new RuntimeException(ex);
         }
     }
 
     @Override
-    public void save(User user) {
+    public void save(final User user) {
         accounts.put(user.getName(), user);
         this.save();
     }
 
     @Override
-    public User get(String username) {
+    public User get(final String username) {
         return accounts.get(username);
     }
 
     @Override
-    public void setCurrentUsername(String name) {
+    public void setCurrentUsername(final String name) {
         currentUsername = name;
     }
 
@@ -111,12 +117,12 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
     }
 
     @Override
-    public boolean existsByName(String identifier) {
+    public boolean existsByName(final String identifier) {
         return accounts.containsKey(identifier);
     }
 
     @Override
-    public void changePassword(User user) {
+    public void changePassword(final User user) {
         // Replace the User object in the map
         accounts.put(user.getName(), user);
         save();

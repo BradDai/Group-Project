@@ -7,17 +7,18 @@ public class GetPriceInteractor implements GetPriceInputBoundary {
     private final PriceGateway gateway;
     private final GetPriceOutputBoundary presenter;
 
-    public GetPriceInteractor(PriceGateway gateway, GetPriceOutputBoundary presenter) {
+    public GetPriceInteractor(final PriceGateway gateway, final GetPriceOutputBoundary presenter) {
         this.gateway = gateway;
         this.presenter = presenter;
     }
 
     @Override
-    public void execute(GetPriceInputData inputData) {
+    public void execute(final GetPriceInputData inputData) {
         try {
-            double price = gateway.getPrice(inputData.getSymbol());
+            final double price = gateway.getPrice(inputData.getSymbol());
             presenter.presentPrice(new GetPriceOutputData(price));
-        } catch (IOException e) {
+        }
+        catch (final IOException e) {
             presenter.presentError(e.getMessage());
         }
     }

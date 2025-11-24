@@ -7,7 +7,7 @@ public class ChangePasswordOutputData {
 
     private final String username;
 
-    public ChangePasswordOutputData(String username) {
+    public ChangePasswordOutputData(final String username) {
         this.username = username;
     }
 

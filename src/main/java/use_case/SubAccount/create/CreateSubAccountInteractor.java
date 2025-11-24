@@ -1,10 +1,10 @@
 package use_case.SubAccount.create;
 
-import entity.SubAccount;
-import use_case.SubAccount.SubAccountDataAccessInterface;
-
 import java.math.BigDecimal;
 import java.util.List;
+
+import entity.SubAccount;
+import use_case.SubAccount.SubAccountDataAccessInterface;
 
 /**
  * CreateSubAccount Interactor.
@@ -16,17 +16,17 @@ public class CreateSubAccountInteractor implements CreateSubAccountInputBoundary
 
     private static final int MAX_SUBACCOUNTS = 5;
 
-    public CreateSubAccountInteractor(SubAccountDataAccessInterface subAccountDataAccess,
-                                      CreateSubAccountOutputBoundary presenter) {
+    public CreateSubAccountInteractor(final SubAccountDataAccessInterface subAccountDataAccess,
+                                      final CreateSubAccountOutputBoundary presenter) {
         this.subAccountDataAccess = subAccountDataAccess;
         this.presenter = presenter;
     }
 
     @Override
-    public void execute(CreateSubAccountInputData inputData) {
+    public void execute(final CreateSubAccountInputData inputData) {
 
-        String username = inputData.getUsername();
-        String newName = inputData.getSubAccountName();
+        final String username = inputData.getUsername();
+        final String newName = inputData.getSubAccountName();
         if (newName == null || newName.isBlank()) {
             presenter.prepareFailView("Subaccount name cannot be empty.");
             return;
@@ -41,12 +41,12 @@ public class CreateSubAccountInteractor implements CreateSubAccountInputBoundary
             presenter.prepareFailView("Subaccount with this name already exists.");
             return;
         }
-        SubAccount newSA =
-                new SubAccount(newName.trim(), BigDecimal.ZERO, false);
+        final SubAccount newSA =
+            new SubAccount(newName.trim(), BigDecimal.ZERO, false);
         subAccountDataAccess.save(username, newSA);
-        List<SubAccount> all = subAccountDataAccess.getSubAccountsOf(username);
-        CreateSubAccountOutputData outputData =
-                new CreateSubAccountOutputData(username, all);
+        final List<SubAccount> all = subAccountDataAccess.getSubAccountsOf(username);
+        final CreateSubAccountOutputData outputData =
+            new CreateSubAccountOutputData(username, all);
         presenter.prepareSuccessView(outputData);
     }
 }

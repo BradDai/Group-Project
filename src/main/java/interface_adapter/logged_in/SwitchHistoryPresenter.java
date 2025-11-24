@@ -9,7 +9,7 @@ public class SwitchHistoryPresenter implements SwitchHistoryOutputBoundary {
     private final HistoryViewModel historyViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public SwitchHistoryPresenter(HistoryViewModel historyViewModel, ViewManagerModel viewManagerModel) {
+    public SwitchHistoryPresenter(final HistoryViewModel historyViewModel, final ViewManagerModel viewManagerModel) {
 
         this.historyViewModel = historyViewModel;
         this.viewManagerModel = viewManagerModel;

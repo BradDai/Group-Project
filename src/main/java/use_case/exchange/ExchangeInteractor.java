@@ -1,53 +1,56 @@
 package use_case.exchange;
 
-import entity.SubAccount;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import entity.SubAccount;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class ExchangeInteractor implements ExchangeInputBoundary {
 
     private final ExchangeOutputBoundary exchangePresenter;
     private final ExchangeDataAccessInterface exchangeDataAccess;
 
-    public ExchangeInteractor(ExchangeOutputBoundary exchangePresenter,
-                              ExchangeDataAccessInterface exchangeDataAccess) {
+    public ExchangeInteractor(final ExchangeOutputBoundary exchangePresenter,
+                              final ExchangeDataAccessInterface exchangeDataAccess) {
         this.exchangePresenter = exchangePresenter;
         this.exchangeDataAccess = exchangeDataAccess;
     }
 
     @Override
-    public void fetchExchangeRate(ExchangeInputData inputData) {
+    public void fetchExchangeRate(final ExchangeInputData inputData) {
         try {
-            Map<String, Double> rates = getRates(inputData.getFrom());
-            Double rate = rates.get(inputData.getTo());
+            final Map<String, Double> rates = getRates(inputData.getFrom());
+            final Double rate = rates.get(inputData.getTo());
 
             if (rate == null) {
                 exchangePresenter.presentFailure("Invalid target currency.");
-            } else {
-                ExchangeOutputData outputData = new ExchangeOutputData(
-                        inputData.getFrom(),
-                        inputData.getTo(),
-                        rate
+            }
+            else {
+                final ExchangeOutputData outputData = new ExchangeOutputData(
+                    inputData.getFrom(),
+                    inputData.getTo(),
+                    rate
                 );
                 exchangePresenter.presentSuccess(outputData);
             }
 
-        } catch (Exception e) {
+        }
+        catch (final Exception e) {
             exchangePresenter.presentFailure("Error fetching rate: " + e.getMessage());
         }
     }
 
     @Override
-    public void convert(ExchangeConversionInputData inputData) {
+    public void convert(final ExchangeConversionInputData inputData) {
         try {
             if (inputData.getAmount() <= 0) {
                 exchangePresenter.presentConversionFailure("Amount must be positive.");
@@ -59,13 +62,13 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
             }
 
             // 1) Load current balances for this subaccount
-            Map<String, Double> currencies =
-                    exchangeDataAccess.getCurrencies(inputData.getUsername(), inputData.getAccountName());
+            final Map<String, Double> currencies =
+                exchangeDataAccess.getCurrencies(inputData.getUsername(), inputData.getAccountName());
 
-            Double fromBalance = currencies.get(inputData.getFrom());
+            final Double fromBalance = currencies.get(inputData.getFrom());
             if (fromBalance == null) {
                 exchangePresenter.presentConversionFailure(
-                        "Account does not own currency: " + inputData.getFrom());
+                    "Account does not own currency: " + inputData.getFrom());
                 return;
             }
             if (fromBalance < inputData.getAmount()) {
@@ -74,83 +77,86 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
             }
 
             // 2) Get rate from API
-            Map<String, Double> rates = getRates(inputData.getFrom());
-            Double rate = rates.get(inputData.getTo());
+            final Map<String, Double> rates = getRates(inputData.getFrom());
+            final Double rate = rates.get(inputData.getTo());
             if (rate == null) {
                 exchangePresenter.presentConversionFailure("Invalid target currency.");
                 return;
             }
 
-            double amountGiven = inputData.getAmount();
-            double amountReceived = amountGiven * rate;
+            final double amountGiven = inputData.getAmount();
+            final double amountReceived = amountGiven * rate;
 
-            double fromAfter = fromBalance - amountGiven;
-            double toBefore = currencies.getOrDefault(inputData.getTo(), 0.0);
-            double toAfter = toBefore + amountReceived;
+            final double fromAfter = fromBalance - amountGiven;
+            final double toBefore = currencies.getOrDefault(inputData.getTo(), 0.0);
+            final double toAfter = toBefore + amountReceived;
 
             currencies.put(inputData.getFrom(), fromAfter);
             currencies.put(inputData.getTo(), toAfter);
 
             // 3) Persist to JSON
             exchangeDataAccess.saveCurrencies(
-                    inputData.getUsername(),
-                    inputData.getAccountName(),
-                    currencies
+                inputData.getUsername(),
+                inputData.getAccountName(),
+                currencies
             );
             // Get entire updated subaccount list for the user
-            List<SubAccount> updatedSubAccounts = exchangeDataAccess.getSubAccountsOf(inputData.getUsername());
+            final List<SubAccount> updatedSubAccounts = exchangeDataAccess.getSubAccountsOf(inputData.getUsername());
 
             // 4) Build output data for presenter
-            ExchangeConversionOutputData outputData = new ExchangeConversionOutputData(
-                    inputData.getAccountName(),
-                    inputData.getFrom(),
-                    inputData.getTo(),
-                    amountGiven,
-                    amountReceived,
-                    rate,
-                    fromAfter,
-                    toAfter,
-                    updatedSubAccounts
+            final ExchangeConversionOutputData outputData = new ExchangeConversionOutputData(
+                inputData.getAccountName(),
+                inputData.getFrom(),
+                inputData.getTo(),
+                amountGiven,
+                amountReceived,
+                rate,
+                fromAfter,
+                toAfter,
+                updatedSubAccounts
             );
             exchangePresenter.presentConversionSuccess(outputData);
 
-        } catch (Exception e) {
+        }
+        catch (final Exception e) {
             exchangePresenter.presentConversionFailure("Error during conversion: " + e.getMessage());
         }
     }
 
     // unchanged
-    public Map<String, Double> getRates(String currency) {
+    public Map<String, Double> getRates(final String currency) {
 
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("https://open.er-api.com/v6/latest/" + currency)
-                .get()
-                .build();
+        final OkHttpClient client = new OkHttpClient();
+        final Request request = new Request.Builder()
+            .url("https://open.er-api.com/v6/latest/" + currency)
+            .get()
+            .build();
 
-        HashMap<String, Double> rates = new HashMap<>();
+        final HashMap<String, Double> rates = new HashMap<>();
 
-        try (Response response = client.newCall(request).execute()) {
+        try (final Response response = client.newCall(request).execute()) {
 
             if (!response.isSuccessful() || response.body() == null) {
                 throw new RuntimeException("API response error");
             }
 
-            JSONObject responseBody = new JSONObject(response.body().string());
+            final JSONObject responseBody = new JSONObject(response.body().string());
 
             if (responseBody.getString("result").equals("success")) {
-                JSONObject rateObject = responseBody.getJSONObject("rates");
-                Iterator<String> keys = rateObject.keys();
+                final JSONObject rateObject = responseBody.getJSONObject("rates");
+                final Iterator<String> keys = rateObject.keys();
 
                 while (keys.hasNext()) {
-                    String key = keys.next();
+                    final String key = keys.next();
                     rates.put(key, rateObject.getDouble(key));
                 }
-            } else {
+            }
+            else {
                 throw new RuntimeException("API returned failure");
             }
 
-        } catch (IOException | JSONException e) {
+        }
+        catch (final IOException | JSONException e) {
             throw new RuntimeException("Failed to fetch exchange rates", e);
         }
 

@@ -13,9 +13,10 @@ public class ExchangeViewModel {
         return exchangeState;
     }
 
-    public void setExchangeRate(String rate) {
+    public void setExchangeRate(final String rate) {
         this.exchangeRate = rate;
     }
+
     public void firePropertyChangedRate() {
         support.firePropertyChange("exchangeRate", null, exchangeRate);
     }
@@ -24,12 +25,12 @@ public class ExchangeViewModel {
         support.firePropertyChange("exchangeState", null, this.exchangeState);
     }
 
-    public void setState(ExchangeState state) {
+    public void setState(final ExchangeState state) {
         this.exchangeState = state;
         support.firePropertyChange("exchangeState", null, this.exchangeState);
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
 

@@ -2,7 +2,7 @@
 //
 //import java.time.LocalDateTime;
 //
-///**
+/// **
 // * Abstract base class representing a transaction.
 // */
 //public abstract class Transaction {
@@ -77,20 +77,20 @@ public abstract class Transaction {
 
     // === CONSTRUCTOR (extended but keeps original parameters) ===
     protected Transaction(
-            String transactionId,
-            LocalDateTime date,
-            String fromPortfolio,
-            String toPortfolio,
+        final String transactionId,
+        final LocalDateTime date,
+        final String fromPortfolio,
+        final String toPortfolio,
 
-            //
-            String assetSymbol,
-            Double quantity,
-            Double priceAtTime,
-            Double totalValue,
-            String fromCurrency,
-            String toCurrency,
-            Double rate,
-            Double amount
+        //
+        final String assetSymbol,
+        final Double quantity,
+        final Double priceAtTime,
+        final Double totalValue,
+        final String fromCurrency,
+        final String toCurrency,
+        final Double rate,
+        final Double amount
     ) {
         // Original validation kept exactly the same
         if (transactionId == null || transactionId.isEmpty()) {
