@@ -10,8 +10,8 @@ public class SellAssetController {
         this.sellAssetInteractor = sellAssetInteractor;
     }
 
-    public void execute(String portfolioName, String stockName, double quantity) {
-        final SellAssetInputData sellAssetInputData = new SellAssetInputData(portfolioName, stockName, quantity);
+    public void execute(String userName, String portfolioName, String stockName, double quantity) {
+        final SellAssetInputData sellAssetInputData = new SellAssetInputData(userName, portfolioName, stockName, quantity);
 
         sellAssetInteractor.execute(sellAssetInputData);
     }

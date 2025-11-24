@@ -54,10 +54,7 @@ import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
 import use_case.SubAccount.SubAccountDataAccessInterface;
-import use_case.sell_asset.SellAssetInputBoundary;
-import use_case.sell_asset.SellAssetInteractor;
-import use_case.sell_asset.SellAssetOutputBoundary;
-import use_case.sell_asset.SellAssetPriceOutputBoundary;
+import use_case.sell_asset.*;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -231,6 +228,7 @@ public class AppBuilder {
 
         final SellAssetInputBoundary sellAssetInteractor =
                 new SellAssetInteractor(
+                        subAccountDataAccess,
                         sellAssetOutputBoundary,
                         sellAssetPriceOutputBoundary
                 );

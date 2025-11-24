@@ -32,6 +32,7 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
     private JLabel totalPriceLabel;
 
     private double currentStockPrice = 0.0;
+    private String userName;
 
     public SellAssetView(SellAssetViewModel sellAssetViewModel) {
         this.sellAssetViewModel = sellAssetViewModel;
@@ -92,7 +93,7 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                         String portfolioName =  (String) portfolioSelector.getSelectedItem();
                         String stockName =  (String) stockSelector.getSelectedItem();
                         double quantity = Double.parseDouble(quantityField.getText());
-                        sellAssetController.execute(portfolioName, stockName, quantity);
+                        sellAssetController.execute(userName, portfolioName, stockName, quantity);
                     }
                 }
         );
@@ -131,6 +132,10 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
         this.currentStockPrice = state.getCurrentPrice();
 
         // Update portfolio list if present
+        if (state.getUsername() != null) {
+            userName = state.getUsername();
+        }
+
         if (state.getPortfolios() != null) {
             portfolioSelector.setModel(new DefaultComboBoxModel<>(state.getPortfolios()));
         }
@@ -138,6 +143,37 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
         if (state.getPriceError() != null) {
             stockPriceLabel.setText("Error: " + state.getPriceError());
             totalPriceLabel.setText("—");
+            return;
+        }
+
+        // Handle success message from SellAssetInteractor
+        if (state.getMessage() != null && !state.getMessage().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    null,  // null = center on screen
+                    state.getMessage(),
+                    "Message",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            // Clear fields for next sale
+            quantityField.setText("");
+            stockPriceLabel.setText("—");
+            totalPriceLabel.setText("—");
+
+            // Optionally reset stock selection:
+            // stockSelector.setSelectedIndex(0);
+
+            return; // avoid processing the rest of the method
+        }
+
+        // Handle failure message
+        if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    state.getErrorMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
             return;
         }
 
