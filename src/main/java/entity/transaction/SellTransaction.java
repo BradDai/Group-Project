@@ -25,22 +25,7 @@ public class SellTransaction extends Transaction {
     public SellTransaction(String transactionId, LocalDateTime date,
                            String fromPortfolio, String assetType, String assetSymbol,
                            double quantity, double pricePerUnit) {
-//        super(transactionId, date, fromPortfolio, null);
-        super(
-                transactionId,
-                date,
-                fromPortfolio,              // fromPortfolio
-                null,                       // toPortfolio
-                assetSymbol,                // assetSymbol
-                quantity,                   // quantity
-                pricePerUnit,               // priceAtTime
-                quantity * pricePerUnit,    // totalValue
-                null,                       // fromCurrency
-                null,                       // toCurrency
-                null,                       // rate
-                null                        // amount
-        );
-
+        super(transactionId, date, fromPortfolio, null);
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be positive");
         }
