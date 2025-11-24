@@ -9,21 +9,7 @@ public class TransferTransaction extends Transaction {
 
     public TransferTransaction(String transactionId, LocalDateTime date, String fromPortfolio, String toPortfolio,
                                String assetType, String assetSymbol, double quantity) {
-        super(
-                transactionId,
-                date,
-                fromPortfolio,          // fromPortfolio
-                toPortfolio,            // toPortfolio
-                assetSymbol,            // assetSymbol
-                quantity,               // quantity
-                null,                   // priceAtTime
-                null,                   // totalValue
-                null,                   // fromCurrency
-                null,                   // toCurrency
-                null,                   // rate
-                null                    // amount
-        );
-
+        super(transactionId, date, fromPortfolio, toPortfolio);
         this.assetType = assetType;
         this.assetSymbol = assetSymbol;
         this.quantity = quantity;
