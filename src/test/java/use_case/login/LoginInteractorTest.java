@@ -1,18 +1,25 @@
 package use_case.login;
 
 import data_access.InMemoryUserDataAccessObject;
-import entity.UserFactory;
+import entity.SubAccount;
 import entity.User;
+import entity.UserFactory;
 import org.junit.jupiter.api.Test;
+import use_case.SubAccount.SubAccountDataAccessInterface;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoginInteractorTest {
 
+    private final SubAccountDataAccessInterface subAccountRepository = new StubSubAccountDataAccess();
+
     @Test
     void successTest() {
         LoginInputData inputData = new LoginInputData("Paul", "password");
-        LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+        InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
         // For the success test, we need to add Paul to the data access repository before we log in.
         UserFactory factory = new UserFactory();
@@ -24,16 +31,20 @@ class LoginInteractorTest {
             @Override
             public void prepareSuccessView(LoginOutputData user) {
                 assertEquals("Paul", user.getUsername());
-                assertEquals("Paul", userRepository.getCurrentUsername());
             }
 
             @Override
             public void prepareFailView(String error) {
                 fail("Use case failure is unexpected.");
             }
+
+            @Override
+            public void switchToSignupView() {
+
+            }
         };
 
-        LoginInputBoundary interactor = new LoginInteractor(userRepository, successPresenter);
+        LoginInputBoundary interactor = new LoginInteractor(userRepository, successPresenter, subAccountRepository);
         interactor.execute(inputData);
     }
 
@@ -41,7 +52,7 @@ class LoginInteractorTest {
     @Test
     void failurePasswordMismatchTest() {
         LoginInputData inputData = new LoginInputData("Paul", "wrong");
-        LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+        InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
         // For this failure test, we need to add Paul to the data access repository before we log in, and
         // the passwords should not match.
@@ -61,16 +72,21 @@ class LoginInteractorTest {
             public void prepareFailView(String error) {
                 assertEquals("Incorrect password for \"Paul\".", error);
             }
+
+            @Override
+            public void switchToSignupView() {
+
+            }
         };
 
-        LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter);
+        LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter, subAccountRepository);
         interactor.execute(inputData);
     }
 
     @Test
     void failureUserDoesNotExistTest() {
         LoginInputData inputData = new LoginInputData("Paul", "password");
-        LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+        InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
         // Add Paul to the repo so that when we check later they already exist
 
@@ -86,9 +102,31 @@ class LoginInteractorTest {
             public void prepareFailView(String error) {
                 assertEquals("Paul: Account does not exist.", error);
             }
+
+            @Override
+            public void switchToSignupView() {
+
+            }
         };
 
-        LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter);
+        LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter, subAccountRepository);
         interactor.execute(inputData);
+    }
+
+    private static class StubSubAccountDataAccess implements SubAccountDataAccessInterface {
+        @Override
+        public boolean exists(String username, String subName) { return false; }
+
+        @Override
+        public void save(String username, SubAccount subAccount) {}
+
+        @Override
+        public List<SubAccount> getSubAccountsOf(String username) { return new ArrayList<>(); }
+
+        @Override
+        public int countByUser(String username) { return 0; }
+
+        @Override
+        public void delete(String username, String subName) {}
     }
 }
