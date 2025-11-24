@@ -83,6 +83,17 @@ import use_case.transfer.TransferInputBoundary;
 import use_case.transfer.TransferInteractor;
 import use_case.transfer.TransferOutputBoundary;
 import view.*;
+import data_access.TwelveDataPriceGateway;
+import interface_adapter.buyasset.GetPriceController;
+import interface_adapter.buyasset.GetPricePresenter;
+import use_case.get_price.GetPriceInputBoundary;
+import use_case.get_price.GetPriceInteractor;
+import use_case.get_price.PriceGateway;
+import interface_adapter.buyasset.BuyAssetController;
+import use_case.buyasset.BuyAssetInteractor;
+import interface_adapter.buyasset.BuyAssetPresenter;
+import use_case.buyasset.BuyAssetInputBoundary;
+import use_case.buyasset.BuyAssetOutputBoundary;
 
 import javax.swing.*;
 import java.awt.*;
@@ -95,6 +106,7 @@ public class AppBuilder {
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     private final FileSubAccountDataAccessJSON subAccountDataAccess = new FileSubAccountDataAccessJSON("subaccounts.json");
+    private static final String TWELVE_DATA_API_KEY = "ebcea301f0ad46579daa6b6dea349164";
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -178,6 +190,16 @@ public class AppBuilder {
         buyAssetViewModel = new BuyAssetViewModel();
         buyAssetView = new BuyAssetView(buyAssetViewModel);
         cardPanel.add(buyAssetView, buyAssetView.getViewName());
+        buyAssetView.setLoggedInViewModel(loggedInViewModel);
+        return this;
+    }
+
+    public AppBuilder addGetPriceUseCase() {
+        GetPricePresenter presenter = new GetPricePresenter(buyAssetViewModel);
+        PriceGateway gateway = new TwelveDataPriceGateway(TWELVE_DATA_API_KEY);
+        GetPriceInputBoundary interactor = new GetPriceInteractor(gateway, presenter);
+        GetPriceController controller = new GetPriceController(interactor);
+        buyAssetView.setGetPriceController(controller);
         return this;
     }
 
@@ -216,6 +238,13 @@ public class AppBuilder {
 
         LoginController loginController = new LoginController(loginInteractor);
         loginView.setLoginController(loginController);
+        return this;
+    }
+    public AppBuilder addBuyAssetUseCase() {
+        BuyAssetPresenter presenter = new BuyAssetPresenter(buyAssetViewModel, loggedInViewModel, subAccountDataAccess);
+        BuyAssetInputBoundary interactor = new BuyAssetInteractor(subAccountDataAccess, presenter);
+        BuyAssetController controller = new BuyAssetController(interactor);
+        buyAssetView.setBuyAssetController(controller);
         return this;
     }
 
