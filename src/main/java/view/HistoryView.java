@@ -182,7 +182,7 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         topButtons.add(back);
         this.add(topButtons);
 
-        // Middle: input fields + date filter + load
+        // Middle: input fields + date filter + load/clear
         JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         portfolioField = new JTextField(10);
