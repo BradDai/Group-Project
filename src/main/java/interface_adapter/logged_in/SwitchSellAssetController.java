@@ -10,8 +10,8 @@ public class SwitchSellAssetController {
         this.switchSellAssetUseCaseInteractor = switchSellAssetUseCaseInteractor;
     }
 
-    public void switchToSellAssetView() {
+    public void switchToSellAssetView(String username) {
 
-        switchSellAssetUseCaseInteractor.switchToSellAssetView();
+        switchSellAssetUseCaseInteractor.switchToSellAssetView(username);
     }
 }

@@ -5,6 +5,14 @@ public class SellAssetState {
     private double currentPrice;
     private String priceError;
 
+    // for switch view
+    private String username;
+    private String[] portfolios;
+
+    // output
+    private String message;
+    private String errorMessage;
+
     public double getCurrentPrice() {
         return currentPrice;
     }
@@ -19,5 +27,39 @@ public class SellAssetState {
 
     public void setPriceError(String priceError) {
         this.priceError = priceError;
+    }
+
+    // methods for switch view
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setPortfolios(String[] portfolios) {
+        this.portfolios = portfolios;
+    }
+
+    public String[] getPortfolios() {
+        return portfolios;
+    }
+
+    // for output
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

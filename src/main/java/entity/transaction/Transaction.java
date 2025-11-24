@@ -65,15 +65,15 @@ public abstract class Transaction {
 
     // === NEW FIELDS FOR HISTORY PAGE (optional) ===
     // These will be ignored for transaction types that don’t use them.
-    private final String assetSymbol;     // e.g., AAPL for buy/sell
-    private final Double quantity;        // how many shares/units
-    private final Double priceAtTime;     // price per unit at execution
-    private final Double totalValue;      // total transaction value
+    private final String assetSymbol;
+    private final Double quantity;
+    private final Double priceAtTime;
+    private final Double totalValue;
 
-    private final String fromCurrency;    // for conversion
-    private final String toCurrency;      // for conversion
-    private final Double rate;            // conversion rate
-    private final Double amount;          // amount converted
+    private final String fromCurrency;
+    private final String toCurrency;
+    private final Double rate;
+    private final Double amount;
 
     // === CONSTRUCTOR (extended but keeps original parameters) ===
     protected Transaction(
