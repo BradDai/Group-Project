@@ -1,9 +1,9 @@
 package data_access;
 
-import entity.transaction.Transaction;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import entity.transaction.Transaction;
 
 /**
  * Data access interface for reading/writing transactions.

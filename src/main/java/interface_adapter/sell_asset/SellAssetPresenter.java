@@ -9,19 +9,19 @@ public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPri
 
     private final SellAssetViewModel sellAssetViewModel;
 
-    public SellAssetPresenter(SellAssetViewModel sellAssetViewModel) {
+    public SellAssetPresenter(final SellAssetViewModel sellAssetViewModel) {
         this.sellAssetViewModel = sellAssetViewModel;
     }
 
     @Override
-    public void prepareSuccessView(SellAssetOutputData data) {
-        SellAssetState state = sellAssetViewModel.getState();
+    public void prepareSuccessView(final SellAssetOutputData data) {
+        final SellAssetState state = sellAssetViewModel.getState();
 
         // Construct a user-friendly message
-        String msg = "Successfully sold " + data.getQuantitySold() + " shares of "
-                + data.getAssetName() + ". Total received: $"
-                + String.format("%.2f", data.getTotalPrice()) +
-                ". Remaining: " + data.getRemainingQuantity();
+        final String msg = "Successfully sold " + data.getQuantitySold() + " shares of "
+            + data.getAssetName() + ". Total received: $"
+            + String.format("%.2f", data.getTotalPrice()) +
+            ". Remaining: " + data.getRemainingQuantity();
 
         state.setMessage(msg);
         state.setErrorMessage(null);
@@ -31,8 +31,8 @@ public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPri
     }
 
     @Override
-    public void prepareFailureView(String errorMessage) {
-        SellAssetState state = sellAssetViewModel.getState();
+    public void prepareFailureView(final String errorMessage) {
+        final SellAssetState state = sellAssetViewModel.getState();
         state.setErrorMessage(errorMessage);
         state.setMessage(null);  // clear success message
 
@@ -41,8 +41,8 @@ public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPri
     }
 
     @Override
-    public void preparePriceSuccessView(SellAssetPriceOutputData sellAssetPriceOutputData) {
-        SellAssetState sellAssetState = sellAssetViewModel.getState();
+    public void preparePriceSuccessView(final SellAssetPriceOutputData sellAssetPriceOutputData) {
+        final SellAssetState sellAssetState = sellAssetViewModel.getState();
         sellAssetState.setCurrentPrice(sellAssetPriceOutputData.getPrice());
         sellAssetState.setPriceError(null);
 
@@ -51,8 +51,8 @@ public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPri
     }
 
     @Override
-    public void preparePriceFailureView(String errorMessage) {
-        SellAssetState sellAssetState = sellAssetViewModel.getState();
+    public void preparePriceFailureView(final String errorMessage) {
+        final SellAssetState sellAssetState = sellAssetViewModel.getState();
         sellAssetState.setPriceError(errorMessage);
         sellAssetState.setCurrentPrice(0.0);
 

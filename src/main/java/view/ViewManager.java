@@ -1,11 +1,16 @@
 package view;
 
-import interface_adapter.ViewManagerModel;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import interface_adapter.ViewManagerModel;
 
 /**
  * The View Manager for the program. It listens for property change events
@@ -16,7 +21,7 @@ public class ViewManager implements PropertyChangeListener {
     private final JPanel views;
     private final ViewManagerModel viewManagerModel;
 
-    public ViewManager(JPanel views, CardLayout cardLayout, ViewManagerModel viewManagerModel) {
+    public ViewManager(final JPanel views, final CardLayout cardLayout, final ViewManagerModel viewManagerModel) {
         this.views = views;
         this.cardLayout = cardLayout;
         this.viewManagerModel = viewManagerModel;
@@ -24,25 +29,27 @@ public class ViewManager implements PropertyChangeListener {
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(final PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
             final String viewModelName = (String) evt.getNewValue();
             cardLayout.show(views, viewModelName);
 
-            Window window = SwingUtilities.getWindowAncestor(views);
+            final Window window = SwingUtilities.getWindowAncestor(views);
             if (window != null) {
 
                 // Loop through all components to find active and reset inactive
-                for (Component comp : views.getComponents()) {
+                for (final Component comp : views.getComponents()) {
                     if (viewModelName.equals(comp.getName())) {
                         // This is the active component
                         if (comp instanceof TransferView) {
                             // Set a minimum size for TransferView
                             comp.setPreferredSize(new Dimension(600, 650));
-                        } else {
+                        }
+                        else {
                             comp.setPreferredSize(null);
                         }
-                    } else {
+                    }
+                    else {
                         comp.setPreferredSize(null);
                     }
                 }

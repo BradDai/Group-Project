@@ -6,6 +6,7 @@ package use_case.transfer;
 public interface TransferInputBoundary {
     /**
      * Executes the transfer use case.
+     *
      * @param transferInputData the input data
      */
     void execute(TransferInputData transferInputData);

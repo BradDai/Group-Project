@@ -28,10 +28,10 @@ public class TransactionHistoryInputData {
     private final String startDate;
     private final String endDate;
 
-    public TransactionHistoryInputData(String portfolio,
-                                       String asset,
-                                       String startDate,
-                                       String endDate) {
+    public TransactionHistoryInputData(final String portfolio,
+                                       final String asset,
+                                       final String startDate,
+                                       final String endDate) {
         this.portfolio = portfolio;
         this.asset = asset;
         this.startDate = startDate;

@@ -8,11 +8,11 @@ public class ExchangeConversionInputData {
     private final String to;
     private final double amount;
 
-    public ExchangeConversionInputData(String username,
-                                       String accountName,
-                                       String from,
-                                       String to,
-                                       double amount) {
+    public ExchangeConversionInputData(final String username,
+                                       final String accountName,
+                                       final String from,
+                                       final String to,
+                                       final double amount) {
         this.username = username;
         this.accountName = accountName;
         this.from = from;
@@ -20,9 +20,23 @@ public class ExchangeConversionInputData {
         this.amount = amount;
     }
 
-    public String getUsername() { return username; }
-    public String getAccountName() { return accountName; }
-    public String getFrom() { return from; }
-    public String getTo() { return to; }
-    public double getAmount() { return amount; }
+    public String getUsername() {
+        return username;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
 }

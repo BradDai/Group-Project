@@ -1,13 +1,5 @@
 package view;
 
-import interface_adapter.exchange.ExchangeController;
-import interface_adapter.exchange.ExchangeState;
-import interface_adapter.exchange.ExchangeViewModel;
-import interface_adapter.SwitchLoggedInController;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -15,6 +7,21 @@ import java.beans.PropertyChangeListener;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import interface_adapter.SwitchLoggedInController;
+import interface_adapter.exchange.ExchangeController;
+import interface_adapter.exchange.ExchangeState;
+import interface_adapter.exchange.ExchangeViewModel;
 
 public class ExchangeView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -39,16 +46,16 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     private final JLabel errorLabel;
     private final JLabel confirmationLabel;
 
-    public ExchangeView(ExchangeViewModel exchangeViewModel) {
+    public ExchangeView(final ExchangeViewModel exchangeViewModel) {
         this.exchangeViewModel = exchangeViewModel;
         this.exchangeViewModel.addPropertyChangeListener(this);
 
-        final JPanel Buttons = new JPanel();
+        final JPanel buttons = new JPanel();
 
         back = new JButton("Cancel");
         confirmExchange = new JButton("Confirm");
-        Buttons.add(confirmExchange);
-        Buttons.add(back);
+        buttons.add(confirmExchange);
+        buttons.add(back);
 
         firstCurrency = new JComboBox<>();
         secondCurrency = new JComboBox<>();
@@ -67,41 +74,41 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         errorLabel = new JLabel(" ");
         confirmationLabel = new JLabel(" ");
 
-        JPanel currencyPanel = new JPanel();
+        final JPanel currencyPanel = new JPanel();
         currencyPanel.add(new JLabel("From:"));
         currencyPanel.add(firstCurrency);
         currencyPanel.add(new JLabel("To:"));
         currencyPanel.add(secondCurrency);
 
-        JPanel resultPanel = new JPanel();
+        final JPanel resultPanel = new JPanel();
         resultPanel.add(new JLabel("Rate:"));
         resultLabel = new JLabel("N/A");
         resultPanel.add(resultLabel);
 
-        JPanel selectedAccountPanel = new JPanel();
+        final JPanel selectedAccountPanel = new JPanel();
         selectedAccountPanel.add(selectedAccountLabel);
         selectedAccountPanel.add(selectedAccount);
 
-        JPanel currencyInputPanel = new JPanel();
+        final JPanel currencyInputPanel = new JPanel();
         currencyInputPanel.add(givenCurrencyLabel);
         currencyInputPanel.add(givenCurrency);
         currencyInputPanel.add(gottenCurrencyLabel);
         currencyInputPanel.add(gottenCurrency);
 
-        JPanel amountInputPanel = new JPanel();
+        final JPanel amountInputPanel = new JPanel();
         amountInputPanel.add(amountLabel);
         amountInputPanel.add(amountField);
 
-        JPanel inputPanel = new JPanel();
+        final JPanel inputPanel = new JPanel();
         inputPanel.add(selectedAccountPanel);
         inputPanel.add(currencyInputPanel);
         inputPanel.add(amountInputPanel);
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
 
-        JPanel confirmPanel = new JPanel();
+        final JPanel confirmPanel = new JPanel();
         confirmPanel.add(confirmationLabel);
 
-        JPanel errorPanel = new JPanel();
+        final JPanel errorPanel = new JPanel();
         errorPanel.add(errorLabel);
 
         this.add(currencyPanel);
@@ -109,24 +116,24 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         this.add(inputPanel);
         this.add(confirmPanel);
         this.add(errorPanel);
-        this.add(Buttons);
+        this.add(buttons);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         back.addActionListener(evt -> switchLoggedInController.switchToLoggedInView());
 
-        selectedAccount.addActionListener(e -> loadCurrenciesForSelectedAccount());
+        selectedAccount.addActionListener(actionEvent -> loadCurrenciesForSelectedAccount());
 
-        ActionListener updateSelection = evt -> triggerRateQuery();
+        final ActionListener updateSelection = evt -> triggerRateQuery();
         firstCurrency.addActionListener(updateSelection);
         secondCurrency.addActionListener(updateSelection);
 
-        confirmExchange.addActionListener(e -> handleConfirmExchange());
+        confirmExchange.addActionListener(actionEvent -> handleConfirmExchange());
     }
 
-    private void loadGlobalCurrencies(JComboBox<String> first, JComboBox<String> second) {
+    private void loadGlobalCurrencies(final JComboBox<String> first, final JComboBox<String> second) {
         try {
-            String json = Files.readString(Paths.get("currencies.json"), StandardCharsets.UTF_8);
-            JSONArray arr = new JSONArray(json);
+            final String json = Files.readString(Paths.get("currencies.json"), StandardCharsets.UTF_8);
+            final JSONArray arr = new JSONArray(json);
 
             first.removeAllItems();
             second.removeAllItems();
@@ -135,31 +142,32 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
                 first.addItem(arr.getString(i));
                 second.addItem(arr.getString(i));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        catch (final Exception exception) {
+            exception.printStackTrace();
         }
     }
 
     private void loadAccounts() {
 
         selectedAccount.removeAllItems();
-        String username = exchangeViewModel.getExchangeState().getUsername();
+        final String username = exchangeViewModel.getExchangeState().getUsername();
 
         try {
-            String json = Files.readString(Paths.get("subaccounts.json"), StandardCharsets.UTF_8);
-            JSONObject root = new JSONObject(json);
+            final String json = Files.readString(Paths.get("subaccounts.json"), StandardCharsets.UTF_8);
+            final JSONObject root = new JSONObject(json);
 
-            if (!root.has(username)) return;
-
-            JSONArray accounts = root.getJSONArray(username);
-
-            for (int i = 0; i < accounts.length(); i++) {
-                JSONObject acc = accounts.getJSONObject(i);
-                selectedAccount.addItem(acc.getString("name"));
+            if (root.has(username)) {
+                final JSONArray accounts = root.getJSONArray(username);
+                for (int i = 0; i < accounts.length(); i++) {
+                    final JSONObject acc = accounts.getJSONObject(i);
+                    selectedAccount.addItem(acc.getString("name"));
+                }
             }
 
-        } catch (Exception e) {
-            System.err.println("Error loading accounts: " + e.getMessage());
+        }
+        catch (final Exception exception) {
+            System.err.println("Error loading accounts: " + exception.getMessage());
         }
     }
 
@@ -167,48 +175,47 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         givenCurrency.removeAllItems();
         gottenCurrency.removeAllItems();
 
-        String username = exchangeViewModel.getExchangeState().getUsername();
-        String accountName = (String) selectedAccount.getSelectedItem();
-        if (accountName == null) return;
+        final String username = exchangeViewModel.getExchangeState().getUsername();
+        final String accountName = (String) selectedAccount.getSelectedItem();
+        if (accountName != null) {
+            try {
+                final String json = Files.readString(Paths.get("subaccounts.json"), StandardCharsets.UTF_8);
+                final JSONObject root = new JSONObject(json);
 
-        try {
-            String json = Files.readString(Paths.get("subaccounts.json"), StandardCharsets.UTF_8);
-            JSONObject root = new JSONObject(json);
+                final JSONArray accounts = root.getJSONArray(username);
 
-            JSONArray accounts = root.getJSONArray(username);
-
-            JSONObject accountObject = null;
-            for (int i = 0; i < accounts.length(); i++) {
-                JSONObject obj = accounts.getJSONObject(i);
-                if (accountName.equals(obj.getString("name"))) {
-                    accountObject = obj;
-                    break;
+                JSONObject accountObject = null;
+                for (int i = 0; i < accounts.length(); i++) {
+                    final JSONObject obj = accounts.getJSONObject(i);
+                    if (accountName.equals(obj.getString("name"))) {
+                        accountObject = obj;
+                        break;
+                    }
                 }
+                if (accountObject != null) {
+                    final JSONObject ownedCurrencies = accountObject.getJSONObject("currencies");
+                    for (final String key : ownedCurrencies.keySet()) {
+                        givenCurrency.addItem(key);
+                    }
+                    final String currencyJson = Files.readString(Paths.get("currencies.json"));
+                    final JSONArray allCurrencies = new JSONArray(currencyJson);
+                    for (int i = 0; i < allCurrencies.length(); i++) {
+                        final String code = allCurrencies.getString(i);
+                        gottenCurrency.addItem(code);
+                    }
+                }
+
             }
-            if (accountObject == null) return;
-
-            JSONObject ownedCurrencies = accountObject.getJSONObject("currencies");
-
-            for (String key : ownedCurrencies.keySet()) {
-                givenCurrency.addItem(key);
+            catch (final Exception exception) {
+                System.err.println("Error loading currencies: " + exception.getMessage());
             }
-
-            String currencyJson = Files.readString(Paths.get("currencies.json"));
-            JSONArray allCurrencies = new JSONArray(currencyJson);
-
-            for (int i = 0; i < allCurrencies.length(); i++) {
-                String code = allCurrencies.getString(i);
-                gottenCurrency.addItem(code);
-            }
-
-        } catch (Exception e) {
-            System.err.println("Error loading currencies: " + e.getMessage());
         }
+
     }
 
     private void triggerRateQuery() {
-        String from = (String) firstCurrency.getSelectedItem();
-        String to = (String) secondCurrency.getSelectedItem();
+        final String from = (String) firstCurrency.getSelectedItem();
+        final String to = (String) secondCurrency.getSelectedItem();
 
         if (from != null && to != null) {
             exchangeController.getExchangeRate(from, to);
@@ -216,41 +223,45 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     }
 
     private void handleConfirmExchange() {
+        boolean finished = false;
 
-        String username = exchangeViewModel.getExchangeState().getUsername();
-        String accountName = (String) selectedAccount.getSelectedItem();
-        String from = (String) givenCurrency.getSelectedItem();
-        String to = (String) gottenCurrency.getSelectedItem();
-        String amountText = amountField.getText();
+        final String username = exchangeViewModel.getExchangeState().getUsername();
+        final String accountName = (String) selectedAccount.getSelectedItem();
+        final String from = (String) givenCurrency.getSelectedItem();
+        final String to = (String) gottenCurrency.getSelectedItem();
+        final String amountText = amountField.getText();
 
         if (accountName == null || from == null || to == null) {
             errorLabel.setText("Please select account and currencies.");
-            return;
+        }
+        else {
+            double amount = 0;
+            try {
+                amount = Double.parseDouble(amountText);
+            }
+            catch (final NumberFormatException numberFormatException) {
+                errorLabel.setText("Amount must be a valid number.");
+                finished = true;
+            }
+            if (!finished) {
+                if (exchangeController == null) {
+                    errorLabel.setText("Exchange controller not set.");
+                }
+                else {
+                    exchangeController.convert(username, accountName, from, to, amount);
+                }
+            }
         }
 
-        double amount;
-        try {
-            amount = Double.parseDouble(amountText);
-        } catch (NumberFormatException e) {
-            errorLabel.setText("Amount must be a valid number.");
-            return;
-        }
-
-        if (exchangeController == null) {
-            errorLabel.setText("Exchange controller not set.");
-            return;
-        }
-
-        exchangeController.convert(username, accountName, from, to, amount);
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(final PropertyChangeEvent evt) {
         if ("exchangeRate".equals(evt.getPropertyName())) {
             resultLabel.setText(evt.getNewValue().toString());
         }
         else if ("exchangeState".equals(evt.getPropertyName())) {
-            ExchangeState state = exchangeViewModel.getExchangeState();
+            final ExchangeState state = exchangeViewModel.getExchangeState();
             errorLabel.setText(state.getErrorMessage());
             confirmationLabel.setText(state.getConversionMessage());
             amountField.setText(state.getAmountField());
@@ -258,20 +269,22 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         }
     }
 
-    public String getViewName() { return VIEW_NAME; }
+    public String getViewName() {
+        return VIEW_NAME;
+    }
 
-    public void setSwitchLoggedInController (SwitchLoggedInController switchLoggedInController) {
+    public void setSwitchLoggedInController(final SwitchLoggedInController switchLoggedInController) {
         this.switchLoggedInController = switchLoggedInController;
     }
 
-    public void setExchangeController(ExchangeController exchangeController) {
+    public void setExchangeController(final ExchangeController exchangeController) {
         this.exchangeController = exchangeController;
 
         triggerRateQuery();
     }
 
     @Override
-    public void actionPerformed(ActionEvent evt) {
+    public void actionPerformed(final ActionEvent evt) {
         // This method is not needed to be used.
     }
 }

@@ -6,7 +6,7 @@ public class SwitchLoggedInController {
 
     private final SwitchLoggedInInputBoundary switchLoggedInUseCaseInteractor;
 
-    public SwitchLoggedInController(SwitchLoggedInInputBoundary switchLoggedInUseCaseInteractor) {
+    public SwitchLoggedInController(final SwitchLoggedInInputBoundary switchLoggedInUseCaseInteractor) {
         this.switchLoggedInUseCaseInteractor = switchLoggedInUseCaseInteractor;
     }
 

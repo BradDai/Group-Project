@@ -1,17 +1,23 @@
 package view;
 
-import interface_adapter.login.LoginController;
-import interface_adapter.login.LoginState;
-import interface_adapter.login.LoginViewModel;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginState;
+import interface_adapter.login.LoginViewModel;
 
 /**
  * The View for when the user is logging into the program.
@@ -29,9 +35,9 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
     private final JButton logIn;
     private final JButton cancel;
-    private LoginController loginController = null;
+    private LoginController loginController;
 
-    public LoginView(LoginViewModel loginViewModel) {
+    public LoginView(final LoginViewModel loginViewModel) {
 
         this.loginViewModel = loginViewModel;
         this.loginViewModel.addPropertyChangeListener(this);
@@ -40,9 +46,9 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         final LabelTextPanel usernameInfo = new LabelTextPanel(
-                new JLabel("Username"), usernameInputField);
+            new JLabel("Username"), usernameInputField);
         final LabelTextPanel passwordInfo = new LabelTextPanel(
-                new JLabel("Password"), passwordInputField);
+            new JLabel("Password"), passwordInputField);
 
         final JPanel buttons = new JPanel();
         logIn = new JButton("log in");
@@ -50,29 +56,30 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         cancel = new JButton("cancel");
         buttons.add(cancel);
 
+        loginController = null;
         logIn.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(logIn)) {
-                            final LoginState currentState = loginViewModel.getState();
+            new ActionListener() {
+                public void actionPerformed(final ActionEvent evt) {
+                    if (evt.getSource().equals(logIn)) {
+                        final LoginState currentState = loginViewModel.getState();
 
-                            loginController.execute(
-                                    currentState.getUsername(),
-                                    currentState.getPassword()
-                            );
-                        }
+                        loginController.execute(
+                            currentState.getUsername(),
+                            currentState.getPassword()
+                        );
                     }
                 }
+            }
         );
 
         cancel.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(cancel)) {
-                            loginController.switchToSignupView();
-                        }
+            new ActionListener() {
+                public void actionPerformed(final ActionEvent evt) {
+                    if (evt.getSource().equals(cancel)) {
+                        loginController.switchToSignupView();
                     }
                 }
+            }
         );
 
         usernameInputField.getDocument().addDocumentListener(new DocumentListener() {
@@ -84,17 +91,17 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
             }
 
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(final DocumentEvent e) {
                 documentListenerHelper();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(final DocumentEvent e) {
                 documentListenerHelper();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(final DocumentEvent e) {
                 documentListenerHelper();
             }
         });
@@ -110,17 +117,17 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
             }
 
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(final DocumentEvent e) {
                 documentListenerHelper();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(final DocumentEvent e) {
                 documentListenerHelper();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(final DocumentEvent e) {
                 documentListenerHelper();
             }
         });
@@ -134,20 +141,21 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
     /**
      * React to a button click that results in evt.
+     *
      * @param evt the ActionEvent to react to
      */
-    public void actionPerformed(ActionEvent evt) {
+    public void actionPerformed(final ActionEvent evt) {
         System.out.println("Click " + evt.getActionCommand());
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(final PropertyChangeEvent evt) {
         final LoginState state = (LoginState) evt.getNewValue();
         setFields(state);
         usernameErrorField.setText(state.getLoginError());
     }
 
-    private void setFields(LoginState state) {
+    private void setFields(final LoginState state) {
         usernameInputField.setText(state.getUsername());
         passwordInputField.setText(state.getPassword());
     }
@@ -156,7 +164,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         return viewName;
     }
 
-    public void setLoginController(LoginController loginController) {
+    public void setLoginController(final LoginController loginController) {
         this.loginController = loginController;
     }
 }

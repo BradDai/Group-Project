@@ -21,6 +21,7 @@
 //        viewModel.setState(state); //
 //    }
 //}
+
 package interface_adapter.history;
 
 import use_case.transaction_history.TransactionHistoryOutputBoundary;
@@ -30,13 +31,13 @@ public class TransactionHistoryPresenter implements TransactionHistoryOutputBoun
 
     private final HistoryViewModel viewModel;
 
-    public TransactionHistoryPresenter(HistoryViewModel viewModel) {  // <== must match AppBuilder
+    public TransactionHistoryPresenter(final HistoryViewModel viewModel) {  // <== must match AppBuilder
         this.viewModel = viewModel;
     }
 
     @Override
-    public void present(TransactionHistoryOutputData outputData) {
-        HistoryState state = viewModel.getState();
+    public void present(final TransactionHistoryOutputData outputData) {
+        final HistoryState state = viewModel.getState();
         state.setRows(outputData.getRows());
         state.setMessage(outputData.getMessage());
         viewModel.setState(state);       // triggers property change in VM

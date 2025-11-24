@@ -1,21 +1,25 @@
 package use_case.SubAccount.delete;
-import entity.SubAccount;
-import use_case.SubAccount.SubAccountDataAccessInterface;
 
 import java.math.BigDecimal;
 import java.util.List;
-public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary{
+
+import entity.SubAccount;
+import use_case.SubAccount.SubAccountDataAccessInterface;
+
+public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary {
     private final SubAccountDataAccessInterface subAccountDataAccess;
     private final DeleteSubAccountOutputBoundary presenter;
-    public DeleteSubAccountInteractor(SubAccountDataAccessInterface subAccountDataAccess,
-                                      DeleteSubAccountOutputBoundary presenter) {
+
+    public DeleteSubAccountInteractor(final SubAccountDataAccessInterface subAccountDataAccess,
+                                      final DeleteSubAccountOutputBoundary presenter) {
         this.subAccountDataAccess = subAccountDataAccess;
         this.presenter = presenter;
     }
+
     @Override
-    public void execute(DeleteSubAccountInputData inputData) {
-        String username = inputData.getUsername();
-        String name = inputData.getSubAccountName();
+    public void execute(final DeleteSubAccountInputData inputData) {
+        final String username = inputData.getUsername();
+        final String name = inputData.getSubAccountName();
         if (name == null || name.isBlank()) {
             presenter.prepareFailView("Subaccount name cannot be empty.");
             return;
@@ -24,11 +28,11 @@ public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary
             presenter.prepareFailView("Subaccount not found.");
             return;
         }
-        List<SubAccount> current = subAccountDataAccess.getSubAccountsOf(username);
-        SubAccount target = current.stream()
-                .filter(sa -> sa.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+        final List<SubAccount> current = subAccountDataAccess.getSubAccountsOf(username);
+        final SubAccount target = current.stream()
+            .filter(sa -> sa.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElse(null);
         if (target == null) {
             presenter.prepareFailView("Subaccount not found.");
             return;
@@ -42,9 +46,9 @@ public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary
             return;
         }
         subAccountDataAccess.delete(username, name);
-        List<SubAccount> updated = subAccountDataAccess.getSubAccountsOf(username);
-        DeleteSubAccountOutputData outputData =
-                new DeleteSubAccountOutputData(username, updated);
+        final List<SubAccount> updated = subAccountDataAccess.getSubAccountsOf(username);
+        final DeleteSubAccountOutputData outputData =
+            new DeleteSubAccountOutputData(username, updated);
         presenter.prepareSuccessView(outputData);
     }
 

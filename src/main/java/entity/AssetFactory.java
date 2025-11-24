@@ -1,7 +1,7 @@
 package entity;
 
 public class AssetFactory {
-    public Asset getAsset(String type, String name, double quantity, String Symbol) {
+    public Asset getAsset(final String type, final String name, final double quantity, final String Symbol) {
         switch (type) {
             case "Stock":
                 return new Stock(name, quantity, Symbol);

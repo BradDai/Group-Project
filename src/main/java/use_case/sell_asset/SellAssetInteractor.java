@@ -5,48 +5,51 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
     private final SellAssetOutputBoundary sellAssetOutputBoundary;
     private final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary;
 
-    private String apiKey = "demo"; // TODO: replace with real API Key
+    private final String apiKey = "demo"; // TODO: replace with real API Key
     private double stockPrice = 0.0;
 
-    public SellAssetInteractor(SellAssetDataAccessInterface dataAccess,
-                               SellAssetOutputBoundary sellAssetOutputBoundary,
-                               SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary) {
+    public SellAssetInteractor(final SellAssetDataAccessInterface dataAccess,
+                               final SellAssetOutputBoundary sellAssetOutputBoundary,
+                               final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary) {
         this.dataAccess = dataAccess;
         this.sellAssetOutputBoundary = sellAssetOutputBoundary;
         this.sellAssetPriceOutputBoundary = sellAssetPriceOutputBoundary;
     }
 
-    public void execute(SellAssetInputData sellAssetInputData) {
-        String username = sellAssetInputData.getUsername();
-        String portfolioName = sellAssetInputData.getportfolioName();
-        String stockName = sellAssetInputData.getAssetName();
-        double quantityToSell = sellAssetInputData.getQuantityToSell();
-        double currentQuantity = dataAccess.getStockQuantity(username, portfolioName, stockName);
+    public void execute(final SellAssetInputData sellAssetInputData) {
+        final String username = sellAssetInputData.getUsername();
+        final String portfolioName = sellAssetInputData.getportfolioName();
+        final String stockName = sellAssetInputData.getAssetName();
+        final double quantityToSell = sellAssetInputData.getQuantityToSell();
+        final double currentQuantity = dataAccess.getStockQuantity(username, portfolioName, stockName);
 
         // handle exceptions
         if (quantityToSell <= 0) {
-            sellAssetPriceOutputBoundary.preparePriceFailureView("Invalid Quantity to Sell: Quantity to sell must be positive.");
+            sellAssetPriceOutputBoundary.preparePriceFailureView(
+                "Invalid Quantity to Sell: Quantity to sell must be positive.");
             return;
         }
 
         if (quantityToSell > currentQuantity) {
-            sellAssetPriceOutputBoundary.preparePriceFailureView("Invalid Quantity to Sell: Quantity to sell must be greater than current Quantity.");
+            sellAssetPriceOutputBoundary.preparePriceFailureView(
+                "Invalid Quantity to Sell: Quantity to sell must be greater than current Quantity.");
             return;
         }
 
         // correct quantity
-        double newQuantity = currentQuantity - quantityToSell;
-        double totalPrice = quantityToSell * stockPrice;
+        final double newQuantity = currentQuantity - quantityToSell;
+        final double totalPrice = quantityToSell * stockPrice;
 
         if (newQuantity == 0) {
             dataAccess.removeStockIfZero(username, portfolioName, stockName);
-        } else {
+        }
+        else {
             dataAccess.updateStockQuantity(username, portfolioName, stockName, newQuantity);
         }
         dataAccess.addCashToPortfolio(username, portfolioName, totalPrice);
 
         // prepare output data
-        SellAssetOutputData outputData = new SellAssetOutputData(
+        final SellAssetOutputData outputData = new SellAssetOutputData(
             username, quantityToSell, totalPrice, newQuantity
         );
 
@@ -54,21 +57,21 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
     }
 
     @Override
-    public void fetchPrice(String stockName) {
+    public void fetchPrice(final String stockName) {
         try {
-            String url = "https://api.twelvedata.com/price?symbol="
-                    + stockName + "&apikey=" + apiKey;
+            final String url = "https://api.twelvedata.com/price?symbol="
+                + stockName + "&apikey=" + apiKey;
 
-            java.net.URL requestUrl = new java.net.URL(url);
-            java.net.HttpURLConnection connection =
-                    (java.net.HttpURLConnection) requestUrl.openConnection();
+            final java.net.URL requestUrl = new java.net.URL(url);
+            final java.net.HttpURLConnection connection =
+                (java.net.HttpURLConnection) requestUrl.openConnection();
             connection.setRequestMethod("GET");
 
-            java.io.BufferedReader in =
-                    new java.io.BufferedReader(
-                            new java.io.InputStreamReader(connection.getInputStream()));
+            final java.io.BufferedReader in =
+                new java.io.BufferedReader(
+                    new java.io.InputStreamReader(connection.getInputStream()));
 
-            StringBuilder response = new StringBuilder();
+            final StringBuilder response = new StringBuilder();
             String inputLine;
 
             while ((inputLine = in.readLine()) != null) {
@@ -76,14 +79,15 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
             }
             in.close();
 
-            org.json.JSONObject json = new org.json.JSONObject(response.toString());
+            final org.json.JSONObject json = new org.json.JSONObject(response.toString());
             stockPrice = json.getDouble("price");
 
             // Send to Presenter (Output Boundary)
-            SellAssetPriceOutputData outputData = new SellAssetPriceOutputData(stockPrice);
+            final SellAssetPriceOutputData outputData = new SellAssetPriceOutputData(stockPrice);
             sellAssetPriceOutputBoundary.preparePriceSuccessView(outputData);
 
-        } catch (Exception e) {
+        }
+        catch (final Exception e) {
             // Report failure to presenter
             sellAssetPriceOutputBoundary.preparePriceFailureView("API Error: " + e.getMessage());
         }

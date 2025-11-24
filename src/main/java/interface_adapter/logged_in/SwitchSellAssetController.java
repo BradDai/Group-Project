@@ -6,11 +6,11 @@ public class SwitchSellAssetController {
 
     private final SwitchSellAssetInputBoundary switchSellAssetUseCaseInteractor;
 
-    public SwitchSellAssetController(SwitchSellAssetInputBoundary switchSellAssetUseCaseInteractor) {
+    public SwitchSellAssetController(final SwitchSellAssetInputBoundary switchSellAssetUseCaseInteractor) {
         this.switchSellAssetUseCaseInteractor = switchSellAssetUseCaseInteractor;
     }
 
-    public void switchToSellAssetView(String username) {
+    public void switchToSellAssetView(final String username) {
 
         switchSellAssetUseCaseInteractor.switchToSellAssetView(username);
     }

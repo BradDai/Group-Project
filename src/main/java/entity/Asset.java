@@ -5,19 +5,20 @@ public class Asset {
     private String type;
     private double quantity;
 
-    public Asset(String type, double quantity) {
+    public Asset(final String type, final double quantity) {
         this.type = type;
         this.quantity = quantity;
     }
 
     /**
      * Creates a new asset category if none was presented. with the given non-empty name and non-empty password.
-     * @param type the name of the asset
+     *
+     * @param type     the name of the asset
      * @param quantity the quantity of asset gained
      * @throws IllegalArgumentException if the type of quantity are empty
      */
 
-    public Asset addNewAsset(String type, Double quantity, String price) {
+    public Asset addNewAsset(final String type, final Double quantity, final String price) {
         if ("".equals(type)) {
             throw new IllegalArgumentException("Type cannot be empty");
         }
@@ -37,11 +38,12 @@ public class Asset {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(final double quantity) {
         this.quantity = quantity;
     }
-    public Asset addAsset(Asset[] xxx, String type, int quantity) {
-        for (Asset asset : xxx) {
+
+    public Asset addAsset(final Asset[] xxx, final String type, final int quantity) {
+        for (final Asset asset : xxx) {
             if (asset.type.equals(type)) {
                 asset.quantity += quantity;
             }

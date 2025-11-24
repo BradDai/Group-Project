@@ -7,14 +7,16 @@ public class SwitchSellAssetInteractor implements SwitchSellAssetInputBoundary {
     private final SwitchSellAssetOutputBoundary sellAssetPresenter;
     private final SellAssetDataAccessInterface dataAccess;
 
-    public SwitchSellAssetInteractor(SwitchSellAssetOutputBoundary sellAssetOutputBoundary, SellAssetDataAccessInterface dataAccess) {
+    public SwitchSellAssetInteractor(final SwitchSellAssetOutputBoundary sellAssetOutputBoundary,
+                                     final SellAssetDataAccessInterface dataAccess) {
         this.sellAssetPresenter = sellAssetOutputBoundary;
         this.dataAccess = dataAccess;
     }
 
-    public void switchToSellAssetView(String username) {
-        String[] portfolios = dataAccess.getAvailablePortfolios(username);
-        String[] stocks = dataAccess.getAvailableStocks(username, portfolios[1]); //TODO: change to current selected portfolio.
+    public void switchToSellAssetView(final String username) {
+        final String[] portfolios = dataAccess.getAvailablePortfolios(username);
+        final String[] stocks =
+            dataAccess.getAvailableStocks(username, portfolios[1]); //TODO: change to current selected portfolio.
         sellAssetPresenter.switchToSellAssetView(username, portfolios);
     }
 }

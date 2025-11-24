@@ -7,15 +7,35 @@ public class ExchangeState {
     private String errorMessage = "";
     private String amountField = "";
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getAmountField() { return amountField; }
-    public void setAmountField(String msg) { this.amountField = msg; }
+    public void setUsername(final String username) {
+        this.username = username;
+    }
 
-    public String getConversionMessage() { return conversionMessage; }
-    public void setConversionMessage(String msg) { this.conversionMessage = msg; }
+    public String getAmountField() {
+        return amountField;
+    }
 
-    public String getErrorMessage() { return errorMessage; }
-    public void setErrorMessage(String msg) { this.errorMessage = msg; }
+    public void setAmountField(final String msg) {
+        this.amountField = msg;
+    }
+
+    public String getConversionMessage() {
+        return conversionMessage;
+    }
+
+    public void setConversionMessage(final String msg) {
+        this.conversionMessage = msg;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(final String msg) {
+        this.errorMessage = msg;
+    }
 }

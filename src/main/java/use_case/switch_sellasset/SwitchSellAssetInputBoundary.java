@@ -2,5 +2,5 @@ package use_case.switch_sellasset;
 
 public interface SwitchSellAssetInputBoundary {
 
-    void switchToSellAssetView(String username) ;
+    void switchToSellAssetView(String username);
 }

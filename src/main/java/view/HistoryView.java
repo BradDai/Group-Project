@@ -137,13 +137,7 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
 
 package view;
 
-import interface_adapter.SwitchLoggedInController;
-import interface_adapter.history.HistoryState;
-import interface_adapter.history.HistoryViewModel;
-import interface_adapter.history.TransactionHistoryController;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -151,6 +145,20 @@ import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+
+import interface_adapter.SwitchLoggedInController;
+import interface_adapter.history.HistoryState;
+import interface_adapter.history.HistoryViewModel;
+import interface_adapter.history.TransactionHistoryController;
 
 public class HistoryView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -169,7 +177,7 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
     private final JButton clearButton;
     private final JLabel messageLabel;
 
-    public HistoryView(HistoryViewModel historyViewModel) {
+    public HistoryView(final HistoryViewModel historyViewModel) {
         this.historyViewModel = historyViewModel;
         this.historyViewModel.addPropertyChangeListener(this);
 
@@ -177,13 +185,13 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // Top: back button
-        JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
         back = new JButton("Back");
         topButtons.add(back);
         this.add(topButtons);
 
         // Middle: input fields + date filter + load
-        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         portfolioField = new JTextField(10);
         assetField = new JTextField(10);
@@ -191,20 +199,20 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         clearButton = new JButton("Clear");
 
         // Date spinners (scrollable)
-        Date today = new Date();
-        SpinnerDateModel startModel =
-                new SpinnerDateModel(today, null, null, Calendar.DAY_OF_MONTH);
-        SpinnerDateModel endModel =
-                new SpinnerDateModel(today, null, null, Calendar.DAY_OF_MONTH);
+        final Date today = new Date();
+        final SpinnerDateModel startModel =
+            new SpinnerDateModel(today, null, null, Calendar.DAY_OF_MONTH);
+        final SpinnerDateModel endModel =
+            new SpinnerDateModel(today, null, null, Calendar.DAY_OF_MONTH);
 
         startDateSpinner = new JSpinner(startModel);
         endDateSpinner = new JSpinner(endModel);
 
         // show as yyyy-MM-dd
         startDateSpinner.setEditor(
-                new JSpinner.DateEditor(startDateSpinner, "yyyy-MM-dd"));
+            new JSpinner.DateEditor(startDateSpinner, "yyyy-MM-dd"));
         endDateSpinner.setEditor(
-                new JSpinner.DateEditor(endDateSpinner, "yyyy-MM-dd"));
+            new JSpinner.DateEditor(endDateSpinner, "yyyy-MM-dd"));
 
         inputPanel.add(new JLabel("Portfolio ID:"));
         inputPanel.add(portfolioField);
@@ -224,7 +232,7 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         this.add(inputPanel);
 
         // Bottom: message label
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         messageLabel = new JLabel(" ");
         bottomPanel.add(messageLabel);
         this.add(bottomPanel);
@@ -241,39 +249,47 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         });
 
         // Load
-        loadButton.addActionListener((ActionEvent e) -> {
-            String portfolioId = portfolioField.getText().trim();
-            String asset = assetField.getText().trim();
+        loadButton.addActionListener((final ActionEvent actionEvent) -> {
+            final String portfolioId = portfolioField.getText().trim();
+            final String asset = assetField.getText().trim();
 
             if (portfolioId.isEmpty()) {
                 JOptionPane.showMessageDialog(
-                        this,
-                        "Please enter a portfolio ID.",
-                        "Input error",
-                        JOptionPane.WARNING_MESSAGE
-                );
-                return;
-            }
-
-            // format dates from spinners
-            SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-            String startDate = fmt.format((Date) startDateSpinner.getValue());
-            String endDate = fmt.format((Date) endDateSpinner.getValue());
-
-            if (transactionHistoryController != null) {
-                transactionHistoryController.loadHistory(
-                        portfolioId,
-                        asset.isEmpty() ? null : asset,
-                        startDate,
-                        endDate
+                    this,
+                    "Please enter a portfolio ID.",
+                    "Input error",
+                    JOptionPane.WARNING_MESSAGE
                 );
             }
-            // presenter will update HistoryViewModel, and propertyChange()
-            // below will refresh the message label / table.
+            else {
+                final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+                final String startDate = fmt.format((Date) startDateSpinner.getValue());
+                final String endDate = fmt.format((Date) endDateSpinner.getValue());
+                if (transactionHistoryController != null) {
+                    if (asset.isEmpty()) {
+                        transactionHistoryController.loadHistory(
+                            portfolioId,
+                            null,
+                            startDate,
+                            endDate
+                        );
+                    }
+                    else {
+                        transactionHistoryController.loadHistory(
+                            portfolioId,
+                            asset,
+                            startDate,
+                            endDate
+                        );
+                    }
+                }// presenter will update HistoryViewModel, and propertyChange()
+// below will refresh the message label / table.
+            }
+
         });
 
         // Clear
-        clearButton.addActionListener((ActionEvent e) -> {
+        clearButton.addActionListener((final ActionEvent actionEvent) -> {
             portfolioField.setText("");
             assetField.setText("");
             messageLabel.setText("Cleared.");
@@ -281,14 +297,14 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
     }
 
     @Override
-    public void actionPerformed(ActionEvent evt) {
+    public void actionPerformed(final ActionEvent evt) {
         System.out.println("Click " + evt.getActionCommand());
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(final PropertyChangeEvent evt) {
         // Whenever HistoryViewModel changes, update UI
-        HistoryState state = historyViewModel.getState();
+        final HistoryState state = historyViewModel.getState();
         if (state != null) {
             messageLabel.setText(state.getMessage());
         }
@@ -298,11 +314,11 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         return viewName;
     }
 
-    public void setSwitchLoggedInController(SwitchLoggedInController switchLoggedInController) {
+    public void setSwitchLoggedInController(final SwitchLoggedInController switchLoggedInController) {
         this.switchLoggedInController = switchLoggedInController;
     }
 
-    public void setTransactionHistoryController(TransactionHistoryController controller) {
+    public void setTransactionHistoryController(final TransactionHistoryController controller) {
         this.transactionHistoryController = controller;
     }
 }

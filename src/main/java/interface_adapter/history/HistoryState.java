@@ -60,14 +60,15 @@ public class HistoryState {
         public double totalValue;
     }
 
-    public HistoryState() {}
+    public HistoryState() {
+    }
 
     // message
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(final String message) {
         this.message = message;
     }
 
@@ -76,7 +77,7 @@ public class HistoryState {
         return rows;
     }
 
-    public void setRows(List<Row> rows) {
+    public void setRows(final List<Row> rows) {
         this.rows = rows;
     }
 }
