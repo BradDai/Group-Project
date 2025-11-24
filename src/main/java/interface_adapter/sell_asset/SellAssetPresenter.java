@@ -14,13 +14,30 @@ public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPri
     }
 
     @Override
-    public void prepareSuccessView(SellAssetOutputData sellAssetOutputData) {
+    public void prepareSuccessView(SellAssetOutputData data) {
+        SellAssetState state = sellAssetViewModel.getState();
 
+        // Construct a user-friendly message
+        String msg = "Successfully sold " + data.getQuantitySold() + " shares of "
+                + data.getAssetName() + ". Total received: $"
+                + String.format("%.2f", data.getTotalPrice()) +
+                ". Remaining: " + data.getRemainingQuantity();
+
+        state.setMessage(msg);
+        state.setErrorMessage(null);
+
+        sellAssetViewModel.setState(state);
+        sellAssetViewModel.firePropertyChanged();
     }
 
     @Override
     public void prepareFailureView(String errorMessage) {
+        SellAssetState state = sellAssetViewModel.getState();
+        state.setErrorMessage(errorMessage);
+        state.setMessage(null);  // clear success message
 
+        sellAssetViewModel.setState(state);
+        sellAssetViewModel.firePropertyChanged();
     }
 
     @Override

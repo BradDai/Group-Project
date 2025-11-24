@@ -255,6 +255,94 @@ public class FileSubAccountDataAccessJSON implements
     }
 
     @Override
+    public double getStockQuantity(String username, String portfolioName, String stockName) {
+        List<SubAccount> accounts = data.get(username);
+        if (accounts != null) {
+            for (SubAccount sa : accounts) {
+                if (sa.getName().equals(portfolioName)) {
+                    for (Asset asset : sa.getAssets()) {
+                        if (asset instanceof Stock) {
+                            Stock stock = (Stock) asset;
+                            if (stock.getCompanySymbol().equals(stockName)) {
+                                return stock.getQuantity();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public void updateStockQuantity(String username, String portfolioName, String stockName, double quantity) {
+        List<SubAccount> accounts = data.get(username);
+        if (accounts != null) {
+            for (SubAccount sa : accounts) {
+                if (sa.getName().equals(portfolioName)) {
+                    for (Asset asset : sa.getAssets()) {
+                        if (asset instanceof Stock) {
+                            Stock stock = (Stock) asset;
+                            if (stock.getCompanySymbol().equals(stockName)) {
+                                stock.setQuantity(quantity);
+                                saveToFile();
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void removeStockIfZero(String username, String portfolioName, String stockName) {
+        List<SubAccount> accounts = data.get(username);
+        if (accounts != null) {
+            for (SubAccount sa : accounts) {
+                if (sa.getName().equals(portfolioName)) {
+                    Iterator<Asset> iter = sa.getAssets().iterator();
+                    while (iter.hasNext()) {
+                        Asset asset = iter.next();
+                        if (asset instanceof Stock) {
+                            Stock stock = (Stock) asset;
+                            if (stock.getCompanySymbol().equals(stockName) && stock.getQuantity() == 0) {
+                                iter.remove();
+                                saveToFile();
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void addCashToPortfolio(String username, String portfolioName, double amount) {
+        List<SubAccount> accounts = data.get(username);
+        if (accounts != null) {
+            for (SubAccount sa : accounts) {
+                if (sa.getName().equals(portfolioName)) {
+                    // Get existing USD balance
+                    BigDecimal current = sa.getBalanceOf("USD");
+                    if (current == null) {
+                        current = BigDecimal.ZERO;
+                    }
+
+                    // Add the amount
+                    BigDecimal updated = current.add(BigDecimal.valueOf(amount));
+                    sa.setBalanceOf("USD", updated);
+
+                    // Persist changes
+                    saveToFile();
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
     public String[] getAvailableCurrencies(String username, String portfolioId) {
         List<SubAccount> accounts = data.get(username);
         if (accounts != null) {
