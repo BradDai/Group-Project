@@ -1,8 +1,11 @@
 package interface_adapter.buyasset;
 
 public class BuyAssetState {
-
-    public BuyAssetState(){
-
-    }
+    public String selectedSymbol = "";
+    public Integer selectedQuantity = null;
+    public double price = 0.0;
+    public double total = 0.0;
+    public String errorMessage = null;
+    public String purchaseMessage = null;
+    public double balanceUSD = 0.0;
 }

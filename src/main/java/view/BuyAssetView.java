@@ -1,28 +1,29 @@
 package view;
 
 import interface_adapter.SwitchLoggedInController;
+import interface_adapter.buyasset.BuyAssetController;
+import interface_adapter.buyasset.BuyAssetState;
 import interface_adapter.buyasset.BuyAssetViewModel;
-
+import interface_adapter.buyasset.GetPriceController;
+import interface_adapter.logged_in.LoggedInViewModel;
+import entity.SubAccount;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.List;
 
-public class BuyAssetView extends JPanel implements ActionListener, PropertyChangeListener {
+public class BuyAssetView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "buyasset";
     private final BuyAssetViewModel buyAssetViewModel;
     private SwitchLoggedInController switchLoggedInController;
-
+    private GetPriceController getPriceController;
+    private BuyAssetController buyAssetController;
+    private LoggedInViewModel loggedInViewModel;
     private final JButton back;
-
-    // drop down menu
+    private final JComboBox<String> portfolioComboBox;
     private final JComboBox<String> assetComboBox;
     private final JLabel priceLabel;
     private final JComboBox<Integer> quantityComboBox;
@@ -38,7 +39,6 @@ public class BuyAssetView extends JPanel implements ActionListener, PropertyChan
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // Back button
         JPanel buttons = new JPanel();
         back = new JButton("Back");
         buttons.add(back);
@@ -53,6 +53,12 @@ public class BuyAssetView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
+        JPanel portfolioPanel = new JPanel();
+        portfolioPanel.add(new JLabel("Choose portfolio:"));
+        portfolioComboBox = new JComboBox<>();
+        portfolioComboBox.addItem("");
+        portfolioPanel.add(portfolioComboBox);
+        this.add(portfolioPanel);
 
         JPanel assetMenu = new JPanel();
         assetMenu.add(new JLabel("Choose asset:"));
@@ -68,111 +74,125 @@ public class BuyAssetView extends JPanel implements ActionListener, PropertyChan
         quantityMenu.add(quantityComboBox);
         this.add(quantityMenu);
 
-
         priceLabel = new JLabel("Price: -");
         this.add(priceLabel);
+
         totalLabel = new JLabel("Total: -");
         this.add(totalLabel);
+
         purchaseButton = new JButton("Purchase");
         this.add(purchaseButton);
 
-
         assetComboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {onAssetSelected();}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onAssetSelected();}
         });
         quantityComboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {updateTotal();}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onQuantitySelected();}
         });
         purchaseButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {onPurchase();}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onPurchase();
+            }
         });
     }
-
 
     private void onAssetSelected() {
         String symbol = (String) assetComboBox.getSelectedItem();
-        if (symbol == null || symbol.isEmpty()) {
-            return;}
-        try {
-            double price = fetchPriceFromApi(symbol);
-            currentPrice = price;
-            priceLabel.setText("Price: " + price);
-            updateTotal();}
-        catch (IOException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Failed to get price.");
-            priceLabel.setText("Price: error");
-            currentPrice = 0.0;
-            updateTotal();}
+
+        BuyAssetState state = buyAssetViewModel.getState();
+        state.selectedSymbol = (symbol == null) ? "" : symbol;
+        buyAssetViewModel.setState(state);
+
+        if (getPriceController != null && symbol != null && !symbol.isEmpty()) {
+            getPriceController.execute(symbol);
+        }
+        System.out.println("Selected asset = " + symbol);
+
+    }
+
+    private void onQuantitySelected() {
+        Integer qty = (Integer) quantityComboBox.getSelectedItem();
+        BuyAssetState state = buyAssetViewModel.getState();
+        state.selectedQuantity = qty;
+        if (qty != null && state.price > 0) {
+            state.total = state.price * qty;}
+        else {
+            state.total = 0.0;}
+        buyAssetViewModel.setState(state);
+        buyAssetViewModel.firePropertyChange();
     }
 
     private void onPurchase() {
-        String symbol = (String) assetComboBox.getSelectedItem();
-        Integer qty = (Integer) quantityComboBox.getSelectedItem();
-
-        if (symbol == null || symbol.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Please choose an asset >:(");
+        BuyAssetState state = buyAssetViewModel.getState();
+        String symbol = state.selectedSymbol;
+        Integer qty = state.selectedQuantity;
+        String portfolio = (String) portfolioComboBox.getSelectedItem();
+        String username = loggedInViewModel.getState().getUsername();
+        if (buyAssetController == null) {
+            JOptionPane.showMessageDialog(this, "Buy controller not set.");
             return;}
-        if (qty == null) {
-            JOptionPane.showMessageDialog(this,
-                    "Please choose a quantity >:(");
-            return;}
-        if (currentPrice <= 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Price is not loaded or invalid :(");
-            return;}
-
-        double total = currentPrice * qty;
-        JOptionPane.showMessageDialog(this,
-                "Purchased " + qty + " of " + symbol + " for total " + total + ".");}
-
-
-    private double currentPrice = 0.0;
-
-    private double fetchPriceFromApi(String symbol) throws IOException {
-        String urlString = "https://api.twelvedata.com/price?symbol="
-                + symbol + "&apikey=" + API_KEY;
-        URL url = new URL(urlString);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        int status = connection.getResponseCode();
-        if (status != 200) {
-            throw new IOException("HTTP " + status);}
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-        while ((line = in.readLine()) != null) {
-            response.append(line);}
-        in.close();
-        connection.disconnect();
-        String body = response.toString();
-        int priceIndex = body.indexOf("\"price\"");
-        if (priceIndex == -1) {
-            throw new IOException("No price.");}
-        int colonIndex = body.indexOf(':', priceIndex);
-        int startIndex = body.indexOf('"', colonIndex);
-        int endIndex = body.indexOf('"', startIndex + 1);
-        if (startIndex == -1 || endIndex == -1) {
-            throw new IOException("Error");}
-        String priceStr = body.substring(startIndex + 1, endIndex);
-        return Double.parseDouble(priceStr);
+        buyAssetController.execute(
+                username,
+                portfolio,
+                symbol,
+                qty,
+                state.price);
     }
 
-    private void updateTotal() {
-        Integer qty = (Integer) quantityComboBox.getSelectedItem();
-        if (qty == null || currentPrice <= 0) {
-            totalLabel.setText("Total: -");}
-        else {
-            double total = currentPrice * qty;
-            totalLabel.setText("Total: " + total);}
+    private void refreshPortfolios() {
+        if (loggedInViewModel == null) {
+            return;}
+
+        portfolioComboBox.removeAllItems();
+        portfolioComboBox.addItem("");
+
+        List<SubAccount> accounts = loggedInViewModel.getState().getSubAccounts();
+        for (SubAccount sa : accounts) {
+            portfolioComboBox.addItem(sa.getName());}
     }
 
-    public void actionPerformed(ActionEvent evt) {}
-    public void propertyChange(PropertyChangeEvent evt) {}
-    public String getViewName() {return viewName;}
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        BuyAssetState state = buyAssetViewModel.getState();
+        if (state.purchaseMessage != null) {
+            JOptionPane.showMessageDialog(this, state.purchaseMessage);
+            state.purchaseMessage = null;}
+        if (state.errorMessage != null) {
+            JOptionPane.showMessageDialog(this, state.errorMessage);
+            state.errorMessage = null;}
+        priceLabel.setText(state.price > 0 ? "Price: " + state.price : "Price: -");
+        totalLabel.setText(state.total > 0 ? "Total: " + state.total : "Total: -");
+    }
+
+    public void setGetPriceController(GetPriceController controller) {
+        this.getPriceController = controller;
+    }
+
+    public void setBuyAssetController(BuyAssetController controller) {
+        this.buyAssetController = controller;
+    }
+
+    public void setLoggedInViewModel(LoggedInViewModel loggedInViewModel) {
+        this.loggedInViewModel = loggedInViewModel;
+        this.loggedInViewModel.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshPortfolios();
+            }
+        });
+        refreshPortfolios();
+    }
+
     public void setSwitchLoggedInController(SwitchLoggedInController controller) {
         this.switchLoggedInController = controller;
+    }
+
+    public String getViewName() {
+        return viewName;
     }
 }
