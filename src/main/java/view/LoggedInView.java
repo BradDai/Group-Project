@@ -14,6 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -205,8 +208,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             if (i < subs.size()) {
                 SubAccount sa = subs.get(i);
                 subAccountNameLabels[i].setText(sa.getName());
-                subAccountCurrencyLabels[i].setText("Currency  USD: " + sa.getBalanceUSD());
-                subAccountStockLabels[i].setText("Stock: (none)");
+                subAccountCurrencyLabels[i].setText(formatCurrenciesForLabel(sa));
+                subAccountStockLabels[i].setText(formatStocksForLabel(sa));
             } else {
                 subAccountNameLabels[i].setText("Empty slot");
                 subAccountCurrencyLabels[i].setText("Currency  USD: -");
@@ -215,6 +218,43 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         }
         revalidate();
         repaint();
+    }
+
+    private String formatCurrenciesForLabel(SubAccount sa) {
+        Map<String, java.math.BigDecimal> currencies = sa.getCurrencies();
+        if (currencies == null || currencies.isEmpty()) {
+            return "Currency  (none)";
+        }
+        StringBuilder sb = new StringBuilder("<html>Currency&nbsp;&nbsp;");
+        boolean first = true;
+        for (Map.Entry<String, java.math.BigDecimal> entry : currencies.entrySet()) {
+            if (!first) {
+                sb.append("<br>");
+            }
+            first = false;
+            sb.append(entry.getKey())
+                    .append(": ")
+                    .append(entry.getValue().toPlainString());
+        }
+        sb.append("</html>");
+        return sb.toString();
+    }
+
+    private String formatStocksForLabel(SubAccount sa) {
+        List<Asset> assets = sa.getAssets();
+        if (assets == null || assets.isEmpty()) {
+            return "<html>Stock: (none)</html>";
+        }
+        StringBuilder sb = new StringBuilder("<html>Stock:<br>");
+        for (Asset a : assets) {
+            sb.append("&nbsp;&nbsp;")
+                    .append(a.getType())
+                    .append(": ")
+                    .append(a.getQuantity())
+                    .append("<br>");
+        }
+        sb.append("</html>");
+        return sb.toString();
     }
 
     public String getViewName() { return VIEW_NAME; }
