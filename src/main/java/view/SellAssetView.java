@@ -47,13 +47,15 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
         final JPanel portfolioPanel = new JPanel();
         portfolioPanel.add(new JLabel("Select portfolio:"));
-        portfolioSelector = new JComboBox<>(new String[] {"Portfolio 1", "Portfolio 2", "Portfolio 3"});
+        portfolioSelector = new JComboBox<>();
+        portfolioSelector.setPrototypeDisplayValue("Select Portfolio...");
         portfolioPanel.add(portfolioSelector);
         this.add(portfolioPanel);
 
         final JPanel stockPanel = new JPanel();
         stockPanel.add(new JLabel("Select stock:"));
-        stockSelector = new JComboBox<>(new String[] {"AAPL", "TSLA", "MSFT"});
+        stockSelector = new JComboBox<>();
+        stockSelector.setPrototypeDisplayValue("Select stock...");
         stockPanel.add(stockSelector);
         this.add(stockPanel);
 
@@ -95,6 +97,17 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                         state.setPriceError(null);
                         state.setCurrentPrice(0.0);
                         stockPriceLabel.setText("—");
+
+                        // Populate stock selector based on selected portfolio
+                        final String selectedPortfolio = (String) portfolioSelector.getSelectedItem();
+                        if (selectedPortfolio != null) {
+                            final String[] stocks = state.getStocksOfPortfolio(selectedPortfolio);
+                            if (stocks != null) {
+                                stockSelector.setModel(new DefaultComboBoxModel<>(stocks));
+                                stockSelector.setSelectedItem(null);
+                            }
+                        }
+
                         totalPriceLabel.setText("—");
                         sellAssetViewModel.setState(state);
                     }

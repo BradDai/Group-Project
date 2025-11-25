@@ -4,6 +4,7 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.sell_asset.SellAssetState;
 import interface_adapter.sell_asset.SellAssetViewModel;
 import use_case.switch_sellasset.SwitchSellAssetOutputBoundary;
+import java.util.Map;
 
 public class SwitchSellAssetPresenter implements SwitchSellAssetOutputBoundary {
 
@@ -15,10 +16,11 @@ public class SwitchSellAssetPresenter implements SwitchSellAssetOutputBoundary {
         this.viewManagerModel = viewManagerModel;
     }
 
-    public void switchToSellAssetView(final String username, final String[] portfolios) {
+    public void switchToSellAssetView(final String username, final String[] portfolios, final Map<String, String[]> portfolioStocks) {
         final SellAssetState state = sellAssetViewModel.getState();
         state.setUsername(username);
         state.setPortfolios(portfolios);
+        state.setPortfolioStocks(portfolioStocks);
         state.setErrorMessage("");
 
         sellAssetViewModel.setState(state);

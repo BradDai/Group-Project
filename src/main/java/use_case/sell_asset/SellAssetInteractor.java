@@ -40,11 +40,9 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
         final double newQuantity = currentQuantity - quantityToSell;
         final double totalPrice = quantityToSell * stockPrice;
 
+        dataAccess.updateStockQuantity(username, portfolioName, stockName, newQuantity);
         if (newQuantity == 0) {
-            dataAccess.removeStockIfZero(username, portfolioName, stockName);
-        }
-        else {
-            dataAccess.updateStockQuantity(username, portfolioName, stockName, newQuantity);
+            dataAccess.removeStock(username, portfolioName, stockName);
         }
         dataAccess.addCashToPortfolio(username, portfolioName, totalPrice);
 
