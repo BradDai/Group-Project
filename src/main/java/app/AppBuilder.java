@@ -6,9 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import data_access.FileSubAccountDataAccessJSON;
-import data_access.FileUserDataAccessObject;
-import data_access.TwelveDataPriceGateway;
+import data_access.*;
 import entity.UserFactory;
 import interface_adapter.SwitchLoggedInController;
 import interface_adapter.SwitchLoggedInPresenter;
