@@ -22,7 +22,6 @@ public class SwitchExchangePresenter implements SwitchExchangeOutputBoundary {
         exchangeState.setErrorMessage("");
         exchangeState.setConversionMessage("");
         exchangeState.setAmountField("");
-        exchangeState.setBalanceMessage("");
 
         exchangeViewModel.setState(exchangeState);
 

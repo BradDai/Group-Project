@@ -1,20 +1,5 @@
 package data_access;
 
-import entity.Asset;
-import entity.Stock;
-import entity.SubAccount;
-import entity.transaction.Transaction;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.json.JSONException;
-import use_case.SubAccount.SubAccountDataAccessInterface;
-import use_case.sell_asset.SellAssetDataAccessInterface;
-import use_case.transfer.TransferDataAccessInterface;
-import use_case.exchange.ExchangeDataAccessInterface;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
@@ -437,42 +422,5 @@ public class FileSubAccountDataAccessJSON implements
             }
         }
         throw new RuntimeException("Account not found: " + accountName);
-    }
-
-    public Map<String, Double> getRates(String currency) {
-
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("https://open.er-api.com/v6/latest/" + currency)
-                .get()
-                .build();
-
-        HashMap<String, Double> rates = new HashMap<>();
-
-        try (Response response = client.newCall(request).execute()) {
-
-            if (!response.isSuccessful() || response.body() == null) {
-                throw new RuntimeException("API response error");
-            }
-
-            JSONObject responseBody = new JSONObject(response.body().string());
-
-            if (responseBody.getString("result").equals("success")) {
-                JSONObject rateObject = responseBody.getJSONObject("rates");
-                Iterator<String> keys = rateObject.keys();
-
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    rates.put(key, rateObject.getDouble(key));
-                }
-            } else {
-                throw new RuntimeException("API returned failure");
-            }
-
-        } catch (IOException | JSONException e) {
-            throw new RuntimeException("Failed to fetch exchange rates", e);
-        }
-
-        return rates;
     }
 }
