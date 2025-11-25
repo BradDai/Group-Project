@@ -1,313 +1,451 @@
 package use_case.transfer;
 
-import entity.SubAccount;
-import entity.transaction.Transaction;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+import entity.SubAccount;
+import entity.transaction.Transaction;
 
 class TransferInteractorTest {
 
     @Test
-    void successTransferTest() {
-        TransferInputData inputData = new TransferInputData(
-                "Paul", "Main Portfolio", "Savings", "Currency", "USD", 50.0);
+    void successTransferTest() throws Exception {
+        final TransferInputData inputData = new TransferInputData(
+            "Paul", "Main Portfolio", "Savings", "Currency", "USD", 50.0);
 
         // Initial state: Main=100 USD, Savings=0 USD
-        InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
         transferDataAccess.addAccount("Paul", "Main Portfolio", "USD", 100.0);
         transferDataAccess.addAccount("Paul", "Savings", "USD", 0.0);
 
-        TransferOutputBoundary successPresenter = new TransferOutputBoundary() {
+        final TransferOutputBoundary successPresenter = new TransferOutputBoundary() {
             @Override
-            public void prepareSuccessView(TransferOutputData outputData) {
+            public void prepareSuccessView(final TransferOutputData outputData) {
                 assertTrue(outputData.isSuccess());
                 assertEquals("Main Portfolio", outputData.getFromPortfolio());
                 assertEquals("Savings", outputData.getToPortfolio());
+                assertEquals("USD", outputData.getAssetSymbol());
                 assertEquals(50.0, outputData.getAmount());
                 assertNotNull(outputData.getTransactionId());
+                assertNotNull(outputData.getUpdatedAccounts());
                 assertEquals(50.0, transferDataAccess.getAssetBalance("Paul", "Main Portfolio", "USD"));
                 assertEquals(50.0, transferDataAccess.getAssetBalance("Paul", "Savings", "USD"));
             }
 
             @Override
-            public void prepareFailView(String error) {
+            public void prepareFailView(final String error) {
                 fail("Use case failure is unexpected: " + error);
             }
 
             @Override
-            public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance, final double toBalance,
+                                        final String[] availableCurrencies) {
                 fail("presentBalances should not be called in execute");
             }
         };
 
-        TransferInteractor interactor = new TransferInteractor(transferDataAccess, successPresenter);
-
-        // Act
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, successPresenter);
         interactor.execute(inputData);
     }
 
     @Test
-    void failSourcePortfolioNotFoundTest() {
-        TransferInputData inputData = new TransferInputData(
-                "Paul", "Ghost Portfolio", "Savings", "Currency", "USD", 50.0);
+    void failSourcePortfolioNotFoundTest() throws Exception {
+        final TransferInputData inputData = new TransferInputData(
+            "Paul", "Ghost Portfolio", "Savings", "Currency", "USD", 50.0);
 
-        InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
         transferDataAccess.addAccount("Paul", "Savings", "USD", 0.0);
 
-        TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
+        final TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
             @Override
-            public void prepareSuccessView(TransferOutputData outputData) {
+            public void prepareSuccessView(final TransferOutputData outputData) {
                 fail("Use case success is unexpected.");
             }
 
             @Override
-            public void prepareFailView(String error) {
+            public void prepareFailView(final String error) {
                 assertEquals("Source portfolio does not exist: Ghost Portfolio", error);
             }
 
             @Override
-            public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance, final double toBalance,
+                                        final String[] availableCurrencies) {
             }
         };
 
-        TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
         interactor.execute(inputData);
     }
 
     @Test
-    void failDestinationPortfolioNotFoundTest() {
-        TransferInputData inputData = new TransferInputData(
-                "Paul", "Main Portfolio", "Ghost Portfolio", "Currency", "USD", 50.0);
+    void failDestinationPortfolioNotFoundTest() throws Exception {
+        final TransferInputData inputData = new TransferInputData(
+            "Paul", "Main Portfolio", "Ghost Portfolio", "Currency", "USD", 50.0);
 
-        InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
         transferDataAccess.addAccount("Paul", "Main Portfolio", "USD", 100.0);
 
-        TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
+        final TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
             @Override
-            public void prepareSuccessView(TransferOutputData outputData) {
+            public void prepareSuccessView(final TransferOutputData outputData) {
                 fail("Use case success is unexpected.");
             }
 
             @Override
-            public void prepareFailView(String error) {
+            public void prepareFailView(final String error) {
                 assertEquals("Destination portfolio does not exist: Ghost Portfolio", error);
             }
 
             @Override
-            public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance,
+                                        final double toBalance, final String[] availableCurrencies) {
             }
         };
 
-        TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
         interactor.execute(inputData);
     }
 
     @Test
-    void failSamePortfolioTest() {
-        TransferInputData inputData = new TransferInputData(
-                "Paul", "Main Portfolio", "Main Portfolio", "Currency", "USD", 50.0);
+    void failSamePortfolioTest() throws Exception {
+        final TransferInputData inputData = new TransferInputData(
+            "Paul", "Main Portfolio", "Main Portfolio", "Currency", "USD", 50.0);
 
-        InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
         transferDataAccess.addAccount("Paul", "Main Portfolio", "USD", 100.0);
 
-        TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
+        final TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
             @Override
-            public void prepareSuccessView(TransferOutputData outputData) {
+            public void prepareSuccessView(final TransferOutputData outputData) {
                 fail("Use case success is unexpected.");
             }
 
             @Override
-            public void prepareFailView(String error) {
+            public void prepareFailView(final String error) {
                 assertEquals("Cannot transfer to the same portfolio", error);
             }
 
             @Override
-            public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance,
+                                        final double toBalance, final String[] availableCurrencies) {
             }
         };
 
-        TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
         interactor.execute(inputData);
     }
 
     @Test
-    void failAssetNotFoundTest() {
+    void failAssetNotFoundTest() throws Exception {
         // Trying to transfer BRL, but only has USD
-        TransferInputData inputData = new TransferInputData(
-                "Paul", "Main Portfolio", "Savings", "Currency", "BRL", 50.0);
+        final TransferInputData inputData = new TransferInputData(
+            "Paul", "Main Portfolio", "Savings", "Currency", "BRL", 50.0);
 
-        InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
         transferDataAccess.addAccount("Paul", "Main Portfolio", "USD", 100.0);
         transferDataAccess.addAccount("Paul", "Savings", "USD", 0.0);
 
-        TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
+        final TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
             @Override
-            public void prepareSuccessView(TransferOutputData outputData) {
+            public void prepareSuccessView(final TransferOutputData outputData) {
                 fail("Use case success is unexpected.");
             }
 
             @Override
-            public void prepareFailView(String error) {
+            public void prepareFailView(final String error) {
                 assertEquals("Source portfolio does not contain asset: BRL", error);
             }
 
             @Override
-            public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance,
+                                        final double toBalance, final String[] availableCurrencies) {
             }
         };
 
-        TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
         interactor.execute(inputData);
     }
 
     @Test
-    void failInsufficientFundsTest() {
+    void failInsufficientFundsTest() throws Exception {
         // Has 20, tries to send 50
-        TransferInputData inputData = new TransferInputData(
-                "Paul", "Main Portfolio", "Savings", "Currency", "USD", 50.0);
+        final TransferInputData inputData = new TransferInputData(
+            "Paul", "Main Portfolio", "Savings", "Currency", "USD", 50.0);
 
-        InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
         transferDataAccess.addAccount("Paul", "Main Portfolio", "USD", 20.0);
         transferDataAccess.addAccount("Paul", "Savings", "USD", 0.0);
 
-        TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
+        final TransferOutputBoundary failurePresenter = new TransferOutputBoundary() {
             @Override
-            public void prepareSuccessView(TransferOutputData outputData) {
+            public void prepareSuccessView(final TransferOutputData outputData) {
                 fail("Use case success is unexpected.");
             }
 
             @Override
-            public void prepareFailView(String error) {
+            public void prepareFailView(final String error) {
                 assertTrue(error.startsWith("Insufficient balance"));
             }
 
             @Override
-            public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance,
+                                        final double toBalance, final String[] availableCurrencies) {
             }
         };
 
-        TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, failurePresenter);
         interactor.execute(inputData);
     }
 
     @Test
     void checkBalancesTest() {
-        InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
         transferDataAccess.addAccount("Paul", "Main Portfolio", "USD", 100.0);
-        transferDataAccess.addAccount("Paul", "Main Portfolio", "EUR", 50.0); // Added EUR
+        transferDataAccess.addAccount("Paul", "Main Portfolio", "EUR", 50.0);
         transferDataAccess.addAccount("Paul", "Savings", "USD", 25.0);
 
-        TransferOutputBoundary balancePresenter = new TransferOutputBoundary() {
+        final TransferOutputBoundary balancePresenter = new TransferOutputBoundary() {
             @Override
-            public void prepareSuccessView(TransferOutputData outputData) {
+            public void prepareSuccessView(final TransferOutputData outputData) {
                 fail("Should not call success view");
             }
 
             @Override
-            public void prepareFailView(String error) {
+            public void prepareFailView(final String error) {
                 fail("Should not call fail view");
             }
 
+            // Fixed: Moved assertions to the correct method signature (4 args) used by Interactor
             @Override
-            public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
                 assertEquals(100.0, fromBalance);
                 assertEquals(25.0, toBalance);
 
                 // Check currencies
-                List<String> currencies = Arrays.asList(availableCurrencies);
+                final List<String> currencies = Arrays.asList(currencyList);
                 assertTrue(currencies.contains("USD"));
                 assertTrue(currencies.contains("EUR"));
                 assertEquals(2, currencies.size());
             }
+
+            @Override
+            public void presentBalances(final double fromBalance,
+                                        final double toBalance, final String[] availableCurrencies) {
+                fail("Should not call the 3-arg presentBalances");
+            }
         };
 
-        TransferInteractor interactor = new TransferInteractor(transferDataAccess, balancePresenter);
-
-        // Act
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, balancePresenter);
         interactor.checkBalances("Paul", "Main Portfolio", "Savings", "USD");
+    }
+
+    @Test
+    void checkBalancesMissingSourceTest() {
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        // Only create destination
+        transferDataAccess.addAccount("Paul", "Savings", "USD", 25.0);
+
+        final TransferOutputBoundary balancePresenter = new TransferOutputBoundary() {
+            @Override
+            public void prepareSuccessView(final TransferOutputData outputData) {
+            }
+
+            @Override
+            public void prepareFailView(final String error) {
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance,
+                                        final double toBalance, final String[] availableCurrencies) {
+            }
+
+            @Override
+            public void presentBalances(double fromBalance, double toBalance,
+                                        String[] currencyList, String[] stockList) {
+                // Assert defaults when source is missing
+                assertEquals(0.0, fromBalance, 0.001);
+                assertEquals(25.0, toBalance, 0.001);
+                // Should return default ["USD"]
+                assertEquals(1, currencyList.length);
+                assertEquals("USD", currencyList[0]);
+                assertEquals(0, stockList.length);
+            }
+        };
+
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, balancePresenter);
+        interactor.checkBalances("Paul", "Missing Portfolio", "Savings", "USD");
+    }
+
+    @Test
+    void checkBalancesMissingDestinationTest() {
+        final InMemoryTransferDataAccess transferDataAccess = new InMemoryTransferDataAccess();
+        // Only create source
+        transferDataAccess.addAccount("Paul", "Main Portfolio", "USD", 100.0);
+
+        final TransferOutputBoundary balancePresenter = new TransferOutputBoundary() {
+            @Override
+            public void prepareSuccessView(final TransferOutputData outputData) {
+            }
+
+            @Override
+            public void prepareFailView(final String error) {
+
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance,
+                                        final double toBalance, final String[] availableCurrencies) {
+            }
+
+            @Override
+            public void presentBalances(double fromBalance, double toBalance,
+                                        String[] currencyList, String[] stockList) {
+                // Assert defaults when dest is missing
+                assertEquals(100.0, fromBalance, 0.001);
+                assertEquals(0.0, toBalance, 0.001);
+            }
+        };
+
+        final TransferInteractor interactor = new TransferInteractor(transferDataAccess, balancePresenter);
+        interactor.checkBalances("Paul", "Main Portfolio", "Missing Portfolio", "USD");
     }
 
     /**
      * InMemory Implementation of TransferDataAccessInterface for testing.
      */
-    private static class InMemoryTransferDataAccess implements TransferDataAccessInterface {
-        // Map<Username, Map<PortfolioName, Map<AssetSymbol, Amount>>>
+    private static final class InMemoryTransferDataAccess implements TransferDataAccessInterface {
         private final Map<String, Map<String, Map<String, Double>>> accounts = new HashMap<>();
 
         // Helper to populate data
-        public void addAccount(String username, String portfolio, String asset, Double amount) {
-            accounts.computeIfAbsent(username, k -> new HashMap<>())
-                    .computeIfAbsent(portfolio, k -> new HashMap<>())
-                    .put(asset, amount);
+        public void addAccount(final String username, final String portfolio, final String asset, final Double amount) {
+            accounts.computeIfAbsent(username, string -> new HashMap<>())
+                .computeIfAbsent(portfolio, string -> new HashMap<>())
+                .put(asset, amount);
         }
 
         @Override
-        public boolean portfolioExists(String username, String portfolioId) {
+        public boolean portfolioExists(final String username, final String portfolioId) {
             return accounts.containsKey(username) && accounts.get(username).containsKey(portfolioId);
         }
 
         @Override
-        public boolean hasAsset(String username, String portfolioId, String assetSymbol) {
-            if (!portfolioExists(username, portfolioId)) return false;
-            return accounts.get(username).get(portfolioId).containsKey(assetSymbol);
+        public boolean hasAsset(final String username, final String portfolioId, final String assetSymbol) {
+            boolean result = false;
+            if (portfolioExists(username, portfolioId)) {
+                result = accounts.get(username).get(portfolioId).containsKey(assetSymbol);
+            }
+            return result;
         }
 
         @Override
-        public double getAssetBalance(String username, String portfolioId, String assetSymbol) {
-            if (!hasAsset(username, portfolioId, assetSymbol)) return 0.0;
-            return accounts.get(username).get(portfolioId).get(assetSymbol);
+        public double getAssetBalance(final String username, final String portfolioId, final String assetSymbol) {
+            double result = 0.0;
+            if (hasAsset(username, portfolioId, assetSymbol)) {
+                result = accounts.get(username).get(portfolioId).get(assetSymbol);
+            }
+            return result;
         }
 
         @Override
-        public void transferAsset(String username, String fromPortfolio, String toPortfolio, String assetSymbol, double amount) {
-            double fromBal = getAssetBalance(username, fromPortfolio, assetSymbol);
-            double toBal = getAssetBalance(username, toPortfolio, assetSymbol);
+        public void transferAsset(final String username, final String fromPortfolio,
+                                  final String toPortfolio, final String assetSymbol, final double amount) {
+            final double fromBal = getAssetBalance(username, fromPortfolio, assetSymbol);
 
             accounts.get(username).get(fromPortfolio).put(assetSymbol, fromBal - amount);
             accounts.get(username).get(toPortfolio).putIfAbsent(assetSymbol, 0.0);
-            double currentTo = accounts.get(username).get(toPortfolio).get(assetSymbol);
+            final double currentTo = accounts.get(username).get(toPortfolio).get(assetSymbol);
             accounts.get(username).get(toPortfolio).put(assetSymbol, currentTo + amount);
         }
 
         @Override
-        public void saveTransaction(Transaction transaction) {
+        public void saveTransaction(final Transaction transaction) {
             // No-op for test
         }
 
         @Override
-        public String[] getAvailablePortfolios(String username) {
-            if (!accounts.containsKey(username)) return new String[0];
-            return accounts.get(username).keySet().toArray(new String[0]);
+        public String[] getAvailablePortfolios(final String username) {
+            final String[] result;
+            if (!accounts.containsKey(username)) {
+                result = new String[0];
+            }
+            else {
+                result = accounts.get(username).keySet().toArray(new String[0]);
+            }
+            return result;
         }
 
         @Override
-        public String[] getAvailableStocks(String username, String portfolioId) {
+        public String[] getAvailableStocks(final String username, final String portfolioId) {
             return new String[0];
         }
 
         @Override
-        public String[] getAvailableCurrencies(String username, String portfolioId) {
-            if (!portfolioExists(username, portfolioId)) return new String[0];
-            return accounts.get(username).get(portfolioId).keySet().toArray(new String[0]);
+        public String[] getAvailableCurrencies(final String username, final String portfolioId) {
+            final String[] result;
+            if (!portfolioExists(username, portfolioId)) {
+                result = new String[0];
+            }
+            else {
+                result = accounts.get(username).get(portfolioId).keySet().toArray(new String[0]);
+            }
+            return result;
         }
 
         @Override
-        public double getStockPrice(String symbol) {
+        public double getStockPrice(final String symbol) {
             return 100.0;
         }
 
         @Override
-        public List<SubAccount> getSubAccountsOf(String username) {
-            List<SubAccount> result = new ArrayList<>();
+        public List<SubAccount> getSubAccountsOf(final String username) {
+            final List<SubAccount> result = new ArrayList<>();
             if (accounts.containsKey(username)) {
-                for (String portName : accounts.get(username).keySet()) {
+                for (final String portName : accounts.get(username).keySet()) {
                     // Create SubAccount for output data verification
                     // Assuming USD is the main balance for simplicity
-                    Double usdBal = accounts.get(username).get(portName).getOrDefault("USD", 0.0);
+                    final Double usdBal = accounts.get(username).get(portName).getOrDefault("USD", 0.0);
                     result.add(new SubAccount(portName, BigDecimal.valueOf(usdBal), false));
                 }
             }

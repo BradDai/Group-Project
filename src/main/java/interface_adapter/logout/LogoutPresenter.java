@@ -13,20 +13,20 @@ import use_case.logout.LogoutOutputData;
  */
 public class LogoutPresenter implements LogoutOutputBoundary {
 
-    private LoggedInViewModel loggedInViewModel;
-    private ViewManagerModel viewManagerModel;
-    private LoginViewModel loginViewModel;
+    private final LoggedInViewModel loggedInViewModel;
+    private final ViewManagerModel viewManagerModel;
+    private final LoginViewModel loginViewModel;
 
-    public LogoutPresenter(ViewManagerModel viewManagerModel,
-                          LoggedInViewModel loggedInViewModel,
-                           LoginViewModel loginViewModel) {
+    public LogoutPresenter(final ViewManagerModel viewManagerModel,
+                           final LoggedInViewModel loggedInViewModel,
+                           final LoginViewModel loginViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.loggedInViewModel = loggedInViewModel;
         this.loginViewModel = loginViewModel;
     }
 
     @Override
-    public void prepareSuccessView(LogoutOutputData response) {
+    public void prepareSuccessView(final LogoutOutputData response) {
 
         // We need to switch to the login view, which should have
         // an empty username and password.
@@ -38,7 +38,7 @@ public class LogoutPresenter implements LogoutOutputBoundary {
         // 2. set the username in the state to the empty string
         // 3. firePropertyChanged so that the View that is listening is updated.
         final LoggedInState loggedInState = loggedInViewModel.getState();
-        String name = loggedInState.getUsername();
+        final String name = loggedInState.getUsername();
         loggedInState.setUsername("");
         loggedInState.setSubAccounts(new java.util.ArrayList<>()); // ⭐ 清空 subAccounts
         loggedInState.setSubAccountError(null);                    // ⭐ 清空错误信息（可选）

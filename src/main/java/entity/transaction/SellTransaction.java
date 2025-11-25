@@ -14,31 +14,32 @@ public class SellTransaction extends Transaction {
 
     /**
      * Creates a new sell transaction.
+     *
      * @param transactionId unique identifier
-     * @param date transaction date
+     * @param date          transaction date
      * @param fromPortfolio portfolio selling the asset
-     * @param assetType type of asset
-     * @param assetSymbol symbol of the asset
-     * @param quantity amount sold
-     * @param pricePerUnit price per unit of asset
+     * @param assetType     type of asset
+     * @param assetSymbol   symbol of the asset
+     * @param quantity      amount sold
+     * @param pricePerUnit  price per unit of asset
      */
-    public SellTransaction(String transactionId, LocalDateTime date,
-                           String fromPortfolio, String assetType, String assetSymbol,
-                           double quantity, double pricePerUnit) {
+    public SellTransaction(final String transactionId, final LocalDateTime date,
+                           final String fromPortfolio, final String assetType, final String assetSymbol,
+                           final double quantity, final double pricePerUnit) {
 //        super(transactionId, date, fromPortfolio, null);
         super(
-                transactionId,
-                date,
-                fromPortfolio,              // fromPortfolio
-                null,                       // toPortfolio
-                assetSymbol,                // assetSymbol
-                quantity,                   // quantity
-                pricePerUnit,               // priceAtTime
-                quantity * pricePerUnit,    // totalValue
-                null,                       // fromCurrency
-                null,                       // toCurrency
-                null,                       // rate
-                null
+            transactionId,
+            date,
+            fromPortfolio,              // fromPortfolio
+            null,                       // toPortfolio
+            assetSymbol,                // assetSymbol
+            quantity,                   // quantity
+            pricePerUnit,               // priceAtTime
+            quantity * pricePerUnit,    // totalValue
+            null,                       // fromCurrency
+            null,                       // toCurrency
+            null,                       // rate
+            null
         );
 
         if (quantity <= 0) {
@@ -62,7 +63,7 @@ public class SellTransaction extends Transaction {
     @Override
     public String getDescription() {
         return String.format("Sold %.2f %s (%s) at $%.2f per unit",
-                quantity, assetType, assetSymbol, pricePerUnit);
+            quantity, assetType, assetSymbol, pricePerUnit);
     }
 
     public String getAssetType() {

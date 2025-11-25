@@ -6,11 +6,11 @@ public class SwitchExchangeController {
 
     private final SwitchExchangeInputBoundary switchExchangeUseCaseInteractor;
 
-    public SwitchExchangeController(SwitchExchangeInputBoundary switchExchangeUseCaseInteractor) {
+    public SwitchExchangeController(final SwitchExchangeInputBoundary switchExchangeUseCaseInteractor) {
         this.switchExchangeUseCaseInteractor = switchExchangeUseCaseInteractor;
     }
 
-    public void switchToExchangeView(String username) {
+    public void switchToExchangeView(final String username) {
         switchExchangeUseCaseInteractor.switchToExchangeView(username);
     }
 

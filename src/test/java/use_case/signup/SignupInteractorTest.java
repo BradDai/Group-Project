@@ -13,29 +13,29 @@ class SignupInteractorTest {
 
     @Test
     void successTest() {
-        SignupInputData inputData =
+        final SignupInputData inputData =
                 new SignupInputData("Paul", "password", "password");
 
-        SignupUserDataAccessInterface userRepository =
+        final SignupUserDataAccessInterface userRepository =
                 new InMemoryUserDataAccessObject();
-        SubAccountDataAccessInterface subAccountRepository =
+        final SubAccountDataAccessInterface subAccountRepository =
                 new InMemorySubAccountDataAccess();
-        SignupOutputBoundary successPresenter = new SignupOutputBoundary() {
+        final SignupOutputBoundary successPresenter = new SignupOutputBoundary() {
             @Override
-            public void prepareSuccessView(SignupOutputData user) {
+            public void prepareSuccessView(final SignupOutputData user) {
                 assertEquals("Paul", user.getUsername());
                 assertTrue(userRepository.existsByName("Paul"));
                 assertTrue(subAccountRepository.exists("Paul", "Main USD Portfolio"));
             }
             @Override
-            public void prepareFailView(String error) {
+            public void prepareFailView(final String error) {
                 fail("Use case failure is unexpected.");
             }
             @Override
             public void switchToLoginView() {
             }
         };
-        SignupInputBoundary interactor = new SignupInteractor(
+        final SignupInputBoundary interactor = new SignupInteractor(
                 userRepository,
                 successPresenter,
                 new UserFactory(),

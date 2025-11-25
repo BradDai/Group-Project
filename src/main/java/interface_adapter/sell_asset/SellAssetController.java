@@ -6,17 +6,18 @@ import use_case.sell_asset.SellAssetInputData;
 public class SellAssetController {
     private final SellAssetInputBoundary sellAssetInteractor;
 
-    public SellAssetController(SellAssetInputBoundary sellAssetInteractor) {
+    public SellAssetController(final SellAssetInputBoundary sellAssetInteractor) {
         this.sellAssetInteractor = sellAssetInteractor;
     }
 
-    public void execute(String userName, String portfolioName, String stockName, double quantity) {
-        final SellAssetInputData sellAssetInputData = new SellAssetInputData(userName, portfolioName, stockName, quantity);
+    public void execute(final String userName, final String portfolioName, final String stockName, final double quantity) {
+        final SellAssetInputData sellAssetInputData =
+            new SellAssetInputData(userName, portfolioName, stockName, quantity);
 
         sellAssetInteractor.execute(sellAssetInputData);
     }
 
-    public void fetchPrice(String stockName) {
+    public void fetchPrice(final String stockName) {
         sellAssetInteractor.fetchPrice(stockName);
     }
 }

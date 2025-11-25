@@ -24,8 +24,9 @@
 
 package use_case.transaction_history;
 
-import interface_adapter.history.HistoryState;
 import java.util.List;
+
+import interface_adapter.history.HistoryState;
 
 public class TransactionHistoryOutputData {
 
@@ -34,10 +35,10 @@ public class TransactionHistoryOutputData {
     private final String startDate;
     private final String endDate;
 
-    public TransactionHistoryOutputData(List<HistoryState.Row> rows,
-                                        String message,
-                                        String startDate,
-                                        String endDate) {
+    public TransactionHistoryOutputData(final List<HistoryState.Row> rows,
+                                        final String message,
+                                        final String startDate,
+                                        final String endDate) {
         this.rows = rows;
         this.message = message;
         this.startDate = startDate;

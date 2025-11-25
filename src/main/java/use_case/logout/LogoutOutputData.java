@@ -7,7 +7,7 @@ public class LogoutOutputData {
 
     private final String username;
 
-    public LogoutOutputData(String username) {
+    public LogoutOutputData(final String username) {
         this.username = username;
     }
 

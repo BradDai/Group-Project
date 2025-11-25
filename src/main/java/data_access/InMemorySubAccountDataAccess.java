@@ -1,36 +1,44 @@
 package data_access;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import entity.SubAccount;
 import use_case.SubAccount.SubAccountDataAccessInterface;
-
-import java.util.*;
 
 public class InMemorySubAccountDataAccess implements SubAccountDataAccessInterface {
 
     private final Map<String, List<SubAccount>> data = new HashMap<>();
+
     @Override
-    public boolean exists(String username, String subName) {
+    public boolean exists(final String username, final String subName) {
         return data.getOrDefault(username, List.of())
-                .stream()
-                .anyMatch(sa -> sa.getName().equalsIgnoreCase(subName));
+            .stream()
+            .anyMatch(sa -> sa.getName().equalsIgnoreCase(subName));
     }
+
     @Override
-    public void save(String username, SubAccount sub) {
-        List<SubAccount> list = data.computeIfAbsent(username, u -> new ArrayList<>());
+    public void save(final String username, final SubAccount sub) {
+        final List<SubAccount> list = data.computeIfAbsent(username, u -> new ArrayList<>());
         list.remove(sub);
         list.add(sub);
     }
+
     @Override
-    public List<SubAccount> getSubAccountsOf(String username) {
+    public List<SubAccount> getSubAccountsOf(final String username) {
         return new ArrayList<>(data.getOrDefault(username, List.of()));
     }
+
     @Override
-    public int countByUser(String username) {
+    public int countByUser(final String username) {
         return data.getOrDefault(username, List.of()).size();
     }
+
     @Override
-    public void delete(String username, String subName) {
-        List<SubAccount> list = data.get(username);
+    public void delete(final String username, final String subName) {
+        final List<SubAccount> list = data.get(username);
         if (list == null) {
             return;
         }

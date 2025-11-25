@@ -10,14 +10,14 @@ public class SwitchTransferPresenter implements SwitchTransferOutputBoundary {
     private final TransferViewModel transferViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public SwitchTransferPresenter(TransferViewModel transferViewModel, ViewManagerModel viewManagerModel) {
+    public SwitchTransferPresenter(final TransferViewModel transferViewModel, final ViewManagerModel viewManagerModel) {
         this.transferViewModel = transferViewModel;
         this.viewManagerModel = viewManagerModel;
     }
 
     @Override
-    public void presentTransferView(String username, String[] portfolios) {
-        TransferState state = transferViewModel.getState();
+    public void presentTransferView(final String username, final String[] portfolios) {
+        final TransferState state = transferViewModel.getState();
         state.setUsername(username);
         state.setAvailablePortfolios(portfolios);
         state.setError("");

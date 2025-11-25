@@ -1,430 +1,259 @@
 package view;
 
-import interface_adapter.SwitchLoggedInController;
-import interface_adapter.transfer.TransferController;
-import interface_adapter.transfer.TransferState;
-import interface_adapter.transfer.TransferViewModel;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import data_access.Constants;
+import interface_adapter.SwitchLoggedInController;
+import interface_adapter.transfer.TransferController;
+import interface_adapter.transfer.TransferException;
+import interface_adapter.transfer.TransferState;
+import interface_adapter.transfer.TransferViewModel;
+import view.transfer_components.BalancePanel;
+import view.transfer_components.CurrencyPanel;
+import view.transfer_components.StockPanel;
+import view.transfer_components.TopPanel;
+import view.transfer_components.TransferButtonPanel;
+
+/**
+ * Main Transfer view delegating UI components to sub-panels.
+ */
 public class TransferView extends JPanel implements ActionListener, PropertyChangeListener {
-    private final String viewName = "transfer";
+
+    private final String viewName = Constants.VIEW_NAME;
     private final TransferViewModel transferViewModel;
     private SwitchLoggedInController switchLoggedInController;
     private TransferController transferController;
 
-    // UI Components
-    private final JComboBox<String> fromPortfolioDropdown;
-    private final JComboBox<String> toPortfolioDropdown;
-    private final JComboBox<String> transferTypeDropdown;
+    // Sub-panels
+    private final TopPanel topPanel;
+    private final StockPanel stockPanel;
+    private final CurrencyPanel currencyPanel;
+    private final BalancePanel balancePanel;
+    private final TransferButtonPanel buttonPanel;
 
-    // Stock components
-    private final JPanel stockPanel;
-    private final JComboBox<String> stockSymbolDropdown;
-    private final JSpinner stockAmountSpinner;
-    private final JLabel stockValueLabel;
+    private boolean isUpdating;
 
-    // Currency components
-    private final JPanel currencyPanel;
-    private final JComboBox<String> currencyTypeDropdown;
-    private final JTextField currencyAmountField;
-    private final JLabel currencyErrorLabel;
-
-    // Labels for Balances
-    private final JLabel fromBalanceLabel;
-    private final JLabel toBalanceLabel;
-
-    // Buttons
-    private final JButton confirmButton;
-    private final JButton cancelButton;
-
-    private boolean isUpdating = false;
-
-    public TransferView(TransferViewModel transferViewModel) {
+    public TransferView(final TransferViewModel transferViewModel) {
         this.transferViewModel = transferViewModel;
         this.transferViewModel.addPropertyChangeListener(this);
         this.setName(viewName);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // Subaccount selection
-        final JPanel fromPortfolioPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        fromPortfolioPanel.add(new JLabel("Transfer from Portfolio:"));
-        fromPortfolioDropdown = new JComboBox<>();
-        fromPortfolioPanel.add(fromPortfolioDropdown);
-        this.add(fromPortfolioPanel);
+        // Initialize sub-panels
+        topPanel = new TopPanel();
+        stockPanel = new StockPanel();
+        currencyPanel = new CurrencyPanel();
+        balancePanel = new BalancePanel();
+        buttonPanel = new TransferButtonPanel();
 
-        final JPanel toPortfolioPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        toPortfolioPanel.add(new JLabel("Transfer to Portfolio:"));
-        toPortfolioDropdown = new JComboBox<>();
-        toPortfolioPanel.add(toPortfolioDropdown);
-        this.add(toPortfolioPanel);
+        // Add components to Layout
+        this.add(topPanel);
 
-        final JPanel transferTypePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        transferTypePanel.add(new JLabel("Type of Transfer:"));
-        transferTypeDropdown = new JComboBox<>(new String[]{"Stock", "Currency"});
-        transferTypePanel.add(transferTypeDropdown);
-        this.add(transferTypePanel);
+        this.add(Box.createVerticalStrut(Constants.RIGID_AREA_SMALL));
 
-        this.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        // Stock panel
-        stockPanel = new JPanel();
-        stockPanel.setLayout(new BoxLayout(stockPanel, BoxLayout.Y_AXIS));
-        stockPanel.setBorder(BorderFactory.createTitledBorder("Stock Transfer Details"));
-
-        JPanel stockSymbolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        stockSymbolPanel.add(new JLabel("Symbol:"));
-        stockSymbolDropdown = new JComboBox<>();
-        stockSymbolPanel.add(stockSymbolDropdown);
-        stockPanel.add(stockSymbolPanel);
-
-        JPanel stockAmountPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        stockAmountPanel.add(new JLabel("Amount:"));
-        stockAmountSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 1000, 1));
-        stockAmountPanel.add(stockAmountSpinner);
-        stockPanel.add(stockAmountPanel);
-
-        JPanel stockValuePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        stockValueLabel = new JLabel("Equivalent Value: $0.00");
-        stockValuePanel.add(stockValueLabel);
-        stockPanel.add(stockValuePanel);
+        // Initially add balance panel to stock panel logic
+        stockPanel.add(balancePanel, Constants.INDEX_SECOND);
         this.add(stockPanel);
-
-        // Currency panel
-        currencyPanel = new JPanel();
-        currencyPanel.setLayout(new BoxLayout(currencyPanel, BoxLayout.Y_AXIS));
-        currencyPanel.setBorder(BorderFactory.createTitledBorder("Currency Transfer Details"));
-
-        // Currency Selection
-        JPanel currencyTypePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        currencyTypePanel.add(new JLabel("Currency:"));
-        currencyTypeDropdown = new JComboBox<>();
-        currencyTypePanel.add(currencyTypeDropdown);
-        currencyPanel.add(currencyTypePanel);
-
-        // Balance Info
-        JPanel balanceInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        Box balanceBox = Box.createVerticalBox();
-
-        fromBalanceLabel = new JLabel("Sender Balance: -");
-        toBalanceLabel = new JLabel("Receiver Balance: -");
-        fromBalanceLabel.setForeground(Color.DARK_GRAY);
-        toBalanceLabel.setForeground(Color.DARK_GRAY);
-
-        balanceBox.add(fromBalanceLabel);
-        balanceBox.add(Box.createVerticalStrut(3));
-        balanceBox.add(toBalanceLabel);
-
-        balanceInfoPanel.add(balanceBox);
-        currencyPanel.add(balanceInfoPanel);
-
-        // Amount Input
-        JPanel currencyAmountPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        currencyAmountPanel.add(new JLabel("Amount:"));
-        currencyAmountField = new JTextField(15);
-        currencyAmountPanel.add(currencyAmountField);
-        currencyPanel.add(currencyAmountPanel);
-
-        // Error Label
-        currencyErrorLabel = new JLabel("");
-        currencyErrorLabel.setForeground(Color.RED);
-        currencyErrorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        currencyPanel.add(currencyErrorLabel);
-
-        currencyPanel.setVisible(false);
         this.add(currencyPanel);
 
-        this.add(Box.createRigidArea(new Dimension(0, 20)));
+        this.add(Box.createVerticalStrut(Constants.RIGID_AREA_MEDIUM));
 
-        // Buttons
-        final JPanel buttonsPanel = new JPanel();
-        confirmButton = new JButton("Confirm Transfer");
-        cancelButton = new JButton("Cancel");
-        buttonsPanel.add(confirmButton);
-        buttonsPanel.add(cancelButton);
-        this.add(buttonsPanel);
+        this.add(buttonPanel);
 
         setupActionListeners();
+        isUpdating = false;
     }
 
     private void setupActionListeners() {
-        ActionListener updateBalancesListener = e -> {
-            if (!isUpdating) triggerBalanceCheck();
-        };
-
-        fromPortfolioDropdown.addActionListener(e -> {
-            if (isUpdating) return;
-            triggerBalanceCheck();
-        });
-
-        toPortfolioDropdown.addActionListener(updateBalancesListener);
-
-        transferTypeDropdown.addActionListener(evt -> {
-            if (isUpdating) return;
-            String selectedType = (String) transferTypeDropdown.getSelectedItem();
-            if ("Stock".equals(selectedType)) {
-                stockPanel.setVisible(true);
-                currencyPanel.setVisible(false);
-                updateStockDropdowns();
-            } else if ("Currency".equals(selectedType)) {
-                stockPanel.setVisible(false);
-                currencyPanel.setVisible(true);
-                updateCurrencyDropdowns();
+        // Top Panel Listener (Portfolio or Type change)
+        topPanel.addActionListener(evt -> {
+            if (!isUpdating) {
+                handleTopPanelChange();
             }
-            triggerBalanceCheck();
-            revalidate();
-            repaint();
-
-            Window window = SwingUtilities.getWindowAncestor(this);
-            if (window != null) window.pack();
         });
 
-        stockSymbolDropdown.addActionListener(e -> {
-            if (isUpdating) return;
-            updateStockValue();
+        // Stock/Currency Listeners
+        stockPanel.addActionListener(evt -> {
+            if (!isUpdating) {
+                triggerBalanceCheck();
+            }
         });
 
-        currencyTypeDropdown.addActionListener(e -> {
-            if (!isUpdating) triggerBalanceCheck();
+        currencyPanel.addActionListener(evt -> {
+            if (!isUpdating) {
+                triggerBalanceCheck();
+            }
         });
 
-        stockAmountSpinner.addChangeListener(evt -> updateStockValue());
+        // Validation Listener
+        currencyPanel.addAmountChangeListener(() -> currencyPanel.validateAmount(buttonPanel));
 
-        currencyAmountField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { validateCurrencyAmount(); }
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { validateCurrencyAmount(); }
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { validateCurrencyAmount(); }
-        });
+        buttonPanel.addConfirmListener(this::actionPerformedConfirm);
 
-        confirmButton.addActionListener(evt -> executeTransfer());
-        cancelButton.addActionListener(evt -> {
-            if (switchLoggedInController != null) switchLoggedInController.switchToLoggedInView();
+        buttonPanel.addCancelListener(evt -> {
+            if (switchLoggedInController != null) {
+                switchLoggedInController.switchToLoggedInView();
+            }
         });
+    }
+
+    private void handleTopPanelChange() {
+        final String type = topPanel.getTransferType();
+
+        if (Constants.TRANSFER_STOCK.equals(type)) {
+            stockPanel.setVisible(true);
+            currencyPanel.setVisible(false);
+
+            // Update dropdowns immediately for the new type
+            updateSubPanels(transferViewModel.getState());
+
+            // Move balance panel
+            stockPanel.add(balancePanel, Constants.INDEX_SECOND);
+        }
+        else {
+            stockPanel.setVisible(false);
+            currencyPanel.setVisible(true);
+
+            updateSubPanels(transferViewModel.getState());
+
+            // Move balance panel
+            currencyPanel.add(balancePanel, Constants.INDEX_SECOND);
+        }
+
+        triggerBalanceCheck();
+        this.revalidate();
+        this.repaint();
+
+        final Window window = SwingUtilities.getWindowAncestor(this);
+        if (window != null) {
+            window.pack();
+        }
     }
 
     private void triggerBalanceCheck() {
-        if (transferController == null) return;
+        if (transferController != null) {
+            final TransferState state = transferViewModel.getState();
+            String asset = "";
 
-        String username = transferViewModel.getState().getUsername();
-        String from = (String) fromPortfolioDropdown.getSelectedItem();
-        String to = (String) toPortfolioDropdown.getSelectedItem();
-        String type = (String) transferTypeDropdown.getSelectedItem();
-        String asset = "";
-
-        if (from == null || to == null) return;
-
-        if ("Currency".equals(type)) {
-            asset = (String) currencyTypeDropdown.getSelectedItem();
-            if (asset == null) asset = "USD";
-        } else {
-            asset = "USD"; // Default check for Stocks
-        }
-
-        transferController.checkBalances(username, from, to, asset);
-    }
-
-    private void updateStockDropdowns() {
-        String from = (String) fromPortfolioDropdown.getSelectedItem();
-        if (from == null) return;
-        TransferState state = transferViewModel.getState();
-        state.setFromPortfolio(from);
-        isUpdating = true;
-        stockSymbolDropdown.removeAllItems();
-        if (state.getAvailableStocks() != null) {
-            for (String s : state.getAvailableStocks()) stockSymbolDropdown.addItem(s);
-        }
-        isUpdating = false;
-    }
-
-    private void updateCurrencyDropdowns() {
-        String from = (String) fromPortfolioDropdown.getSelectedItem();
-        if (from == null) return;
-        TransferState state = transferViewModel.getState();
-        state.setFromPortfolio(from);
-
-        isUpdating = true;
-
-        // Save currently selected item to restore it if it still exists
-        Object currentSelection = currencyTypeDropdown.getSelectedItem();
-
-        currencyTypeDropdown.removeAllItems();
-        if (state.getAvailableCurrencies() != null) {
-            for (String c : state.getAvailableCurrencies()) {
-                currencyTypeDropdown.addItem(c);
-            }
-        }
-        if (currencyTypeDropdown.getItemCount() == 0) currencyTypeDropdown.addItem("USD");
-
-        // Restore selection if possible
-        if (currentSelection != null) {
-            for(int i=0; i<currencyTypeDropdown.getItemCount(); i++) {
-                if(currencyTypeDropdown.getItemAt(i).equals(currentSelection)) {
-                    currencyTypeDropdown.setSelectedIndex(i);
-                    break;
+            if (stockPanel.isVisible()) {
+                final String sel = stockPanel.getSelectedStock();
+                // If sel is null, asset remains empty string, returning 0 balance.
+                if (sel != null) {
+                    asset = sel;
                 }
             }
-        }
-
-        isUpdating = false;
-    }
-
-    private void updateStockValue() {
-        String symbol = (String) stockSymbolDropdown.getSelectedItem();
-        if (symbol == null) {
-            stockValueLabel.setText("Equivalent Value: $0.00");
-            return;
-        }
-        int amount = (Integer) stockAmountSpinner.getValue();
-        TransferState currentState = transferViewModel.getState();
-        double pricePerShare = currentState.getStockPrice(symbol);
-        double totalValue = pricePerShare * amount;
-        stockValueLabel.setText(String.format("Equivalent Value: $%.2f", totalValue));
-    }
-
-    private void validateCurrencyAmount() {
-        try {
-            String amountText = currencyAmountField.getText().trim();
-            if (amountText.isEmpty()) {
-                currencyErrorLabel.setText("");
-                confirmButton.setEnabled(true);
-                return;
+            else {
+                final String sel = currencyPanel.getSelectedCurrency();
+                if (sel != null) {
+                    asset = sel;
+                }
+                else {
+                    asset = Constants.DEFAULT_CURRENCY;
+                }
             }
-            double amount = Double.parseDouble(amountText);
-            if (amount <= 0) {
-                currencyErrorLabel.setText("Amount must be positive");
-                confirmButton.setEnabled(false);
-                return;
-            }
-            currencyErrorLabel.setText("");
-            confirmButton.setEnabled(true);
-        } catch (NumberFormatException e) {
-            currencyErrorLabel.setText("Invalid amount format");
-            currencyErrorLabel.setForeground(Color.RED);
-            confirmButton.setEnabled(false);
+
+            transferController.checkBalances(
+                state.getUsername(),
+                topPanel.getFromPortfolio(),
+                topPanel.getToPortfolio(),
+                asset
+            );
         }
     }
 
     private void executeTransfer() {
-        if (transferController == null) {
-            JOptionPane.showMessageDialog(this, "Transfer controller not initialized", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        String username = transferViewModel.getState().getUsername();
-        String from = (String) fromPortfolioDropdown.getSelectedItem();
-        String to = (String) toPortfolioDropdown.getSelectedItem();
-        String type = (String) transferTypeDropdown.getSelectedItem();
-
-        if ("Stock".equals(type)) {
-            String symbol = (String) stockSymbolDropdown.getSelectedItem();
-            if (symbol == null) { JOptionPane.showMessageDialog(this, "Select a stock."); return; }
-            int amount = (Integer) stockAmountSpinner.getValue();
-            transferController.executeStockTransfer(username, from, to, symbol, amount);
-        } else {
-            String currency = (String) currencyTypeDropdown.getSelectedItem();
+        if (transferController != null) {
+            final TransferState state = transferViewModel.getState();
+            final String username = state.getUsername();
+            final String from = topPanel.getFromPortfolio();
+            final String to = topPanel.getToPortfolio();
             try {
-                double amount = Double.parseDouble(currencyAmountField.getText().trim());
-                transferController.executeCurrencyTransfer(username, from, to, currency, amount);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Invalid currency amount", "Error", JOptionPane.ERROR_MESSAGE);
+                if (stockPanel.isVisible()) {
+                    // Execute Stock Transfer
+                    transferController.executeStockTransfer(
+                        username, from, to, stockPanel.getSelectedStock(), stockPanel.getAmount()
+                    );
+                }
+                else {
+                    // Execute Currency Transfer
+                    transferController.executeCurrencyTransfer(
+                        username, from, to, currencyPanel.getSelectedCurrency(), currencyPanel.getAmount()
+                    );
+                }
+            }
+            catch (final NumberFormatException numberFormatException) {
+                currencyPanel.showError(Constants.ERROR_INVALID_AMOUNT);
+            }
+            catch (final TransferException transferException) {
+                // Show the error message from the exception
+                currencyPanel.showError(transferException.getMessage());
             }
         }
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         System.out.println("Click " + e.getActionCommand());
     }
 
-    public String getViewName() { return viewName; }
-    public void setSwitchLoggedInController(SwitchLoggedInController c) { this.switchLoggedInController = c; }
-    public void setTransferController(TransferController c) { this.transferController = c; }
+    private void actionPerformedConfirm(final ActionEvent actionEvent) {
+        executeTransfer();
+    }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if ("state".equals(evt.getPropertyName())) {
-            TransferState state = (TransferState) evt.getNewValue();
-
-            isUpdating = true;
-
-            // Update Portfolios
-            String[] newPortfolios = state.getAvailablePortfolios();
-            boolean listsDiffer = false;
-
-            if (newPortfolios == null) {
-                if (fromPortfolioDropdown.getItemCount() > 0) listsDiffer = true;
-            } else if (fromPortfolioDropdown.getItemCount() != newPortfolios.length) {
-                listsDiffer = true;
-            } else {
-                for (int i = 0; i < newPortfolios.length; i++) {
-                    if (!newPortfolios[i].equals(fromPortfolioDropdown.getItemAt(i))) {
-                        listsDiffer = true;
-                        break;
-                    }
-                }
-            }
-
-            if (listsDiffer && newPortfolios != null) {
-                fromPortfolioDropdown.removeAllItems();
-                toPortfolioDropdown.removeAllItems();
-
-                for (String p : newPortfolios) {
-                    fromPortfolioDropdown.addItem(p);
-                    toPortfolioDropdown.addItem(p);
-                }
-                if (fromPortfolioDropdown.getItemCount() > 0) fromPortfolioDropdown.setSelectedIndex(0);
-                if (toPortfolioDropdown.getItemCount() > 1) toPortfolioDropdown.setSelectedIndex(1);
-
-                // Since portfolios changed, trigger a balance check
-                SwingUtilities.invokeLater(this::triggerBalanceCheck);
-            }
-
-            // Update Currency Dropdown if the list in state is different
-            String[] newCurrencies = state.getAvailableCurrencies();
-            boolean currenciesDiffer = false;
-
-            if (newCurrencies == null) {
-                if (currencyTypeDropdown.getItemCount() > 0) currenciesDiffer = true;
-            } else if (currencyTypeDropdown.getItemCount() != newCurrencies.length) {
-                currenciesDiffer = true;
-            } else {
-                for (int i=0; i<newCurrencies.length; i++) {
-                    boolean found = false;
-                    for (int j=0; j<currencyTypeDropdown.getItemCount(); j++) {
-                        if (currencyTypeDropdown.getItemAt(j).equals(newCurrencies[i])) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) { currenciesDiffer = true; break; }
-                }
-            }
-
-            if (currenciesDiffer) {
-                updateCurrencyDropdowns();
-            }
-
-            // Update labels
-            fromBalanceLabel.setText("Sender Balance: " + state.getFromBalance());
-            toBalanceLabel.setText("Receiver Balance: " + state.getToBalance());
-
-            // Update amount if changed
-            if (!currencyAmountField.getText().equals(state.getAmount())) {
-                currencyAmountField.setText(state.getAmount());
-            }
-
-            isUpdating = false;
-            this.repaint();
-
-        } else if ("error".equals(evt.getPropertyName())) {
-            TransferState state = (TransferState) evt.getNewValue();
+    public void propertyChange(final PropertyChangeEvent evt) {
+        if (Constants.STATE_PROPERTY.equals(evt.getPropertyName())) {
+            processStateUpdate((TransferState) evt.getNewValue());
+        }
+        else if (Constants.ERROR_PROPERTY.equals(evt.getPropertyName())) {
+            final TransferState state = (TransferState) evt.getNewValue();
             if (state.getError() != null && !state.getError().isEmpty()) {
-                JOptionPane.showMessageDialog(this, state.getError(), "Error", JOptionPane.ERROR_MESSAGE);
+                currencyPanel.showError(state.getError());
             }
         }
+    }
+
+    private void processStateUpdate(final TransferState state) {
+        isUpdating = true;
+
+        topPanel.updatePortfolios(state.getAvailablePortfolios());
+        updateSubPanels(state);
+
+        String typeLabel = Constants.LABEL_BALANCE;
+        if (Constants.TRANSFER_STOCK.equals(topPanel.getTransferType())) {
+            typeLabel = Constants.LABEL_QUANTITY_ONLY;
+        }
+
+        balancePanel.updateBalances(typeLabel, state.getFromBalance(), state.getToBalance());
+        currencyPanel.setAmountText(state.getAmount());
+
+        isUpdating = false;
+        this.repaint();
+    }
+
+    private void updateSubPanels(final TransferState state) {
+        stockPanel.setAvailableStocks(state.getAvailableStocks());
+        currencyPanel.setAvailableCurrencies(state.getAvailableCurrencies());
+    }
+
+    public String getViewName() {
+        return viewName;
+    }
+
+    public void setSwitchLoggedInController(final SwitchLoggedInController controller) {
+        this.switchLoggedInController = controller;
+    }
+
+    public void setTransferController(final TransferController controller) {
+        this.transferController = controller;
     }
 }

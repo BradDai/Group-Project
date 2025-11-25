@@ -8,7 +8,7 @@ public class ChangePasswordInputData {
     private final String password;
     private final String username;
 
-    public ChangePasswordInputData(String password, String username) {
+    public ChangePasswordInputData(final String password, final String username) {
         this.password = password;
         this.username = username;
     }

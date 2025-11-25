@@ -1,10 +1,10 @@
 package use_case.login;
 
+import java.util.List;
+
 import entity.SubAccount;
 import entity.User;
 import use_case.SubAccount.SubAccountDataAccessInterface;
-
-import java.util.List;
 
 /**
  * The Login Interactor.
@@ -14,16 +14,16 @@ public class LoginInteractor implements LoginInputBoundary {
     private final LoginOutputBoundary loginPresenter;
     private final SubAccountDataAccessInterface subAccountDataAccess;
 
-    public LoginInteractor(LoginUserDataAccessInterface userDataAccessInterface,
-                           LoginOutputBoundary loginOutputBoundary,
-                           SubAccountDataAccessInterface subAccountDataAccess) {
+    public LoginInteractor(final LoginUserDataAccessInterface userDataAccessInterface,
+                           final LoginOutputBoundary loginOutputBoundary,
+                           final SubAccountDataAccessInterface subAccountDataAccess) {
         this.userDataAccessObject = userDataAccessInterface;
         this.loginPresenter = loginOutputBoundary;
         this.subAccountDataAccess = subAccountDataAccess;
     }
 
     @Override
-    public void execute(LoginInputData loginInputData) {
+    public void execute(final LoginInputData loginInputData) {
         final String username = loginInputData.getUsername();
         final String password = loginInputData.getPassword();
         if (!userDataAccessObject.existsByName(username)) {
@@ -42,7 +42,7 @@ public class LoginInteractor implements LoginInputBoundary {
 
                 final List<SubAccount> subs = subAccountDataAccess.getSubAccountsOf(username);
                 final LoginOutputData loginOutputData =
-                        new LoginOutputData(user.getName(), subs);
+                    new LoginOutputData(user.getName(), subs);
                 loginPresenter.prepareSuccessView(loginOutputData);
             }
         }

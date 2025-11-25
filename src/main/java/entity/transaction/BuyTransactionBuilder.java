@@ -14,44 +14,44 @@ public class BuyTransactionBuilder {
     private double quantity;
     private double pricePerUnit;
 
-    public BuyTransactionBuilder setTransactionId(String transactionId) {
+    public BuyTransactionBuilder setTransactionId(final String transactionId) {
         this.transactionId = transactionId;
         return this;
     }
 
-    public BuyTransactionBuilder setDate(LocalDateTime date) {
+    public BuyTransactionBuilder setDate(final LocalDateTime date) {
         this.date = date;
         return this;
     }
 
-    public BuyTransactionBuilder setToPortfolio(String toPortfolio) {
+    public BuyTransactionBuilder setToPortfolio(final String toPortfolio) {
         this.toPortfolio = toPortfolio;
         return this;
     }
 
-    public BuyTransactionBuilder setAssetType(String assetType) {
+    public BuyTransactionBuilder setAssetType(final String assetType) {
         this.assetType = assetType;
         return this;
     }
 
-    public BuyTransactionBuilder setAssetSymbol(String assetSymbol) {
+    public BuyTransactionBuilder setAssetSymbol(final String assetSymbol) {
         this.assetSymbol = assetSymbol;
         return this;
     }
 
-    public BuyTransactionBuilder setQuantity(double quantity) {
+    public BuyTransactionBuilder setQuantity(final double quantity) {
         this.quantity = quantity;
         return this;
     }
 
-    public BuyTransactionBuilder setPricePerUnit(double pricePerUnit) {
+    public BuyTransactionBuilder setPricePerUnit(final double pricePerUnit) {
         this.pricePerUnit = pricePerUnit;
         return this;
     }
 
     public BuyTransaction build() {
         return new BuyTransaction(transactionId, date, toPortfolio,
-                assetType, assetSymbol, quantity, pricePerUnit);
+            assetType, assetSymbol, quantity, pricePerUnit);
     }
 }
 

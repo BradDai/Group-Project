@@ -1,9 +1,8 @@
 package use_case.exchange;
 
-import entity.SubAccount;
-
-import java.util.ArrayList;
 import java.util.List;
+
+import entity.SubAccount;
 
 public class ExchangeConversionOutputData {
 
@@ -17,15 +16,15 @@ public class ExchangeConversionOutputData {
     private final double toBalanceAfter;
     private final List<SubAccount> updatedAccounts;
 
-    public ExchangeConversionOutputData(String accountName,
-                                        String from,
-                                        String to,
-                                        double amountGiven,
-                                        double amountReceived,
-                                        double rateUsed,
-                                        double fromBalanceAfter,
-                                        double toBalanceAfter,
-                                        List<SubAccount> updatedAccounts) {
+    public ExchangeConversionOutputData(final String accountName,
+                                        final String from,
+                                        final String to,
+                                        final double amountGiven,
+                                        final double amountReceived,
+                                        final double rateUsed,
+                                        final double fromBalanceAfter,
+                                        final double toBalanceAfter,
+                                        final List<SubAccount> updatedAccounts) {
         this.accountName = accountName;
         this.from = from;
         this.to = to;
@@ -37,13 +36,39 @@ public class ExchangeConversionOutputData {
         this.updatedAccounts = updatedAccounts;
     }
 
-    public String getAccountName() { return accountName; }
-    public String getFrom() { return from; }
-    public String getTo() { return to; }
-    public double getAmountGiven() { return amountGiven; }
-    public double getAmountReceived() { return amountReceived; }
-    public double getRateUsed() { return rateUsed; }
-    public double getFromBalanceAfter() { return fromBalanceAfter; }
-    public double getToBalanceAfter() { return toBalanceAfter; }
-    public List<SubAccount> getUpdatedSubAccounts() {return updatedAccounts;}
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public double getAmountGiven() {
+        return amountGiven;
+    }
+
+    public double getAmountReceived() {
+        return amountReceived;
+    }
+
+    public double getRateUsed() {
+        return rateUsed;
+    }
+
+    public double getFromBalanceAfter() {
+        return fromBalanceAfter;
+    }
+
+    public double getToBalanceAfter() {
+        return toBalanceAfter;
+    }
+
+    public List<SubAccount> getUpdatedSubAccounts() {
+        return updatedAccounts;
+    }
 }

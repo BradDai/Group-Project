@@ -6,13 +6,21 @@ public class ExchangeOutputData {
     private final String to;
     private final double rate;
 
-    public ExchangeOutputData(String from, String to, double rate) {
+    public ExchangeOutputData(final String from, final String to, final double rate) {
         this.from = from;
         this.to = to;
         this.rate = rate;
     }
 
-    public String getFrom() { return from; }
-    public String getTo() { return to; }
-    public double getRate() { return rate; }
+    public String getFrom() {
+        return from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public double getRate() {
+        return rate;
+    }
 }
