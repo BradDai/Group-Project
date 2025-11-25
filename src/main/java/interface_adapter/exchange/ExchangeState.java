@@ -3,9 +3,10 @@ package interface_adapter.exchange;
 public class ExchangeState {
 
     private String username = "";
+    private String amountField = "";
     private String conversionMessage = "";
     private String errorMessage = "";
-    private String amountField = "";
+    private String balanceMessage = "";
 
     public String getUsername() {
         return username;
@@ -19,23 +20,9 @@ public class ExchangeState {
         return amountField;
     }
 
-    public void setAmountField(final String msg) {
-        this.amountField = msg;
-    }
+    public String getErrorMessage() { return errorMessage; }
+    public void setErrorMessage(String msg) { this.errorMessage = msg; }
 
-    public String getConversionMessage() {
-        return conversionMessage;
-    }
-
-    public void setConversionMessage(final String msg) {
-        this.conversionMessage = msg;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(final String msg) {
-        this.errorMessage = msg;
-    }
+    public String getBalanceMessage() { return balanceMessage; }
+    public void setBalanceMessage(String msg) { this.balanceMessage = msg; }
 }
