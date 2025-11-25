@@ -69,7 +69,7 @@ public class ExchangePresenter implements ExchangeOutputBoundary {
         state.setConversionMessage(msg);
         exchangeViewModel.setState(state);
         exchangeViewModel.firePropertyChangedState();
-        //
+
         final LoggedInState loggedState = loggedInViewModel.getState();
         loggedState.setSubAccounts(outputData.getUpdatedSubAccounts());
         loggedInViewModel.setState(loggedState);
