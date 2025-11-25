@@ -142,7 +142,9 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                     final String portfolioName = (String) portfolioSelector.getSelectedItem();
                     final String stockName = (String) stockSelector.getSelectedItem();
                     final double quantity = Double.parseDouble(quantityField.getText());
-                    sellAssetController.execute(userName, portfolioName, stockName, quantity);
+//                    sellAssetController.execute(userName, portfolioName, stockName, quantity);
+                    sellAssetController.execute(portfolioName, stockName, quantity);
+
                 }
             }
         );
