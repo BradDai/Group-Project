@@ -6,11 +6,11 @@ import use_case.get_price.GetPriceInputData;
 public class GetPriceController {
     private final GetPriceInputBoundary interactor;
 
-    public GetPriceController(GetPriceInputBoundary interactor) {
+    public GetPriceController(final GetPriceInputBoundary interactor) {
         this.interactor = interactor;
     }
 
-    public void execute(String symbol) {
+    public void execute(final String symbol) {
         interactor.execute(new GetPriceInputData(symbol));
     }
 }

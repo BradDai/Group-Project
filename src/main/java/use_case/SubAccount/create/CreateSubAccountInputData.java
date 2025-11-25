@@ -8,7 +8,7 @@ public class CreateSubAccountInputData {
     private final String username;
     private final String subAccountName;
 
-    public CreateSubAccountInputData(String username, String subAccountName) {
+    public CreateSubAccountInputData(final String username, final String subAccountName) {
         this.username = username;
         this.subAccountName = subAccountName;
     }

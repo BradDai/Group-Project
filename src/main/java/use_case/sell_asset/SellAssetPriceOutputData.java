@@ -1,9 +1,9 @@
 package use_case.sell_asset;
 
 public class SellAssetPriceOutputData {
-    private double price;
+    private final double price;
 
-    public SellAssetPriceOutputData(double price) {
+    public SellAssetPriceOutputData(final double price) {
         this.price = price;
     }
 

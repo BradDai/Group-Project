@@ -1,7 +1,5 @@
 package interface_adapter.transfer;
 
-import interface_adapter.ViewModel;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -24,7 +22,7 @@ public class TransferViewModel {
         return state;
     }
 
-    public void setState(TransferState state) {
+    public void setState(final TransferState state) {
         this.state = state;
     }
 
@@ -32,15 +30,15 @@ public class TransferViewModel {
         support.firePropertyChange("state", null, this.state);
     }
 
-    public void firePropertyChanged(String propertyName) {
+    public void firePropertyChanged(final String propertyName) {
         support.firePropertyChange(propertyName, null, this.state);
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
+    public void removePropertyChangeListener(final PropertyChangeListener listener) {
         support.removePropertyChangeListener(listener);
     }
 }

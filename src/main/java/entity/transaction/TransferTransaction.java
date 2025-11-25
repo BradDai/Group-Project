@@ -7,21 +7,21 @@ public class TransferTransaction extends Transaction {
     private final String assetSymbol;
     private final double quantity;
 
-    public TransferTransaction(String transactionId, LocalDateTime date, String fromPortfolio, String toPortfolio,
-                               String assetType, String assetSymbol, double quantity) {
+    public TransferTransaction(final String transactionId, final LocalDateTime date, final String fromPortfolio, final String toPortfolio,
+                               final String assetType, final String assetSymbol, final double quantity) {
         super(
-                transactionId,
-                date,
-                fromPortfolio,          // fromPortfolio
-                toPortfolio,            // toPortfolio
-                assetSymbol,            // assetSymbol
-                quantity,               // quantity
-                null,                   // priceAtTime
-                null,                   // totalValue
-                null,                   // fromCurrency
-                null,                   // toCurrency
-                null,                   // rate
-                null
+            transactionId,
+            date,
+            fromPortfolio,          // fromPortfolio
+            toPortfolio,            // toPortfolio
+            assetSymbol,            // assetSymbol
+            quantity,               // quantity
+            null,                   // priceAtTime
+            null,                   // totalValue
+            null,                   // fromCurrency
+            null,                   // toCurrency
+            null,                   // rate
+            null
         );
 
         this.assetType = assetType;
@@ -49,6 +49,6 @@ public class TransferTransaction extends Transaction {
     @Override
     public String getDescription() {
         return String.format("Transfer of %.2f %s from %s to %s",
-                quantity, assetSymbol, getFromPortfolio(), getToPortfolio());
+            quantity, assetSymbol, getFromPortfolio(), getToPortfolio());
     }
 }

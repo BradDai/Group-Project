@@ -6,7 +6,7 @@ public class SwitchHistoryController {
 
     private final SwitchHistoryInputBoundary switchHistoryUseCaseInteractor;
 
-    public SwitchHistoryController(SwitchHistoryInputBoundary switchHistoryUseCaseInteractor) {
+    public SwitchHistoryController(final SwitchHistoryInputBoundary switchHistoryUseCaseInteractor) {
         this.switchHistoryUseCaseInteractor = switchHistoryUseCaseInteractor;
     }
 

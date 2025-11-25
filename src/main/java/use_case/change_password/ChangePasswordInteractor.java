@@ -11,22 +11,22 @@ public class ChangePasswordInteractor implements ChangePasswordInputBoundary {
     private final ChangePasswordOutputBoundary userPresenter;
     private final UserFactory userFactory;
 
-    public ChangePasswordInteractor(ChangePasswordUserDataAccessInterface changePasswordDataAccessInterface,
-                                    ChangePasswordOutputBoundary changePasswordOutputBoundary,
-                                    UserFactory userFactory) {
+    public ChangePasswordInteractor(final ChangePasswordUserDataAccessInterface changePasswordDataAccessInterface,
+                                    final ChangePasswordOutputBoundary changePasswordOutputBoundary,
+                                    final UserFactory userFactory) {
         this.userDataAccessObject = changePasswordDataAccessInterface;
         this.userPresenter = changePasswordOutputBoundary;
         this.userFactory = userFactory;
     }
 
     @Override
-    public void execute(ChangePasswordInputData changePasswordInputData) {
+    public void execute(final ChangePasswordInputData changePasswordInputData) {
         if ("".equals(changePasswordInputData.getPassword())) {
             userPresenter.prepareFailView("New password cannot be empty");
         }
         else {
             final User user = userFactory.create(changePasswordInputData.getUsername(),
-                    changePasswordInputData.getPassword());
+                changePasswordInputData.getPassword());
 
             userDataAccessObject.changePassword(user);
 

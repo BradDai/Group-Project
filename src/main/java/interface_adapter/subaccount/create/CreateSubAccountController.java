@@ -7,13 +7,13 @@ public class CreateSubAccountController {
 
     private final CreateSubAccountInputBoundary interactor;
 
-    public CreateSubAccountController(CreateSubAccountInputBoundary interactor) {
+    public CreateSubAccountController(final CreateSubAccountInputBoundary interactor) {
         this.interactor = interactor;
     }
 
-    public void execute(String username, String newSubAccountName) {
-        CreateSubAccountInputData data =
-                new CreateSubAccountInputData(username, newSubAccountName);
+    public void execute(final String username, final String newSubAccountName) {
+        final CreateSubAccountInputData data =
+            new CreateSubAccountInputData(username, newSubAccountName);
         interactor.execute(data);
     }
 }

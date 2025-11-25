@@ -1,9 +1,9 @@
 package use_case.transfer;
 
+import java.util.List;
+
 import entity.SubAccount;
 import entity.transaction.Transaction;
-
-import java.util.List;
 
 /**
  * DAO for the Transfer Use Case.

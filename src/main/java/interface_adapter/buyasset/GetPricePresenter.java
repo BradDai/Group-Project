@@ -7,18 +7,19 @@ public class GetPricePresenter implements GetPriceOutputBoundary {
 
     private final BuyAssetViewModel buyAssetViewModel;
 
-    public GetPricePresenter(BuyAssetViewModel buyAssetViewModel) {
+    public GetPricePresenter(final BuyAssetViewModel buyAssetViewModel) {
         this.buyAssetViewModel = buyAssetViewModel;
     }
 
     @Override
-    public void presentPrice(GetPriceOutputData data) {
-        BuyAssetState state = buyAssetViewModel.getState();
+    public void presentPrice(final GetPriceOutputData data) {
+        final BuyAssetState state = buyAssetViewModel.getState();
         state.price = data.getPrice();
 
         if (state.selectedQuantity != null && state.price > 0) {
             state.total = state.price * state.selectedQuantity;
-        } else {
+        }
+        else {
             state.total = 0.0;
         }
 
@@ -29,8 +30,8 @@ public class GetPricePresenter implements GetPriceOutputBoundary {
     }
 
     @Override
-    public void presentError(String message) {
-        BuyAssetState state = buyAssetViewModel.getState();
+    public void presentError(final String message) {
+        final BuyAssetState state = buyAssetViewModel.getState();
         state.price = 0.0;
         state.total = 0.0;
         state.errorMessage = message;

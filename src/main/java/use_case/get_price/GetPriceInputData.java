@@ -3,7 +3,7 @@ package use_case.get_price;
 public class GetPriceInputData {
     private final String symbol;
 
-    public GetPriceInputData(String symbol) {
+    public GetPriceInputData(final String symbol) {
         this.symbol = symbol;
     }
 

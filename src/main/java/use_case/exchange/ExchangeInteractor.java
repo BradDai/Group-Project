@@ -4,41 +4,51 @@ import entity.SubAccount;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import entity.SubAccount;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class ExchangeInteractor implements ExchangeInputBoundary {
 
     private final ExchangeOutputBoundary exchangePresenter;
     private final ExchangeDataAccessInterface exchangeDataAccess;
 
-    public ExchangeInteractor(ExchangeOutputBoundary exchangePresenter,
-                              ExchangeDataAccessInterface exchangeDataAccess) {
+    public ExchangeInteractor(final ExchangeOutputBoundary exchangePresenter,
+                              final ExchangeDataAccessInterface exchangeDataAccess) {
         this.exchangePresenter = exchangePresenter;
         this.exchangeDataAccess = exchangeDataAccess;
     }
 
     @Override
-    public void fetchExchangeRate(ExchangeInputData inputData) {
+    public void fetchExchangeRate(final ExchangeInputData inputData) {
         try {
             Map<String, Double> rates = exchangeDataAccess.getRates(inputData.getFrom());
             Double rate = rates.get(inputData.getTo());
 
             if (rate == null) {
                 exchangePresenter.presentFailure("Invalid target currency.");
-            } else {
-                ExchangeOutputData outputData = new ExchangeOutputData(
-                        inputData.getFrom(),
-                        inputData.getTo(),
-                        rate
+            }
+            else {
+                final ExchangeOutputData outputData = new ExchangeOutputData(
+                    inputData.getFrom(),
+                    inputData.getTo(),
+                    rate
                 );
                 exchangePresenter.presentSuccess(outputData);
             }
 
-        } catch (Exception e) {
+        }
+        catch (final Exception e) {
             exchangePresenter.presentFailure("Error fetching rate: " + e.getMessage());
         }
     }
 
     @Override
-    public void convert(ExchangeConversionInputData inputData) {
+    public void convert(final ExchangeConversionInputData inputData) {
         try {
             if (inputData.getAmount() <= 0) {
                 exchangePresenter.presentConversionFailure("Amount must be positive.");
@@ -52,10 +62,10 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
             Map<String, Double> currencies =
                     exchangeDataAccess.getCurrencies(inputData.getUsername(), inputData.getAccountName());
 
-            Double fromBalance = currencies.get(inputData.getFrom());
+            final Double fromBalance = currencies.get(inputData.getFrom());
             if (fromBalance == null) {
                 exchangePresenter.presentConversionFailure(
-                        "Account does not own currency: " + inputData.getFrom());
+                    "Account does not own currency: " + inputData.getFrom());
                 return;
             }
             if (fromBalance < inputData.getAmount()) {
@@ -70,20 +80,20 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
                 return;
             }
 
-            double amountGiven = inputData.getAmount();
-            double amountReceived = amountGiven * rate;
+            final double amountGiven = inputData.getAmount();
+            final double amountReceived = amountGiven * rate;
 
-            double fromAfter = fromBalance - amountGiven;
-            double toBefore = currencies.getOrDefault(inputData.getTo(), 0.0);
-            double toAfter = toBefore + amountReceived;
+            final double fromAfter = fromBalance - amountGiven;
+            final double toBefore = currencies.getOrDefault(inputData.getTo(), 0.0);
+            final double toAfter = toBefore + amountReceived;
 
             currencies.put(inputData.getFrom(), fromAfter);
             currencies.put(inputData.getTo(), toAfter);
 
             exchangeDataAccess.saveCurrencies(
-                    inputData.getUsername(),
-                    inputData.getAccountName(),
-                    currencies
+                inputData.getUsername(),
+                inputData.getAccountName(),
+                currencies
             );
 
             List<SubAccount> updatedSubAccounts = exchangeDataAccess.getSubAccountsOf(inputData.getUsername());
@@ -101,7 +111,8 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
             );
             exchangePresenter.presentConversionSuccess(outputData);
 
-        } catch (Exception e) {
+        }
+        catch (final Exception e) {
             exchangePresenter.presentConversionFailure("Error during conversion: " + e.getMessage());
         }
     }

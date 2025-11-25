@@ -6,7 +6,7 @@ public class SwitchBuyAssetController {
 
     private final SwitchBuyAssetInputBoundary switchBuyAssetUseCaseInteractor;
 
-    public SwitchBuyAssetController(SwitchBuyAssetInputBoundary switchBuyAssetUseCaseInteractor) {
+    public SwitchBuyAssetController(final SwitchBuyAssetInputBoundary switchBuyAssetUseCaseInteractor) {
         this.switchBuyAssetUseCaseInteractor = switchBuyAssetUseCaseInteractor;
     }
 

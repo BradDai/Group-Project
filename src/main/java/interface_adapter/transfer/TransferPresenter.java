@@ -11,24 +11,24 @@ public class TransferPresenter implements TransferOutputBoundary {
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public TransferPresenter(TransferViewModel transferViewModel,
-                             LoggedInViewModel loggedInViewModel,
-                             ViewManagerModel viewManagerModel) {
+    public TransferPresenter(final TransferViewModel transferViewModel,
+                             final LoggedInViewModel loggedInViewModel,
+                             final ViewManagerModel viewManagerModel) {
         this.transferViewModel = transferViewModel;
         this.loggedInViewModel = loggedInViewModel;
         this.viewManagerModel = viewManagerModel;
     }
 
     @Override
-    public void prepareSuccessView(TransferOutputData outputData) {
-        TransferState state = transferViewModel.getState();
+    public void prepareSuccessView(final TransferOutputData outputData) {
+        final TransferState state = transferViewModel.getState();
         state.setError(null);
         state.setAmount("");
 
         transferViewModel.setState(state);
         transferViewModel.firePropertyChanged();
 
-        LoggedInState loggedInState = loggedInViewModel.getState();
+        final LoggedInState loggedInState = loggedInViewModel.getState();
         loggedInState.setSubAccounts(outputData.getUpdatedAccounts());
         loggedInViewModel.setState(loggedInState);
         loggedInViewModel.firePropertyChange();
@@ -36,21 +36,21 @@ public class TransferPresenter implements TransferOutputBoundary {
         viewManagerModel.setState(loggedInViewModel.getViewName());
         viewManagerModel.firePropertyChange();
 
-        String message = "Transfer successful!";
+        final String message = "Transfer successful!";
         loggedInViewModel.firePropertyChange("notification", null, message);
     }
 
     @Override
-    public void prepareFailView(String errorMessage) {
-        TransferState state = transferViewModel.getState();
+    public void prepareFailView(final String errorMessage) {
+        final TransferState state = transferViewModel.getState();
         state.setError(errorMessage);
         transferViewModel.setState(state);
         transferViewModel.firePropertyChanged("error");
     }
 
     @Override
-    public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
-        TransferState state = transferViewModel.getState();
+    public void presentBalances(final double fromBalance, final double toBalance, final String[] availableCurrencies) {
+        final TransferState state = transferViewModel.getState();
         state.setFromBalance(String.format("%.2f", fromBalance));
         state.setToBalance(String.format("%.2f", toBalance));
         state.setAvailableCurrencies(availableCurrencies);

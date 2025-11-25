@@ -7,15 +7,16 @@ public class User {
 
     private final String name;
     private final String password;
-    private SubAccount[] subaccounts;
+    private final SubAccount[] subaccounts;
 
     /**
      * Creates a new user with the given non-empty name and non-empty password.
-     * @param name the username
+     *
+     * @param name     the username
      * @param password the password
      * @throws IllegalArgumentException if the password or name are empty
      */
-    public User(String name, String password) {
+    public User(final String name, final String password) {
         if ("".equals(name)) {
             throw new IllegalArgumentException("Username cannot be empty");
         }

@@ -9,13 +9,13 @@ public class CreateSubAccountPresenter implements CreateSubAccountOutputBoundary
 
     private final LoggedInViewModel loggedInViewModel;
 
-    public CreateSubAccountPresenter(LoggedInViewModel loggedInViewModel) {
+    public CreateSubAccountPresenter(final LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
     }
 
     @Override
-    public void prepareSuccessView(CreateSubAccountOutputData outputData) {
-        LoggedInState state = loggedInViewModel.getState();
+    public void prepareSuccessView(final CreateSubAccountOutputData outputData) {
+        final LoggedInState state = loggedInViewModel.getState();
 
         state.setUsername(outputData.getUsername());
         state.setSubAccounts(outputData.getAllSubAccounts());
@@ -25,8 +25,8 @@ public class CreateSubAccountPresenter implements CreateSubAccountOutputBoundary
     }
 
     @Override
-    public void prepareFailView(String errorMessage) {
-        LoggedInState state = loggedInViewModel.getState();
+    public void prepareFailView(final String errorMessage) {
+        final LoggedInState state = loggedInViewModel.getState();
         state.setSubAccountError(errorMessage);
         loggedInViewModel.setState(state);
         loggedInViewModel.firePropertyChange("subAccountError");

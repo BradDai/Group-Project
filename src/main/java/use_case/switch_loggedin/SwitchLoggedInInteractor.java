@@ -4,7 +4,7 @@ public class SwitchLoggedInInteractor implements SwitchLoggedInInputBoundary {
 
     private final SwitchLoggedInOutputBoundary switchLoggedInPresenter;
 
-    public SwitchLoggedInInteractor(SwitchLoggedInOutputBoundary switchLoggedInOutputBoundary) {
+    public SwitchLoggedInInteractor(final SwitchLoggedInOutputBoundary switchLoggedInOutputBoundary) {
         this.switchLoggedInPresenter = switchLoggedInOutputBoundary;
     }
 
