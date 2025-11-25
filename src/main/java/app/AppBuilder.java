@@ -298,23 +298,43 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addSellAssetUseCase() {
-        final SellAssetOutputBoundary sellAssetOutputBoundary =
-            new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
-        final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary =
+//    public AppBuilder addSellAssetUseCase() {
+//        final SellAssetOutputBoundary sellAssetOutputBoundary =
+//            new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
+//        final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary =
+//            new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
+//
+//        final SellAssetInputBoundary sellAssetInteractor =
+//            new SellAssetInteractor(
+//                subAccountDataAccess,
+//                sellAssetOutputBoundary,
+//                sellAssetPriceOutputBoundary
+//            );
+//
+//        final SellAssetController sellAssetController = new SellAssetController(sellAssetInteractor);
+//        sellAssetView.setSellAssetController(sellAssetController);
+//        return this;
+//    }
+public AppBuilder addSellAssetUseCase() {
+    // One presenter that implements BOTH SellAssetOutputBoundary
+    // and SellAssetPriceOutputBoundary
+    final SellAssetPresenter sellAssetPresenter =
             new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
 
-        final SellAssetInputBoundary sellAssetInteractor =
+    final SellAssetInputBoundary sellAssetInteractor =
             new SellAssetInteractor(
-                subAccountDataAccess,
-                sellAssetOutputBoundary,
-                sellAssetPriceOutputBoundary
+                    subAccountDataAccess,   // implements SellAssetDataAccessInterface
+                    transactionDataAccessObject,  // ⭐ SAME DAO used in BuyAssetInteractor
+                    sellAssetPresenter,     // SellAssetOutputBoundary
+                    sellAssetPresenter      // SellAssetPriceOutputBoundary
             );
 
-        final SellAssetController sellAssetController = new SellAssetController(sellAssetInteractor);
-        sellAssetView.setSellAssetController(sellAssetController);
-        return this;
-    }
+    final SellAssetController sellAssetController =
+            new SellAssetController(sellAssetInteractor, loggedInViewModel);
+
+    sellAssetView.setSellAssetController(sellAssetController);
+    return this;
+}
 
     public AppBuilder addSwitchExchangeUseCase() {
         final SwitchExchangeOutputBoundary switchExchangeOutputBoundary = new SwitchExchangePresenter(
