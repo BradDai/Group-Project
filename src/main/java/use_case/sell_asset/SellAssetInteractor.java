@@ -5,7 +5,8 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
     private final SellAssetOutputBoundary sellAssetOutputBoundary;
     private final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary;
 
-    private final String apiKey = "demo"; // TODO: replace with real API Key
+    // Jack's API key
+    private final String apiKey = "88ae0ec531a04cbc80652a7a22487707";
     private double stockPrice = 0.0;
 
     public SellAssetInteractor(final SellAssetDataAccessInterface dataAccess,
@@ -79,6 +80,7 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
 
             final org.json.JSONObject json = new org.json.JSONObject(response.toString());
             stockPrice = json.getDouble("price");
+            stockPrice = Math.round(stockPrice * 100) / 100.0;
 
             // Send to Presenter (Output Boundary)
             final SellAssetPriceOutputData outputData = new SellAssetPriceOutputData(stockPrice);
