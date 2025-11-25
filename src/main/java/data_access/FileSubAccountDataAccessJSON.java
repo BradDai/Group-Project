@@ -375,8 +375,9 @@ public class FileSubAccountDataAccessJSON implements
         }
     }
 
+
     @Override
-    public void removeStockIfZero(final String username, final String portfolioName, final String stockName) {
+    public void removeStock(final String username, final String portfolioName, final String stockName) {
         final List<SubAccount> accounts = data.get(username);
         if (accounts != null) {
             for (final SubAccount sa : accounts) {
@@ -386,8 +387,8 @@ public class FileSubAccountDataAccessJSON implements
                         final Asset asset = iter.next();
                         if (asset instanceof Stock) {
                             final Stock stock = (Stock) asset;
-                            if (stock.getCompanySymbol().equals(stockName) && stock.getQuantity() == 0) {
-                                iter.remove();
+                            if (stock.getCompanySymbol().equals(stockName)) {
+                                sa.removeAsset(stock);
                                 saveToFile();
                                 return;
                             }

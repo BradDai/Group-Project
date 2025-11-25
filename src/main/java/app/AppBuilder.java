@@ -273,9 +273,9 @@ public class AppBuilder {
 
     public AppBuilder addSellAssetUseCase() {
         final SellAssetOutputBoundary sellAssetOutputBoundary =
-            new SellAssetPresenter(sellAssetViewModel);
+            new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
         final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary =
-            new SellAssetPresenter(sellAssetViewModel);
+            new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
 
         final SellAssetInputBoundary sellAssetInteractor =
             new SellAssetInteractor(
@@ -369,10 +369,12 @@ public class AppBuilder {
     public AppBuilder addSwitchLoggedInUseCase() {
         final SwitchLoggedInOutputBoundary switchLoggedInOutputBoundary = new SwitchLoggedInPresenter(
             loggedInViewModel,
-            viewManagerModel);
+            viewManagerModel,
+            subAccountDataAccess);
 
         final SwitchLoggedInInputBoundary switchLoggedInInteractor = new SwitchLoggedInInteractor(
-            switchLoggedInOutputBoundary);
+            switchLoggedInOutputBoundary,
+            subAccountDataAccess);
 
         final SwitchLoggedInController switchLoggedInController = new SwitchLoggedInController(switchLoggedInInteractor);
         exchangeView.setSwitchLoggedInController(switchLoggedInController);
@@ -382,10 +384,12 @@ public class AppBuilder {
     public AppBuilder addSwitchLoggedInUseCase2() {
         final SwitchLoggedInOutputBoundary switchLoggedInOutputBoundary = new SwitchLoggedInPresenter(
             loggedInViewModel,
-            viewManagerModel);
+            viewManagerModel,
+            subAccountDataAccess);
 
         final SwitchLoggedInInputBoundary switchLoggedInInteractor = new SwitchLoggedInInteractor(
-            switchLoggedInOutputBoundary);
+            switchLoggedInOutputBoundary,
+            subAccountDataAccess);
 
         final SwitchLoggedInController switchLoggedInController =
             new SwitchLoggedInController(switchLoggedInInteractor);
@@ -396,10 +400,12 @@ public class AppBuilder {
     public AppBuilder addSwitchLoggedInUseCase3() {
         final SwitchLoggedInOutputBoundary switchLoggedInOutputBoundary = new SwitchLoggedInPresenter(
             loggedInViewModel,
-            viewManagerModel);
+            viewManagerModel,
+            subAccountDataAccess);
 
         final SwitchLoggedInInputBoundary switchLoggedInInteractor = new SwitchLoggedInInteractor(
-            switchLoggedInOutputBoundary);
+            switchLoggedInOutputBoundary,
+            subAccountDataAccess);
 
         final SwitchLoggedInController switchLoggedInController =
             new SwitchLoggedInController(switchLoggedInInteractor);
@@ -410,10 +416,12 @@ public class AppBuilder {
     public AppBuilder addSwitchLoggedInUseCase4() {
         final SwitchLoggedInOutputBoundary switchLoggedInOutputBoundary = new SwitchLoggedInPresenter(
             loggedInViewModel,
-            viewManagerModel);
+            viewManagerModel,
+            subAccountDataAccess);
 
         final SwitchLoggedInInputBoundary switchLoggedInInteractor = new SwitchLoggedInInteractor(
-            switchLoggedInOutputBoundary);
+            switchLoggedInOutputBoundary,
+            subAccountDataAccess);
 
         final SwitchLoggedInController switchLoggedInController =
             new SwitchLoggedInController(switchLoggedInInteractor);
@@ -424,10 +432,12 @@ public class AppBuilder {
     public AppBuilder addSwitchLoggedInUseCase5() {
         final SwitchLoggedInOutputBoundary switchLoggedInOutputBoundary = new SwitchLoggedInPresenter(
             loggedInViewModel,
-            viewManagerModel);
+            viewManagerModel,
+            subAccountDataAccess);
 
         final SwitchLoggedInInputBoundary switchLoggedInInteractor = new SwitchLoggedInInteractor(
-            switchLoggedInOutputBoundary);
+            switchLoggedInOutputBoundary,
+            subAccountDataAccess);
 
         final SwitchLoggedInController switchLoggedInController =
             new SwitchLoggedInController(switchLoggedInInteractor);

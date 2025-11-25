@@ -1,6 +1,8 @@
 package use_case.switch_sellasset;
 
 import use_case.sell_asset.SellAssetDataAccessInterface;
+import java.util.Map;
+import java.util.HashMap;
 
 public class SwitchSellAssetInteractor implements SwitchSellAssetInputBoundary {
 
@@ -15,8 +17,10 @@ public class SwitchSellAssetInteractor implements SwitchSellAssetInputBoundary {
 
     public void switchToSellAssetView(final String username) {
         final String[] portfolios = dataAccess.getAvailablePortfolios(username);
-        final String[] stocks =
-            dataAccess.getAvailableStocks(username, portfolios[1]); //TODO: change to current selected portfolio.
-        sellAssetPresenter.switchToSellAssetView(username, portfolios);
+        final Map<String, String[]> portfolioStocks = new HashMap<>();
+        for (final String p : portfolios) {
+            portfolioStocks.put(p, dataAccess.getAvailableStocks(username, p));
+        }
+        sellAssetPresenter.switchToSellAssetView(username, portfolios, portfolioStocks);
     }
 }

@@ -5,7 +5,8 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
     private final SellAssetOutputBoundary sellAssetOutputBoundary;
     private final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary;
 
-    private final String apiKey = "demo"; // TODO: replace with real API Key
+    // Jack's API key
+    private final String apiKey = "88ae0ec531a04cbc80652a7a22487707";
     private double stockPrice = 0.0;
 
     public SellAssetInteractor(final SellAssetDataAccessInterface dataAccess,
@@ -25,13 +26,13 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
 
         // handle exceptions
         if (quantityToSell <= 0) {
-            sellAssetPriceOutputBoundary.preparePriceFailureView(
+            sellAssetOutputBoundary.prepareFailureView(
                 "Invalid Quantity to Sell: Quantity to sell must be positive.");
             return;
         }
 
         if (quantityToSell > currentQuantity) {
-            sellAssetPriceOutputBoundary.preparePriceFailureView(
+            sellAssetOutputBoundary.prepareFailureView(
                 "Invalid Quantity to Sell: Quantity to sell must be greater than current Quantity.");
             return;
         }
@@ -40,17 +41,15 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
         final double newQuantity = currentQuantity - quantityToSell;
         final double totalPrice = quantityToSell * stockPrice;
 
+        dataAccess.updateStockQuantity(username, portfolioName, stockName, newQuantity);
         if (newQuantity == 0) {
-            dataAccess.removeStockIfZero(username, portfolioName, stockName);
-        }
-        else {
-            dataAccess.updateStockQuantity(username, portfolioName, stockName, newQuantity);
+            dataAccess.removeStock(username, portfolioName, stockName);
         }
         dataAccess.addCashToPortfolio(username, portfolioName, totalPrice);
 
         // prepare output data
         final SellAssetOutputData outputData = new SellAssetOutputData(
-            username, quantityToSell, totalPrice, newQuantity
+            username, stockName, quantityToSell, totalPrice, newQuantity
         );
 
         sellAssetOutputBoundary.prepareSuccessView(outputData);
@@ -81,6 +80,7 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
 
             final org.json.JSONObject json = new org.json.JSONObject(response.toString());
             stockPrice = json.getDouble("price");
+            stockPrice = Math.round(stockPrice * 100) / 100.0;
 
             // Send to Presenter (Output Boundary)
             final SellAssetPriceOutputData outputData = new SellAssetPriceOutputData(stockPrice);

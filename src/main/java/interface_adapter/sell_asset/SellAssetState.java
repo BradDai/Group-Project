@@ -1,5 +1,7 @@
 package interface_adapter.sell_asset;
 
+import java.util.Map;
+
 public class SellAssetState {
 
     private double currentPrice;
@@ -8,6 +10,7 @@ public class SellAssetState {
     // for switch view
     private String username;
     private String[] portfolios;
+    private Map<String, String[]> portfolioStocks;
 
     // output
     private String message;
@@ -62,4 +65,21 @@ public class SellAssetState {
     public void setErrorMessage(final String errorMessage) {
         this.errorMessage = errorMessage;
     }
+
+    public void setPortfolioStocks(final Map<String, String[]> portfolioStocks) {
+        this.portfolioStocks = portfolioStocks;
+    }
+
+    public Map<String, String[]> getPortfolioStocks() {
+        return portfolioStocks;
+    }
+
+    // helper to get stocks for a given portfolio
+    public String[] getStocksOfPortfolio(final String portfolioName) {
+        if (portfolioStocks == null) {
+            return null;
+        }
+        return portfolioStocks.getOrDefault(portfolioName, new String[0]);
+    }
+
 }

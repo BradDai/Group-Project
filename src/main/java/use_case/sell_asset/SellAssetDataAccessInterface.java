@@ -9,7 +9,7 @@ public interface SellAssetDataAccessInterface {
 
     void updateStockQuantity(String username, String portfolioName, String stockName, double quantity);
 
-    void removeStockIfZero(String username, String portfolioName, String stockName);
+    void removeStock(String username, String portfolioName, String stockName);
 
     void addCashToPortfolio(String username, String portfolioName, double amount);
 }
