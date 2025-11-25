@@ -14,7 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import entity.Asset;
@@ -27,10 +31,10 @@ import use_case.sell_asset.SellAssetDataAccessInterface;
 import use_case.transfer.TransferDataAccessInterface;
 
 public class FileSubAccountDataAccessJSON implements
-    SubAccountDataAccessInterface,
-    TransferDataAccessInterface,
-    SellAssetDataAccessInterface,
-    ExchangeDataAccessInterface {    // ➕ ADDED
+        SubAccountDataAccessInterface,
+        TransferDataAccessInterface,
+        SellAssetDataAccessInterface,
+        ExchangeDataAccessInterface {    // ➕ ADDED
     private final Path filePath;
     private final Map<String, List<SubAccount>> data = new HashMap<>();
 
@@ -142,7 +146,7 @@ public class FileSubAccountDataAccessJSON implements
     @Override
     public boolean exists(final String username, final String subName) {
         return data.getOrDefault(username, List.of()).stream()
-            .anyMatch(sa -> sa.getName().equalsIgnoreCase(subName));
+                .anyMatch(sa -> sa.getName().equalsIgnoreCase(subName));
     }
 
     @Override
@@ -422,5 +426,44 @@ public class FileSubAccountDataAccessJSON implements
             }
         }
         throw new RuntimeException("Account not found: " + accountName);
+    }
+
+    public Map<String, Double> getRates(final String currency) {
+
+        final OkHttpClient client = new OkHttpClient();
+        final Request request = new Request.Builder()
+                .url("https://open.er-api.com/v6/latest/" + currency)
+                .get()
+                .build();
+
+        final HashMap<String, Double> rates = new HashMap<>();
+
+        try (final Response response = client.newCall(request).execute()) {
+
+            if (!response.isSuccessful() || response.body() == null) {
+                throw new RuntimeException("API response error");
+            }
+
+            final JSONObject responseBody = new JSONObject(response.body().string());
+
+            if (responseBody.getString("result").equals("success")) {
+                final JSONObject rateObject = responseBody.getJSONObject("rates");
+                final Iterator<String> keys = rateObject.keys();
+
+                while (keys.hasNext()) {
+                    final String key = keys.next();
+                    rates.put(key, rateObject.getDouble(key));
+                }
+            }
+            else {
+                throw new RuntimeException("API returned failure");
+            }
+
+        }
+        catch (final IOException | JSONException e) {
+            throw new RuntimeException("Failed to fetch exchange rates", e);
+        }
+
+        return rates;
     }
 }

@@ -18,4 +18,5 @@ public interface ExchangeDataAccessInterface {
     void saveCurrencies(String username, String accountName, Map<String, Double> currencies);
 
     List<SubAccount> getSubAccountsOf(String username);
+    Map<String, Double> getRates(final String currency);
 }
