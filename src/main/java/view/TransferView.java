@@ -17,11 +17,11 @@ import interface_adapter.transfer.TransferController;
 import interface_adapter.transfer.TransferException;
 import interface_adapter.transfer.TransferState;
 import interface_adapter.transfer.TransferViewModel;
-import view.components.BalancePanel;
-import view.components.CurrencyPanel;
-import view.components.StockPanel;
-import view.components.TopPanel;
-import view.components.TransferButtonPanel;
+import view.transfer_components.BalancePanel;
+import view.transfer_components.CurrencyPanel;
+import view.transfer_components.StockPanel;
+import view.transfer_components.TopPanel;
+import view.transfer_components.TransferButtonPanel;
 
 /**
  * Main Transfer view delegating UI components to sub-panels.

@@ -1,4 +1,4 @@
-package view.components;
+package view.transfer_components;
 
 import java.awt.event.ActionListener;
 

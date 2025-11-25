@@ -34,7 +34,7 @@ public class FileSubAccountDataAccessJSON implements
         SubAccountDataAccessInterface,
         TransferDataAccessInterface,
         SellAssetDataAccessInterface,
-        ExchangeDataAccessInterface {    // ➕ ADDED
+        ExchangeDataAccessInterface {
     private final Path filePath;
     private final Map<String, List<SubAccount>> data = new HashMap<>();
 
@@ -230,8 +230,8 @@ public class FileSubAccountDataAccessJSON implements
     }
 
     @Override
-    public void transferAsset(final String username, final String fromPortfolio, final String toPortfolio, final String assetSymbol,
-                              final double amount) {
+    public void transferAsset(final String username, final String fromPortfolio,
+                              final String toPortfolio, final String assetSymbol, final double amount) {
         final List<SubAccount> accounts = data.get(username);
         if (accounts == null) {
             throw new IllegalArgumentException("User not found.");
