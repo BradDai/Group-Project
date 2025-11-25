@@ -18,5 +18,7 @@ public interface TransferOutputBoundary {
      */
     void prepareFailView(String errorMessage);
 
+    void presentBalances(double fromBalance, double toBalance, String[] currencyList, String[] stockList);
+
     void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies);
 }
