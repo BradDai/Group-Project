@@ -1,6 +1,9 @@
+//
 //package use_case.transaction_history;
 //
+//import data_access.TransactionDataAccessInterface;
 //import interface_adapter.history.HistoryState;
+//
 //import java.util.ArrayList;
 //import java.util.List;
 //
@@ -8,13 +11,21 @@
 //
 //    private final TransactionHistoryOutputBoundary presenter;
 //
-//    public TransactionHistoryInteractor(TransactionHistoryOutputBoundary presenter) {
+//    public TransactionHistoryInteractor(TransactionDataAccessInterface transactionDataAccessObject, TransactionHistoryOutputBoundary presenter) {
 //        this.presenter = presenter;
 //    }
 //
 //    @Override
 //    public void execute(TransactionHistoryInputData inputData) {
 //
+//        // ===== DEBUG: incoming request =====
+//        System.out.println("[Interactor] execute() called");
+//        System.out.println("  portfolio = " + inputData.getPortfolio());
+//        System.out.println("  asset     = " + inputData.getAsset());
+//        System.out.println("  startDate = " + inputData.getStartDate());
+//        System.out.println("  endDate   = " + inputData.getEndDate());
+//
+//        // ==== FAKE ROWS JUST FOR DEMO ====
 //        List<HistoryState.Row> rows = new ArrayList<>();
 //
 //        HistoryState.Row r1 = new HistoryState.Row();
@@ -22,73 +33,103 @@
 //        r1.dateTime = "2025-11-02";
 //        r1.asset = "AAPL";
 //        r1.type = "BUY";
-//        r1.quantity = 10;
-//        r1.totalValue = 1500;
-//        rows.add(r1);
-//
-//        HistoryState.Row r2 = new HistoryState.Row();
-//        r2.id = "T2";
-//        r2.dateTime = "2025-11-03";
-//        r2.asset = "TSLA";
-//        r2.type = "SELL";
-//        r2.quantity = 5;
-//        r2.totalValue = 1100;
-//        rows.add(r2);
-//
-//        TransactionHistoryOutputData output =
-//                new TransactionHistoryOutputData(
-//                        rows,
-//                        "Loaded demo history for portfolio: " + inputData.getPortfolio()
-//                );
-//
-//        presenter.present(output); //
-//    }
-//}
-
+//        r1.quantity = 10
 package use_case.transaction_history;
 
+import data_access.TransactionDataAccessInterface;
+import entity.transaction.BuyTransaction;
+import entity.transaction.SellTransaction;
+import entity.transaction.Transaction;
 import interface_adapter.history.HistoryState;
+import interface_adapter.logged_in.LoggedInViewModel;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionHistoryInteractor implements TransactionHistoryInputBoundary {
 
+    private final TransactionDataAccessInterface transactionRepo;
     private final TransactionHistoryOutputBoundary presenter;
+    private final LoggedInViewModel loggedInViewModel;
 
-    public TransactionHistoryInteractor(TransactionHistoryOutputBoundary presenter) {
+    public TransactionHistoryInteractor(TransactionDataAccessInterface transactionRepo,
+                                        TransactionHistoryOutputBoundary presenter,
+                                        LoggedInViewModel loggedInViewModel) {
+        this.transactionRepo = transactionRepo;
         this.presenter = presenter;
+        this.loggedInViewModel = loggedInViewModel;
     }
 
     @Override
     public void execute(TransactionHistoryInputData inputData) {
 
-        // ==== FAKE ROWS JUST FOR DEMO ====
+        String portfolio = inputData.getPortfolio();
+        String asset = inputData.getAsset();
+        LocalDate start = parseDate(inputData.getStartDate());
+        LocalDate end   = parseDate(inputData.getEndDate());
+
+        System.out.println("[Interactor] execute() called");
+        System.out.println("  portfolio = " + portfolio);
+        System.out.println("  asset     = " + asset);
+        System.out.println("  startDate = " + start);
+        System.out.println("  endDate   = " + end);
+
+        // use real logged-in username
+        String username = loggedInViewModel.getState().getUsername();
+        System.out.println("  username  = " + username);
+
+        List<Transaction> txList = transactionRepo.getByFilters(
+                username,
+                portfolio,
+                asset,
+                start,
+                end
+        );
+
+        System.out.println("[Interactor] DAO returned " + txList.size() + " transactions");
+
+        // map to HistoryState.Row
         List<HistoryState.Row> rows = new ArrayList<>();
+        for (Transaction tx : txList) {
+            HistoryState.Row row = new HistoryState.Row();
+            row.id = tx.getTransactionId();
+            row.dateTime = tx.getDate().toString();
 
-        HistoryState.Row r1 = new HistoryState.Row();
-        r1.id = "T1";
-        r1.dateTime = "2025-11-02";
-        r1.asset = "AAPL";
-        r1.type = "BUY";
-        r1.quantity = 10;
-        r1.totalValue = 1500;
-        rows.add(r1);
+            if (tx instanceof BuyTransaction) {
+                BuyTransaction bt = (BuyTransaction) tx;
+                row.asset = bt.getAssetSymbol();
+                row.type = "BUY";
+                row.quantity = bt.getQuantity();
+                row.totalValue = bt.getTotalValue();
+            } else if (tx instanceof SellTransaction) {
+                SellTransaction st = (SellTransaction) tx;
+                row.asset = st.getAssetSymbol();
+                row.type = "SELL";
+                row.quantity = st.getQuantity();
+                row.totalValue = st.getTotalValue();
+            } else {
+                // other types (transfer/convert) – for now show minimal info
+                row.asset = "";
+                row.type = tx.getTransactionType();
+                row.quantity = 0.0;
+                row.totalValue = 0.0;
+            }
 
-        HistoryState.Row r2 = new HistoryState.Row();
-        r2.id = "T2";
-        r2.dateTime = "2025-11-03";
-        r2.asset = "TSLA";
-        r2.type = "SELL";
-        r2.quantity = 5;
-        r2.totalValue = 1100;
-        rows.add(r2);
+            System.out.println("  [row] id=" + row.id +
+                    ", dateTime=" + row.dateTime +
+                    ", asset=" + row.asset +
+                    ", type=" + row.type +
+                    ", qty=" + row.quantity +
+                    ", total=" + row.totalValue);
 
-        // You can later actually filter 'rows' using inputData.getStartDate()/getEndDate()
+            rows.add(row);
+        }
 
-        String msg = "Loaded demo history for portfolio " + inputData.getPortfolio();
-        if (inputData.getStartDate() != null && inputData.getEndDate() != null) {
-            msg += " from " + inputData.getStartDate() + " to " + inputData.getEndDate();
+        // build output & send to presenter
+        String msg = "Loaded " + rows.size() + " transactions for portfolio " + portfolio;
+        if (start != null && end != null) {
+            msg += " from " + start + " to " + end;
         }
 
         TransactionHistoryOutputData output =
@@ -99,6 +140,17 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
                         inputData.getEndDate()
                 );
 
+        System.out.println("[Interactor] message = " + msg);
+        System.out.println("[Interactor] calling presenter.present(...)");
         presenter.present(output);
+        System.out.println("[Interactor] execute() finished");
+    }
+
+    private LocalDate parseDate(String s) {
+        if (s == null || s.isBlank()) {
+            return null;
+        }
+        // expects yyyy-MM-dd
+        return LocalDate.parse(s);
     }
 }

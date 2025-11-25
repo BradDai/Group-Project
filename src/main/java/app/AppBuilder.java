@@ -1,7 +1,6 @@
 package app;
 
-import data_access.FileSubAccountDataAccessJSON;
-import data_access.FileUserDataAccessObject;
+import data_access.*;
 import entity.UserFactory;
 import interface_adapter.SwitchLoggedInController;
 import interface_adapter.SwitchLoggedInPresenter;
@@ -83,7 +82,6 @@ import use_case.transfer.TransferInputBoundary;
 import use_case.transfer.TransferInteractor;
 import use_case.transfer.TransferOutputBoundary;
 import view.*;
-import data_access.TwelveDataPriceGateway;
 import interface_adapter.buyasset.GetPriceController;
 import interface_adapter.buyasset.GetPricePresenter;
 import use_case.get_price.GetPriceInputBoundary;
@@ -108,6 +106,8 @@ public class AppBuilder {
     private final FileSubAccountDataAccessJSON subAccountDataAccess = new FileSubAccountDataAccessJSON("subaccounts.json");
     private static final String TWELVE_DATA_API_KEY = "ebcea301f0ad46579daa6b6dea349164";
 
+    private final TransactionDataAccessInterface transactionDataAccessObject =
+            new FileTransactionDataAccess("data/transactions");
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -176,7 +176,9 @@ public class AppBuilder {
                 new TransactionHistoryPresenter(historyViewModel);
 
         TransactionHistoryInputBoundary interactor =
-                new TransactionHistoryInteractor(presenter);
+                new TransactionHistoryInteractor(transactionDataAccessObject,
+                        presenter,
+                        loggedInViewModel);
 
         TransactionHistoryController controller =
                 new TransactionHistoryController(interactor);
@@ -240,10 +242,36 @@ public class AppBuilder {
         loginView.setLoginController(loginController);
         return this;
     }
+//    public AppBuilder addBuyAssetUseCase() {
+//        BuyAssetPresenter presenter = new BuyAssetPresenter(buyAssetViewModel, loggedInViewModel, subAccountDataAccess);
+//        BuyAssetInputBoundary interactor = new BuyAssetInteractor(subAccountDataAccess, presenter);
+//        BuyAssetController controller = new BuyAssetController(interactor);
+//        BuyAssetPresenter presenter = new BuyAssetPresenter(buyAssetViewModel, loggedInViewModel, subAccountDataAccess);
+//        BuyAssetInputBoundary interactor =
+//                new BuyAssetInteractor(
+//                        subAccountDataAccess,
+//                        transactionDataAccessObject,   // ⭐ pass DAO here
+//                        presenter
+//                );
+//
+//        BuyAssetController controller = new BuyAssetController(interactor, loggedInViewModel);
+//        buyAssetView.setBuyAssetController(controller);
+//        return this;
+//    }
     public AppBuilder addBuyAssetUseCase() {
+    // --- DELETE THE OLD BLOCK THAT WAS HERE ---
+
+    // Keep this new block (it has the updated transactionDataAccessObject)
         BuyAssetPresenter presenter = new BuyAssetPresenter(buyAssetViewModel, loggedInViewModel, subAccountDataAccess);
-        BuyAssetInputBoundary interactor = new BuyAssetInteractor(subAccountDataAccess, presenter);
-        BuyAssetController controller = new BuyAssetController(interactor);
+
+        BuyAssetInputBoundary interactor =
+                new BuyAssetInteractor(
+                    subAccountDataAccess,
+                    transactionDataAccessObject,   // ⭐ This is the new part you likely wanted
+                    presenter
+                );
+
+        BuyAssetController controller = new BuyAssetController(interactor, loggedInViewModel);
         buyAssetView.setBuyAssetController(controller);
         return this;
     }

@@ -29,7 +29,7 @@ public class LoggedInState {
             this.subAccounts = new ArrayList<>();
         }
     }
-
+    private String currentPortfolioName = "";
     // Because of the previous copy constructor, the default constructor must be explicit.
     public LoggedInState() {
     }
@@ -73,4 +73,13 @@ public class LoggedInState {
     public void setSubAccountError(String subAccountError) {
         this.subAccountError = subAccountError;
     }
+
+    public String getCurrentPortfolioName() {
+        return currentPortfolioName;
+    }
+
+    public void setCurrentPortfolioName(String currentPortfolioName) {
+        this.currentPortfolioName = currentPortfolioName;
+    }
+
 }
