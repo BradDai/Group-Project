@@ -135,190 +135,207 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
 }
 */
 
+// File: src/main/java/view/HistoryView.java
 package view;
-
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerDateModel;
 
 import interface_adapter.SwitchLoggedInController;
 import interface_adapter.history.HistoryState;
 import interface_adapter.history.HistoryViewModel;
 import interface_adapter.history.TransactionHistoryController;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 public class HistoryView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "history";
     private final HistoryViewModel historyViewModel;
+
     private SwitchLoggedInController switchLoggedInController;
     private TransactionHistoryController transactionHistoryController;
 
-    // UI components
+    // filters
     private final JButton back;
     private final JTextField portfolioField;
     private final JTextField assetField;
-    private final JSpinner startDateSpinner;
-    private final JSpinner endDateSpinner;
+    private final JSpinner fromDateSpinner;
+    private final JSpinner toDateSpinner;
     private final JButton loadButton;
     private final JButton clearButton;
     private final JLabel messageLabel;
 
-    public HistoryView(final HistoryViewModel historyViewModel) {
+    // table
+    private final DefaultTableModel tableModel;
+    private final JTable table;
+
+    public HistoryView(HistoryViewModel historyViewModel) {
         this.historyViewModel = historyViewModel;
         this.historyViewModel.addPropertyChangeListener(this);
 
-        // ----- layout -----
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout());
 
-        // Top: back button
-        final JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // ======== TOP BAR (back button) ========
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         back = new JButton("Back");
-        topButtons.add(back);
-        this.add(topButtons);
+        topPanel.add(back);
+        add(topPanel, BorderLayout.NORTH);
 
-        // Middle: input fields + date filter + load
-        final JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // ======== FILTER PANEL ========
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         portfolioField = new JTextField(10);
         assetField = new JTextField(10);
+
+        // date spinners (yyyy-MM-dd)
+        SpinnerDateModel fromModel = new SpinnerDateModel();
+        SpinnerDateModel toModel = new SpinnerDateModel();
+        fromDateSpinner = new JSpinner(fromModel);
+        toDateSpinner = new JSpinner(toModel);
+        JSpinner.DateEditor fromEditor = new JSpinner.DateEditor(fromDateSpinner, "yyyy-MM-dd");
+        JSpinner.DateEditor toEditor = new JSpinner.DateEditor(toDateSpinner, "yyyy-MM-dd");
+        fromDateSpinner.setEditor(fromEditor);
+        toDateSpinner.setEditor(toEditor);
+
         loadButton = new JButton("Load");
         clearButton = new JButton("Clear");
 
-        // Date spinners (scrollable)
-        final Date today = new Date();
-        final SpinnerDateModel startModel =
-            new SpinnerDateModel(today, null, null, Calendar.DAY_OF_MONTH);
-        final SpinnerDateModel endModel =
-            new SpinnerDateModel(today, null, null, Calendar.DAY_OF_MONTH);
+        filterPanel.add(new JLabel("Portfolio ID:"));
+        filterPanel.add(portfolioField);
+        filterPanel.add(new JLabel("Asset:"));
+        filterPanel.add(assetField);
+        filterPanel.add(new JLabel("From:"));
+        filterPanel.add(fromDateSpinner);
+        filterPanel.add(new JLabel("To:"));
+        filterPanel.add(toDateSpinner);
+        filterPanel.add(loadButton);
+        filterPanel.add(clearButton);
 
-        startDateSpinner = new JSpinner(startModel);
-        endDateSpinner = new JSpinner(endModel);
+        add(filterPanel, BorderLayout.CENTER);
 
-        // show as yyyy-MM-dd
-        startDateSpinner.setEditor(
-            new JSpinner.DateEditor(startDateSpinner, "yyyy-MM-dd"));
-        endDateSpinner.setEditor(
-            new JSpinner.DateEditor(endDateSpinner, "yyyy-MM-dd"));
+        // ======== TABLE + MESSAGE (BOTTOM) ========
+        tableModel = new DefaultTableModel(
+                new Object[]{"ID", "Date/Time", "Asset", "Type", "Qty", "Total"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
 
-        inputPanel.add(new JLabel("Portfolio ID:"));
-        inputPanel.add(portfolioField);
-
-        inputPanel.add(new JLabel("Asset:"));
-        inputPanel.add(assetField);
-
-        inputPanel.add(new JLabel("From:"));
-        inputPanel.add(startDateSpinner);
-
-        inputPanel.add(new JLabel("To:"));
-        inputPanel.add(endDateSpinner);
-
-        inputPanel.add(loadButton);
-        inputPanel.add(clearButton);
-
-        this.add(inputPanel);
-
-        // Bottom: message label
-        final JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
         messageLabel = new JLabel(" ");
-        bottomPanel.add(messageLabel);
-        this.add(bottomPanel);
+        bottomPanel.add(messageLabel, BorderLayout.NORTH);
+        bottomPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // ----- listeners ----- //
+        add(bottomPanel, BorderLayout.SOUTH);
 
-        // Back to logged-in view
+        // ======== LISTENERS ========
+
         back.addActionListener(evt -> {
-            if (evt.getSource().equals(back)) {
-                if (switchLoggedInController != null) {
-                    switchLoggedInController.switchToLoggedInView();
-                }
+            if (switchLoggedInController != null) {
+                switchLoggedInController.switchToLoggedInView();
             }
         });
 
-        // Load
-        loadButton.addActionListener((final ActionEvent actionEvent) -> {
-            final String portfolioId = portfolioField.getText().trim();
-            final String asset = assetField.getText().trim();
+        loadButton.addActionListener((ActionEvent e) -> {
+            String portfolioId = portfolioField.getText().trim();
+            String asset = assetField.getText().trim();
+
+            System.out.println("[DEBUG] Load clicked");
+            System.out.println("[DEBUG] portfolioId = '" + portfolioId + "'");
+            System.out.println("[DEBUG] asset = '" + asset + "'");
 
             if (portfolioId.isEmpty()) {
                 JOptionPane.showMessageDialog(
-                    this,
-                    "Please enter a portfolio ID.",
-                    "Input error",
-                    JOptionPane.WARNING_MESSAGE
+                        this,
+                        "Please enter a portfolio ID.",
+                        "Input error",
+                        JOptionPane.WARNING_MESSAGE
                 );
-            }
-            else {
-                final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-                final String startDate = fmt.format((Date) startDateSpinner.getValue());
-                final String endDate = fmt.format((Date) endDateSpinner.getValue());
-                if (transactionHistoryController != null) {
-                    if (asset.isEmpty()) {
-                        transactionHistoryController.loadHistory(
-                            portfolioId,
-                            null,
-                            startDate,
-                            endDate
-                        );
-                    }
-                    else {
-                        transactionHistoryController.loadHistory(
-                            portfolioId,
-                            asset,
-                            startDate,
-                            endDate
-                        );
-                    }
-                }// presenter will update HistoryViewModel, and propertyChange()
-// below will refresh the message label / table.
+                return;
             }
 
+            String fromDateStr = ((JSpinner.DateEditor) fromDateSpinner.getEditor())
+                    .getFormat().format(fromDateSpinner.getValue());
+            String toDateStr = ((JSpinner.DateEditor) toDateSpinner.getEditor())
+                    .getFormat().format(toDateSpinner.getValue());
+
+            if (transactionHistoryController != null) {
+                transactionHistoryController.loadHistory(
+                        portfolioId,
+                        asset.isEmpty() ? null : asset,
+                        fromDateStr,
+                        toDateStr
+                );
+            } else {
+                // temporary debug if controller not wired
+                JOptionPane.showMessageDialog(this,
+                        "TransactionHistoryController is null – check AppBuilder wiring.");
+            }
         });
 
-        // Clear
-        clearButton.addActionListener((final ActionEvent actionEvent) -> {
+        clearButton.addActionListener((ActionEvent e) -> {
             portfolioField.setText("");
             assetField.setText("");
             messageLabel.setText("Cleared.");
+            tableModel.setRowCount(0);
         });
     }
 
     @Override
-    public void actionPerformed(final ActionEvent evt) {
+    public void actionPerformed(ActionEvent evt) {
         System.out.println("Click " + evt.getActionCommand());
     }
 
     @Override
-    public void propertyChange(final PropertyChangeEvent evt) {
-        // Whenever HistoryViewModel changes, update UI
-        final HistoryState state = historyViewModel.getState();
-        if (state != null) {
-            messageLabel.setText(state.getMessage());
+    public void propertyChange(PropertyChangeEvent evt) {
+        // HistoryViewModel fired "state" change
+        HistoryState state = historyViewModel.getState();
+        if (state == null) {
+            return;
+        }
+
+        System.out.println("[View] propertyChange fired for '"
+                + evt.getPropertyName() + "'");
+        System.out.println("[View] rows to display = " + state.getRows().size());
+        System.out.println("[View] message        = " + state.getMessage());
+
+        // update message
+        messageLabel.setText(state.getMessage());
+
+        // update table rows
+        tableModel.setRowCount(0);
+        for (HistoryState.Row r : state.getRows()) {
+            tableModel.addRow(new Object[]{
+                    r.id,
+                    r.dateTime,
+                    r.asset,
+                    r.type,
+                    r.quantity,
+                    r.totalValue
+            });
         }
     }
+
 
     public String getViewName() {
         return viewName;
     }
 
-    public void setSwitchLoggedInController(final SwitchLoggedInController switchLoggedInController) {
+    public void setSwitchLoggedInController(SwitchLoggedInController switchLoggedInController) {
         this.switchLoggedInController = switchLoggedInController;
     }
 
-    public void setTransactionHistoryController(final TransactionHistoryController controller) {
+    public void setTransactionHistoryController(TransactionHistoryController controller) {
         this.transactionHistoryController = controller;
     }
 }
+

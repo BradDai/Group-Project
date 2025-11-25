@@ -1,9 +1,8 @@
 package interface_adapter.logged_in;
 
+import entity.SubAccount;
 import java.util.ArrayList;
 import java.util.List;
-
-import entity.SubAccount;
 
 /**
  * The State information representing the logged-in user.
@@ -15,7 +14,7 @@ public class LoggedInState {
     private List<SubAccount> subAccounts = new ArrayList<>();
     private String subAccountError;
 
-    public LoggedInState(final LoggedInState copy) {
+    public LoggedInState(LoggedInState copy) {
         username = copy.username;
         password = copy.password;
         passwordError = copy.passwordError;
@@ -26,12 +25,11 @@ public class LoggedInState {
         // Create a new list containing the same elements (shallow copy of list)
         if (copy.subAccounts != null) {
             this.subAccounts = new ArrayList<>(copy.subAccounts);
-        }
-        else {
+        } else {
             this.subAccounts = new ArrayList<>();
         }
     }
-
+    private String currentPortfolioName = "";
     // Because of the previous copy constructor, the default constructor must be explicit.
     public LoggedInState() {
     }
@@ -40,11 +38,11 @@ public class LoggedInState {
         return username;
     }
 
-    public void setUsername(final String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
-    public void setPassword(final String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
@@ -52,7 +50,7 @@ public class LoggedInState {
         return password;
     }
 
-    public void setPasswordError(final String passwordError) {
+    public void setPasswordError(String passwordError) {
         this.passwordError = passwordError;
     }
 
@@ -64,7 +62,7 @@ public class LoggedInState {
         return subAccounts;
     }
 
-    public void setSubAccounts(final List<SubAccount> subAccounts) {
+    public void setSubAccounts(List<SubAccount> subAccounts) {
         this.subAccounts = subAccounts;
     }
 
@@ -72,7 +70,16 @@ public class LoggedInState {
         return subAccountError;
     }
 
-    public void setSubAccountError(final String subAccountError) {
+    public void setSubAccountError(String subAccountError) {
         this.subAccountError = subAccountError;
     }
+
+    public String getCurrentPortfolioName() {
+        return currentPortfolioName;
+    }
+
+    public void setCurrentPortfolioName(String currentPortfolioName) {
+        this.currentPortfolioName = currentPortfolioName;
+    }
+
 }

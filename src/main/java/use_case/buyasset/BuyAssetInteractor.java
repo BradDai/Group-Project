@@ -1,31 +1,37 @@
 package use_case.buyasset;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import entity.Stock;
 import entity.SubAccount;
 import use_case.SubAccount.SubAccountDataAccessInterface;
+import data_access.TransactionDataAccessInterface;
+import entity.transaction.BuyTransaction;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.util.List;
 
 public class BuyAssetInteractor implements BuyAssetInputBoundary {
 
     private final SubAccountDataAccessInterface subAccountDAO;
+    private final TransactionDataAccessInterface transactionDAO;   // ⭐ NEW
     private final BuyAssetOutputBoundary presenter;
 
-    public BuyAssetInteractor(final SubAccountDataAccessInterface subAccountDAO,
-                              final BuyAssetOutputBoundary presenter) {
+    public BuyAssetInteractor(SubAccountDataAccessInterface subAccountDAO,
+                              TransactionDataAccessInterface transactionDAO,  // ⭐ NEW
+                              BuyAssetOutputBoundary presenter) {
         this.subAccountDAO = subAccountDAO;
+        this.transactionDAO = transactionDAO;  // ⭐ NEW
         this.presenter = presenter;
     }
 
-    @Override
-    public void execute(final BuyAssetInputData inputData) {
 
-        final String username = inputData.getUsername();
-        final String portfolioName = inputData.getPortfolioName();
-        final String symbol = inputData.getSymbol();
-        final int qty = inputData.getQuantity();
-        final double price = inputData.getPrice();
+    @Override
+    public void execute(BuyAssetInputData inputData) {
+
+        String username = inputData.getUsername();
+        String portfolioName = inputData.getPortfolioName();
+        String symbol = inputData.getSymbol();
+        int qty = inputData.getQuantity();
+        double price = inputData.getPrice();
 
         if (username == null || username.isEmpty()) {
             presenter.presentFail("No user logged in.");
@@ -48,9 +54,9 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
             return;
         }
 
-        final List<SubAccount> accounts = subAccountDAO.getSubAccountsOf(username);
+        List<SubAccount> accounts = subAccountDAO.getSubAccountsOf(username);
         SubAccount target = null;
-        for (final SubAccount sa : accounts) {
+        for (SubAccount sa : accounts) {
             if (sa.getName().equalsIgnoreCase(portfolioName)) {
                 target = sa;
                 break;
@@ -62,29 +68,61 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
             return;
         }
 
-        final BigDecimal cost = BigDecimal.valueOf(price).multiply(BigDecimal.valueOf(qty));
+        BigDecimal cost = BigDecimal.valueOf(price).multiply(BigDecimal.valueOf(qty));
 
         if (target.getBalanceUSD().compareTo(cost) < 0) {
             presenter.presentFail("Insufficient funds.");
             return;
         }
 
-        final BigDecimal newBal = target.getBalanceUSD().subtract(cost);
+        BigDecimal newBal = target.getBalanceUSD().subtract(cost);
         target.setBalanceUSD(newBal);
 
-        final Stock stock = new Stock(symbol, qty, symbol);
+        // update holdings
+        Stock stock = new Stock(symbol, qty, symbol);
         target.addOrIncreaseAsset(stock);
 
         subAccountDAO.save(username, target);
 
-        subAccountDAO.save(username, target);
+        // ============================================================
+        // ⭐ NEW: Save real transaction into transactionDAO
+        // ============================================================
+        BuyTransaction tx = new BuyTransaction(
+                generateTransactionId(),       // You can implement UUID-based ID
+                LocalDateTime.now(),
+                portfolioName,                 // toPortfolio = portfolio receiving asset
+                "STOCK",                       // assetType
+                symbol,                        // assetSymbol
+                qty,                           // quantity
+                price                          // price per unit
+        );
+
+        System.out.println("[BuyAssetInteractor] Saving transaction: " + tx.getTransactionId());
+
+        transactionDAO.save(username,
+                new BuyTransaction(
+                        "TX-" + System.currentTimeMillis(),
+                        LocalDateTime.now(),
+                        portfolioName,           // toPortfolio
+                        "Stock",
+                        symbol,
+                        qty,
+                        price
+                )
+        );
+
+        // ============================================================
 
         presenter.presentSuccess(
-            new BuyAssetOutputData(
-                "Purchased " + qty + " of " + symbol +
-                    " for $" + cost + " in " + portfolioName + ".",
-                username
-            )
+                new BuyAssetOutputData(
+                        "Purchased " + qty + " of " + symbol +
+                                " for $" + cost + " in " + portfolioName + ".",
+                        username
+                )
         );
+    }
+
+    private String generateTransactionId() {
+        return "TX-" + System.currentTimeMillis();
     }
 }

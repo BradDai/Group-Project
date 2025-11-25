@@ -56,7 +56,7 @@ public class HistoryState {
         public String dateTime;
         public String asset;
         public String type;
-        public int quantity;
+        public double quantity;
         public double totalValue;
     }
 
