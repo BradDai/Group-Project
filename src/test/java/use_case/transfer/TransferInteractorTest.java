@@ -39,6 +39,11 @@ class TransferInteractorTest {
             }
 
             @Override
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
             public void presentBalances(final double fromBalance, final double toBalance, final String[] availableCurrencies) {
                 fail("presentBalances should not be called in execute");
             }
@@ -70,7 +75,13 @@ class TransferInteractorTest {
             }
 
             @Override
-            public void presentBalances(final double fromBalance, final double toBalance, final String[] availableCurrencies) {
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
+            public void presentBalances(final double fromBalance, final double toBalance,
+                                        final String[] availableCurrencies) {
             }
         };
 
@@ -95,6 +106,11 @@ class TransferInteractorTest {
             @Override
             public void prepareFailView(final String error) {
                 assertEquals("Destination portfolio does not exist: Ghost Portfolio", error);
+            }
+
+            @Override
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
             }
 
             @Override
@@ -123,6 +139,11 @@ class TransferInteractorTest {
             @Override
             public void prepareFailView(final String error) {
                 assertEquals("Cannot transfer to the same portfolio", error);
+            }
+
+            @Override
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
             }
 
             @Override
@@ -156,6 +177,11 @@ class TransferInteractorTest {
             }
 
             @Override
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
             public void presentBalances(final double fromBalance, final double toBalance, final String[] availableCurrencies) {
             }
         };
@@ -186,6 +212,11 @@ class TransferInteractorTest {
             }
 
             @Override
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
             public void presentBalances(final double fromBalance, final double toBalance, final String[] availableCurrencies) {
             }
         };
@@ -213,6 +244,11 @@ class TransferInteractorTest {
             }
 
             @Override
+            public void presentBalances(double fromBalance, double toBalance, String[] currencyList,
+                                        String[] stockList) {
+            }
+
+            @Override
             public void presentBalances(final double fromBalance, final double toBalance, final String[] availableCurrencies) {
                 assertEquals(100.0, fromBalance);
                 assertEquals(25.0, toBalance);
@@ -235,7 +271,6 @@ class TransferInteractorTest {
      * InMemory Implementation of TransferDataAccessInterface for testing.
      */
     private static class InMemoryTransferDataAccess implements TransferDataAccessInterface {
-        // Map<Username, Map<PortfolioName, Map<AssetSymbol, Amount>>>
         private final Map<String, Map<String, Map<String, Double>>> accounts = new HashMap<>();
 
         // Helper to populate data

@@ -11,20 +11,19 @@ public class TransferPresenter implements TransferOutputBoundary {
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public TransferPresenter(final TransferViewModel transferViewModel,
-                             final LoggedInViewModel loggedInViewModel,
-                             final ViewManagerModel viewManagerModel) {
+    public TransferPresenter(TransferViewModel transferViewModel,
+                             LoggedInViewModel loggedInViewModel,
+                             ViewManagerModel viewManagerModel) {
         this.transferViewModel = transferViewModel;
         this.loggedInViewModel = loggedInViewModel;
         this.viewManagerModel = viewManagerModel;
     }
 
     @Override
-    public void prepareSuccessView(final TransferOutputData outputData) {
+    public void prepareSuccessView(TransferOutputData outputData) {
         final TransferState state = transferViewModel.getState();
         state.setError(null);
         state.setAmount("");
-
         transferViewModel.setState(state);
         transferViewModel.firePropertyChanged();
 
@@ -41,7 +40,7 @@ public class TransferPresenter implements TransferOutputBoundary {
     }
 
     @Override
-    public void prepareFailView(final String errorMessage) {
+    public void prepareFailView(String errorMessage) {
         final TransferState state = transferViewModel.getState();
         state.setError(errorMessage);
         transferViewModel.setState(state);
@@ -49,13 +48,20 @@ public class TransferPresenter implements TransferOutputBoundary {
     }
 
     @Override
-    public void presentBalances(final double fromBalance, final double toBalance, final String[] availableCurrencies) {
+    public void presentBalances(double fromBalance, double toBalance, String[] currencyList, String[] stockList) {
         final TransferState state = transferViewModel.getState();
         state.setFromBalance(String.format("%.2f", fromBalance));
         state.setToBalance(String.format("%.2f", toBalance));
-        state.setAvailableCurrencies(availableCurrencies);
+
+        state.setAvailableCurrencies(currencyList);
+        state.setAvailableStocks(stockList);
 
         transferViewModel.setState(state);
-        transferViewModel.firePropertyChanged(); // This triggers the View
+        transferViewModel.firePropertyChanged();
+    }
+
+    @Override
+    public void presentBalances(double fromBalance, double toBalance, String[] availableCurrencies) {
+
     }
 }

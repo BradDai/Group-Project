@@ -85,17 +85,18 @@ public class TransferInteractor implements TransferInputBoundary {
         double fromBalance = 0.0;
         double toBalance = 0.0;
         String[] currencies = new String[] {"USD"};
+        String[] stocks = new String[0];
 
         if (transferDataAccess.portfolioExists(username, fromPortfolio)) {
             fromBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
             currencies = transferDataAccess.getAvailableCurrencies(username, fromPortfolio);
+            stocks = transferDataAccess.getAvailableStocks(username, fromPortfolio);
         }
 
         if (transferDataAccess.portfolioExists(username, toPortfolio)) {
             toBalance = transferDataAccess.getAssetBalance(username, toPortfolio, assetSymbol);
         }
 
-        // Pass the currencies to the presenter
-        transferPresenter.presentBalances(fromBalance, toBalance, currencies);
+        transferPresenter.presentBalances(fromBalance, toBalance, currencies, stocks);
     }
 }

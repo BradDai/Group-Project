@@ -30,7 +30,7 @@ public class FileSubAccountDataAccessJSON implements
     SubAccountDataAccessInterface,
     TransferDataAccessInterface,
     SellAssetDataAccessInterface,
-    ExchangeDataAccessInterface {    // ➕ ADDED
+    ExchangeDataAccessInterface {
     private final Path filePath;
     private final Map<String, List<SubAccount>> data = new HashMap<>();
 
@@ -186,7 +186,16 @@ public class FileSubAccountDataAccessJSON implements
 
         for (final SubAccount sa : accounts) {
             if (sa.getName().equals(portfolioId)) {
-                return sa.getCurrencies().containsKey(assetSymbol);
+                // Check currency first
+                if (sa.getCurrencies().containsKey(assetSymbol)) {
+                    return true;
+                }
+                // Check stocks
+                for (final Asset asset : sa.getAssets()) {
+                    if (asset instanceof Stock && ((Stock) asset).getCompanySymbol().equalsIgnoreCase(assetSymbol)) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -201,7 +210,16 @@ public class FileSubAccountDataAccessJSON implements
 
         for (final SubAccount sa : accounts) {
             if (sa.getName().equalsIgnoreCase(portfolioId)) {
-                return sa.getBalanceOf(assetSymbol).doubleValue();
+                // Check currency
+                if (sa.getCurrencies().containsKey(assetSymbol)) {
+                    return sa.getBalanceOf(assetSymbol).doubleValue();
+                }
+                // Check stocks
+                for (final Asset asset : sa.getAssets()) {
+                    if (asset instanceof Stock && ((Stock) asset).getCompanySymbol().equalsIgnoreCase(assetSymbol)) {
+                        return asset.getQuantity();
+                    }
+                }
             }
         }
         return 0.0;
@@ -215,7 +233,8 @@ public class FileSubAccountDataAccessJSON implements
             throw new IllegalArgumentException("User not found.");
         }
 
-        SubAccount from = null, to = null;
+        SubAccount from = null;
+        SubAccount to = null;
         for (final SubAccount sa : accounts) {
             if (sa.getName().equals(fromPortfolio)) {
                 from = sa;
@@ -229,19 +248,51 @@ public class FileSubAccountDataAccessJSON implements
             throw new IllegalArgumentException("Portfolio not found.");
         }
 
-        final BigDecimal amt = BigDecimal.valueOf(amount);
-        final BigDecimal fromBalance = from.getBalanceOf(assetSymbol);
-
-        if (fromBalance.compareTo(amt) < 0) {
-            throw new IllegalArgumentException("Insufficient funds.");
+        // 1. Check if it is a Stock transfer
+        Stock sourceStock = null;
+        for (final Asset asset : from.getAssets()) {
+            if (asset instanceof Stock) {
+                final Stock s = (Stock) asset;
+                if (s.getCompanySymbol().equalsIgnoreCase(assetSymbol)) {
+                    sourceStock = s;
+                    break;
+                }
+            }
         }
 
-        // Subtract from sender
-        from.setBalanceOf(assetSymbol, fromBalance.subtract(amt));
+        if (sourceStock != null) {
+            // Transferring Stock
+            if (sourceStock.getQuantity() < amount) {
+                throw new IllegalArgumentException("Insufficient stock quantity.");
+            }
 
-        // Add to receiver
-        final BigDecimal toBalance = to.getBalanceOf(assetSymbol);
-        to.setBalanceOf(assetSymbol, toBalance.add(amt));
+            // Update Sender
+            sourceStock.setQuantity(sourceStock.getQuantity() - amount);
+            if (sourceStock.getQuantity() == 0) {
+                from.removeAsset(sourceStock);
+            }
+
+            // Update Receiver (SubAccount logic handles existing stock check automatically)
+            final Stock newStock = new Stock(assetSymbol, amount, assetSymbol);
+            to.addOrIncreaseAsset(newStock);
+
+        }
+        else {
+            // 2. Fallback to Currency transfer
+            final BigDecimal amt = BigDecimal.valueOf(amount);
+            final BigDecimal fromBalance = from.getBalanceOf(assetSymbol);
+
+            if (fromBalance.compareTo(amt) < 0) {
+                throw new IllegalArgumentException("Insufficient funds.");
+            }
+
+            // Subtract from sender
+            from.setBalanceOf(assetSymbol, fromBalance.subtract(amt));
+
+            // Add to receiver
+            final BigDecimal toBalance = to.getBalanceOf(assetSymbol);
+            to.setBalanceOf(assetSymbol, toBalance.add(amt));
+        }
 
         saveToFile();
     }
