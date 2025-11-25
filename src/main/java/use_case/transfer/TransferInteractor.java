@@ -31,57 +31,51 @@ public class TransferInteractor implements TransferInputBoundary {
 
         if (!transferDataAccess.portfolioExists(username, fromPortfolio)) {
             transferPresenter.prepareFailView("Source portfolio does not exist: " + fromPortfolio);
-            return;
         }
-        if (!transferDataAccess.portfolioExists(username, toPortfolio)) {
+        else if (!transferDataAccess.portfolioExists(username, toPortfolio)) {
             transferPresenter.prepareFailView("Destination portfolio does not exist: " + toPortfolio);
-            return;
         }
-        if (fromPortfolio.equals(toPortfolio)) {
+        else if (fromPortfolio.equals(toPortfolio)) {
             transferPresenter.prepareFailView("Cannot transfer to the same portfolio");
-            return;
         }
-
-        if (!transferDataAccess.hasAsset(username, fromPortfolio, assetSymbol)) {
+        else if (!transferDataAccess.hasAsset(username, fromPortfolio, assetSymbol)) {
             transferPresenter.prepareFailView("Source portfolio does not contain asset: " + assetSymbol);
-            return;
+        }
+        else {
+            final double availableBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
+            if (availableBalance < amount) {
+                transferPresenter.prepareFailView(
+                    String.format("Insufficient balance. Available: %.2f", availableBalance));
+            }
+            else {
+                transferDataAccess.transferAsset(username, fromPortfolio, toPortfolio, assetSymbol, amount);
+
+                final String transactionId = UUID.randomUUID().toString();
+                final TransferTransaction transaction = transactionBuilder
+                    .setTransactionId(transactionId)
+                    .setDate(LocalDateTime.now())
+                    .setFromPortfolio(fromPortfolio)
+                    .setToPortfolio(toPortfolio)
+                    .setAssetType(transferType)
+                    .setAssetSymbol(assetSymbol)
+                    .setQuantity(amount)
+                    .build();
+
+                transferDataAccess.saveTransaction(transaction);
+                final List<SubAccount> updatedAccounts = transferDataAccess.getSubAccountsOf(username);
+                final TransferOutputData outputData = new TransferOutputData(
+                    transactionId, fromPortfolio, toPortfolio, assetSymbol, amount, true, updatedAccounts);
+
+                transferPresenter.prepareSuccessView(outputData);
+
+            }
         }
 
-        final double availableBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
-        if (availableBalance < amount) {
-            transferPresenter.prepareFailView(String.format("Insufficient balance. Available: %.2f", availableBalance));
-            return;
-        }
-
-        try {
-            transferDataAccess.transferAsset(username, fromPortfolio, toPortfolio, assetSymbol, amount);
-
-            final String transactionId = UUID.randomUUID().toString();
-            final TransferTransaction transaction = transactionBuilder
-                .setTransactionId(transactionId)
-                .setDate(LocalDateTime.now())
-                .setFromPortfolio(fromPortfolio)
-                .setToPortfolio(toPortfolio)
-                .setAssetType(transferType)
-                .setAssetSymbol(assetSymbol)
-                .setQuantity(amount)
-                .build();
-
-            transferDataAccess.saveTransaction(transaction);
-            final List<SubAccount> updatedAccounts = transferDataAccess.getSubAccountsOf(username);
-            final TransferOutputData outputData = new TransferOutputData(
-                transactionId, fromPortfolio, toPortfolio, assetSymbol, amount, true, updatedAccounts);
-
-            transferPresenter.prepareSuccessView(outputData);
-
-        }
-        catch (final Exception e) {
-            transferPresenter.prepareFailView("Transfer failed: " + e.getMessage());
-        }
     }
 
     @Override
-    public void checkBalances(final String username, final String fromPortfolio, final String toPortfolio, final String assetSymbol) {
+    public void checkBalances(
+        final String username, final String fromPortfolio, final String toPortfolio, final String assetSymbol) {
         double fromBalance = 0.0;
         double toBalance = 0.0;
         String[] currencies = new String[] {"USD"};

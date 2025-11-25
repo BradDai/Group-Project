@@ -4,7 +4,7 @@ package use_case.transfer;
  * Input Data for the Transfer Use Case.
  */
 public class TransferInputData {
-    private final String username; // Added
+    private final String username;
     private final String fromPortfolio;
     private final String toPortfolio;
     private final String transferType;
