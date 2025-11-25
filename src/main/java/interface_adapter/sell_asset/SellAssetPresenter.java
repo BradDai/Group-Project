@@ -1,5 +1,8 @@
 package interface_adapter.sell_asset;
 
+import interface_adapter.logged_in.LoggedInState;
+import interface_adapter.logged_in.LoggedInViewModel;
+import use_case.SubAccount.SubAccountDataAccessInterface;
 import use_case.sell_asset.SellAssetOutputBoundary;
 import use_case.sell_asset.SellAssetOutputData;
 import use_case.sell_asset.SellAssetPriceOutputBoundary;
@@ -8,9 +11,15 @@ import use_case.sell_asset.SellAssetPriceOutputData;
 public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPriceOutputBoundary {
 
     private final SellAssetViewModel sellAssetViewModel;
+    private final LoggedInViewModel loggedInViewModel;
+    private final SubAccountDataAccessInterface dataAccess;
 
-    public SellAssetPresenter(final SellAssetViewModel sellAssetViewModel) {
+    public SellAssetPresenter(final SellAssetViewModel sellAssetViewModel,
+                              final LoggedInViewModel loggedInViewModel,
+                              final SubAccountDataAccessInterface dataAccess) {
         this.sellAssetViewModel = sellAssetViewModel;
+        this.loggedInViewModel = loggedInViewModel;
+        this.dataAccess = dataAccess;
     }
 
     @Override
@@ -28,6 +37,12 @@ public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPri
 
         sellAssetViewModel.setState(state);
         sellAssetViewModel.firePropertyChanged();
+
+        final String username = data.getAssetName();
+        final LoggedInState loggedInState = loggedInViewModel.getState();
+        loggedInState.setSubAccounts(dataAccess.getSubAccountsOf(username));
+        loggedInViewModel.setState(loggedInState);
+        loggedInViewModel.firePropertyChange(LoggedInViewModel.SUBACCOUNTS_CHANGED);
     }
 
     @Override

@@ -25,13 +25,13 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
 
         // handle exceptions
         if (quantityToSell <= 0) {
-            sellAssetPriceOutputBoundary.preparePriceFailureView(
+            sellAssetOutputBoundary.prepareFailureView(
                 "Invalid Quantity to Sell: Quantity to sell must be positive.");
             return;
         }
 
         if (quantityToSell > currentQuantity) {
-            sellAssetPriceOutputBoundary.preparePriceFailureView(
+            sellAssetOutputBoundary.prepareFailureView(
                 "Invalid Quantity to Sell: Quantity to sell must be greater than current Quantity.");
             return;
         }
@@ -50,7 +50,7 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
 
         // prepare output data
         final SellAssetOutputData outputData = new SellAssetOutputData(
-            username, quantityToSell, totalPrice, newQuantity
+            username, stockName, quantityToSell, totalPrice, newQuantity
         );
 
         sellAssetOutputBoundary.prepareSuccessView(outputData);

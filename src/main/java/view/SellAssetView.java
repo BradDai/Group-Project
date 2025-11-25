@@ -84,14 +84,43 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        stockSelector.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final String stockName = (String) stockSelector.getSelectedItem();
-                    sellAssetController.fetchPrice(stockName);
+        portfolioSelector.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        // Clear messages when changing portfolio
+                        final SellAssetState state = sellAssetViewModel.getState();
+                        state.setMessage(null);
+                        state.setErrorMessage(null);
+                        state.setPriceError(null);
+                        state.setCurrentPrice(0.0);
+                        stockPriceLabel.setText("—");
+                        totalPriceLabel.setText("—");
+                        sellAssetViewModel.setState(state);
+                    }
                 }
-            });
+        );
+
+        stockSelector.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        final String stockName = (String) stockSelector.getSelectedItem();
+
+                        // CLEAR previous messages when selecting a new stock
+                        final SellAssetState state = sellAssetViewModel.getState();
+                        state.setMessage(null);
+                        state.setErrorMessage(null);
+                        state.setPriceError(null);
+                        state.setCurrentPrice(0.0);
+                        sellAssetViewModel.setState(state);
+
+                        if (stockName != null && !stockName.isEmpty() && sellAssetController != null) {
+                            sellAssetController.fetchPrice(stockName);
+                        }
+                    }
+                }
+        );
 
         confirm.addActionListener(
             new ActionListener() {
@@ -156,57 +185,101 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
         }
 
         if (state.getPortfolios() != null) {
-            portfolioSelector.setModel(new DefaultComboBoxModel<>(state.getPortfolios()));
+            // Save current selection
+            final String currentSelection = (String) portfolioSelector.getSelectedItem();
+
+            // Only update if the list actually changed
+            boolean needsUpdate = false;
+            if (portfolioSelector.getItemCount() != state.getPortfolios().length) {
+                needsUpdate = true;
+            } else {
+                for (int i = 0; i < state.getPortfolios().length; i++) {
+                    if (!state.getPortfolios()[i].equals(portfolioSelector.getItemAt(i))) {
+                        needsUpdate = true;
+                        break;
+                    }
+                }
+            }
+
+            if (needsUpdate) {
+                portfolioSelector.setModel(new DefaultComboBoxModel<>(state.getPortfolios()));
+
+                // Restore previous selection if it still exists
+                if (currentSelection != null) {
+                    for (int i = 0; i < portfolioSelector.getItemCount(); i++) {
+                        if (portfolioSelector.getItemAt(i).equals(currentSelection)) {
+                            portfolioSelector.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
-        if (state.getPriceError() != null) {
-            stockPriceLabel.setText("Error: " + state.getPriceError());
-            totalPriceLabel.setText("—");
-            return;
-        }
-
-        // Handle success message from SellAssetInteractor
+        // Handle success message
         if (state.getMessage() != null && !state.getMessage().isEmpty()) {
             JOptionPane.showMessageDialog(
-                null,
-                state.getMessage(),
-                "Message",
-                JOptionPane.INFORMATION_MESSAGE
+                    this,
+                    state.getMessage(),
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
             );
 
-            // Clear fields for next sale
+            // Clear the message immediately after showing
             quantityField.setText("");
             stockPriceLabel.setText("—");
             totalPriceLabel.setText("—");
-
-            // Optionally reset stock selection:
-            // stockSelector.setSelectedIndex(0);
-
+            state.setMessage(null);
+            sellAssetViewModel.setState(state);
             return;
         }
 
-        // Handle failure message
+        // Handle error message
         if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
             JOptionPane.showMessageDialog(
-                null,
-                state.getErrorMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
+                    this,
+                    state.getErrorMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
             );
+
+            // Clear after showing
+            state.setErrorMessage(null);
+            sellAssetViewModel.setState(state);
             return;
         }
 
-        // Update price label
-        stockPriceLabel.setText("$" + String.format("%.2f", state.getCurrentPrice()));
+        // Handle price error
+        if (state.getPriceError() != null && !state.getPriceError().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    state.getPriceError(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
 
-        // Optionally recompute total if qty entered
-        try {
-            final double qty = Double.parseDouble(quantityField.getText());
-            final double total = qty * state.getCurrentPrice();
-            totalPriceLabel.setText(String.format("%.2f", total));
-        }
-        catch (final Exception ignored) {
+            stockPriceLabel.setText("—");
             totalPriceLabel.setText("—");
+
+            // Clear after showing
+            state.setPriceError(null);
+            sellAssetViewModel.setState(state);
+            return;
+        }
+
+        // Update price label only if valid price
+        if (state.getCurrentPrice() > 0) {
+            stockPriceLabel.setText("$" + String.format("%.2f", state.getCurrentPrice()));
+
+            // Recompute total if quantity entered
+            try {
+                final double qty = Double.parseDouble(quantityField.getText());
+                final double total = qty * state.getCurrentPrice();
+                totalPriceLabel.setText("$" + String.format("%.2f", total));
+            }
+            catch (final Exception ignored) {
+                totalPriceLabel.setText("—");
+            }
         }
     }
 
