@@ -1,9 +1,11 @@
+
 package use_case.transfer;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import data_access.TransactionDataAccessInterface;
 import entity.SubAccount;
 import entity.transaction.TransferTransaction;
 import entity.transaction.TransferTransactionBuilder;
@@ -12,12 +14,15 @@ public class TransferInteractor implements TransferInputBoundary {
     private final TransferDataAccessInterface transferDataAccess;
     private final TransferOutputBoundary transferPresenter;
     private final TransferTransactionBuilder transactionBuilder;
+    private final TransactionDataAccessInterface transactionRepo;  // ⭐ NEW
 
     public TransferInteractor(final TransferDataAccessInterface transferDataAccess,
-                              final TransferOutputBoundary transferPresenter) {
+                              final TransferOutputBoundary transferPresenter,
+                              final TransactionDataAccessInterface transactionRepo) { // ⭐ NEW
         this.transferDataAccess = transferDataAccess;
         this.transferPresenter = transferPresenter;
         this.transactionBuilder = new TransferTransactionBuilder();
+        this.transactionRepo = transactionRepo;   // ⭐ NEW
     }
 
     @Override
@@ -42,40 +47,52 @@ public class TransferInteractor implements TransferInputBoundary {
             transferPresenter.prepareFailView("Source portfolio does not contain asset: " + assetSymbol);
         }
         else {
-            final double availableBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
+            final double availableBalance =
+                    transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
             if (availableBalance < amount) {
                 transferPresenter.prepareFailView(
-                    String.format("Insufficient balance. Available: %.2f", availableBalance));
+                        String.format("Insufficient balance. Available: %.2f", availableBalance));
             }
             else {
-                transferDataAccess.transferAsset(username, fromPortfolio, toPortfolio, assetSymbol, amount);
+                // 1) move asset
+                transferDataAccess.transferAsset(
+                        username, fromPortfolio, toPortfolio, assetSymbol, amount);
 
+                // 2) build a TransferTransaction
                 final String transactionId = UUID.randomUUID().toString();
                 final TransferTransaction transaction = transactionBuilder
-                    .setTransactionId(transactionId)
-                    .setDate(LocalDateTime.now())
-                    .setFromPortfolio(fromPortfolio)
-                    .setToPortfolio(toPortfolio)
-                    .setAssetType(transferType)
-                    .setAssetSymbol(assetSymbol)
-                    .setQuantity(amount)
-                    .build();
+                        .setTransactionId(transactionId)
+                        .setDate(LocalDateTime.now())
+                        .setFromPortfolio(fromPortfolio)
+                        .setToPortfolio(toPortfolio)
+                        .setAssetType(transferType)
+                        .setAssetSymbol(assetSymbol)
+                        .setQuantity(amount)
+                        .build();
 
+                // 3) save via transfer DAO (existing behaviour)
                 transferDataAccess.saveTransaction(transaction);
-                final List<SubAccount> updatedAccounts = transferDataAccess.getSubAccountsOf(username);
+
+                // 4) ⭐ NEW: also save into the generic transaction history DAO
+                transactionRepo.save(username, transaction);
+
+                // 5) update accounts & presenter
+                final List<SubAccount> updatedAccounts =
+                        transferDataAccess.getSubAccountsOf(username);
                 final TransferOutputData outputData = new TransferOutputData(
-                    transactionId, fromPortfolio, toPortfolio, assetSymbol, amount, true, updatedAccounts);
+                        transactionId, fromPortfolio, toPortfolio,
+                        assetSymbol, amount, true, updatedAccounts);
 
                 transferPresenter.prepareSuccessView(outputData);
-
             }
         }
-
     }
 
     @Override
     public void checkBalances(
-        final String username, final String fromPortfolio, final String toPortfolio, final String assetSymbol) {
+            final String username, final String fromPortfolio,
+            final String toPortfolio, final String assetSymbol) {
+
         double fromBalance = 0.0;
         double toBalance = 0.0;
         String[] currencies = new String[] {"USD"};
@@ -94,3 +111,4 @@ public class TransferInteractor implements TransferInputBoundary {
         transferPresenter.presentBalances(fromBalance, toBalance, currencies, stocks);
     }
 }
+
