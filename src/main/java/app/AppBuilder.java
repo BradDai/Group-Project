@@ -264,22 +264,7 @@ public class AppBuilder {
         loginView.setLoginController(loginController);
         return this;
     }
-//    public AppBuilder addBuyAssetUseCase() {
-//        BuyAssetPresenter presenter = new BuyAssetPresenter(buyAssetViewModel, loggedInViewModel, subAccountDataAccess);
-//        BuyAssetInputBoundary interactor = new BuyAssetInteractor(subAccountDataAccess, presenter);
-//        BuyAssetController controller = new BuyAssetController(interactor);
-//        BuyAssetPresenter presenter = new BuyAssetPresenter(buyAssetViewModel, loggedInViewModel, subAccountDataAccess);
-//        BuyAssetInputBoundary interactor =
-//                new BuyAssetInteractor(
-//                        subAccountDataAccess,
-//                        transactionDataAccessObject,   // ⭐ pass DAO here
-//                        presenter
-//                );
-//
-//        BuyAssetController controller = new BuyAssetController(interactor, loggedInViewModel);
-//        buyAssetView.setBuyAssetController(controller);
-//        return this;
-//    }
+
     public AppBuilder addBuyAssetUseCase() {
     // --- DELETE THE OLD BLOCK THAT WAS HERE ---
 
@@ -298,23 +283,6 @@ public class AppBuilder {
         return this;
     }
 
-//    public AppBuilder addSellAssetUseCase() {
-//        final SellAssetOutputBoundary sellAssetOutputBoundary =
-//            new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
-//        final SellAssetPriceOutputBoundary sellAssetPriceOutputBoundary =
-//            new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
-//
-//        final SellAssetInputBoundary sellAssetInteractor =
-//            new SellAssetInteractor(
-//                subAccountDataAccess,
-//                sellAssetOutputBoundary,
-//                sellAssetPriceOutputBoundary
-//            );
-//
-//        final SellAssetController sellAssetController = new SellAssetController(sellAssetInteractor);
-//        sellAssetView.setSellAssetController(sellAssetController);
-//        return this;
-//    }
 public AppBuilder addSellAssetUseCase() {
     // One presenter that implements BOTH SellAssetOutputBoundary
     // and SellAssetPriceOutputBoundary
@@ -362,17 +330,6 @@ public AppBuilder addSellAssetUseCase() {
         return this;
     }
 
-//    public AppBuilder addTransferUseCase() {
-//        final TransferOutputBoundary transferOutputBoundary = new TransferPresenter(
-//            transferViewModel, loggedInViewModel, viewManagerModel);
-//
-//        final TransferInputBoundary transferInteractor = new TransferInteractor(
-//            subAccountDataAccess, transferOutputBoundary);
-//
-//        final TransferController transferController = new TransferController(transferInteractor);
-//        transferView.setTransferController(transferController);
-//        return this;
-//    }
 public AppBuilder addTransferUseCase() {
     final TransferOutputBoundary transferOutputBoundary = new TransferPresenter(
             transferViewModel, loggedInViewModel, viewManagerModel);
@@ -518,18 +475,6 @@ public AppBuilder addTransferUseCase() {
         loggedInView.setChangePasswordController(changePasswordController);
         return this;
     }
-
-//    public AppBuilder addExchangeUseCase() {
-//        final ExchangeOutputBoundary exchangeOutputBoundary =
-//            new ExchangePresenter(exchangeViewModel, loggedInViewModel);
-//
-//        final ExchangeInputBoundary exchangeInteractor =
-//            new ExchangeInteractor(exchangeOutputBoundary, subAccountDataAccess);
-//
-//        final ExchangeController exchangeController = new ExchangeController(exchangeInteractor);
-//        exchangeView.setExchangeController(exchangeController);
-//        return this;
-//    }
 
     public AppBuilder addExchangeUseCase() {
         final ExchangeOutputBoundary exchangeOutputBoundary =
