@@ -16,6 +16,12 @@ public class SwitchSellAssetPresenter implements SwitchSellAssetOutputBoundary {
         this.viewManagerModel = viewManagerModel;
     }
 
+    /**
+     * Switch to sell asset view.
+     * @param username        the username
+     * @param portfolios      portfolios
+     * @param portfolioStocks stocks in each portfolio
+     */
     public void switchToSellAssetView(final String username, final String[] portfolios, final Map<String, String[]> portfolioStocks) {
         final SellAssetState state = sellAssetViewModel.getState();
         state.setUsername(username);

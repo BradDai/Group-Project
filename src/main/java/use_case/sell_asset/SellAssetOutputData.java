@@ -7,7 +7,8 @@ public class SellAssetOutputData {
     private final double totalPrice;
     private final double remainingQuantity;
 
-    public SellAssetOutputData(final String username, final String assetName, final double quantitySold, final double totalPrice, final double remainingQuantity) {
+    public SellAssetOutputData(final String username, final String assetName,
+                               final double quantitySold, final double totalPrice, final double remainingQuantity) {
         this.username = username;
         this.assetName = assetName;
         this.quantitySold = quantitySold;

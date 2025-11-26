@@ -20,8 +20,10 @@ import interface_adapter.sell_asset.SellAssetState;
 import interface_adapter.sell_asset.SellAssetViewModel;
 
 public class SellAssetView extends JPanel implements ActionListener, PropertyChangeListener {
-
-    private final String viewName = "sellasset";
+    private static final String SPACE_PLACEHOLDER = "";
+    private static final String DOLLAR_PLACEHOLDER = "$";
+    private static final String DECIMAL_PLACEHOLDER = "%.2f";
+    
     private final SellAssetViewModel sellAssetViewModel;
     private SwitchLoggedInController switchLoggedInController;
 
@@ -38,11 +40,9 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
     private final JTextField quantityField;
     private final JLabel totalPriceLabel;
 
-    private double currentStockPrice;
-    private String userName;
-    private String[] portfolios;
-
     public SellAssetView(final SellAssetViewModel sellAssetViewModel) {
+        final int ten = 10;
+
         this.sellAssetViewModel = sellAssetViewModel;
         this.sellAssetViewModel.addPropertyChangeListener(this);
 
@@ -62,19 +62,19 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
         final JPanel stockPricePanel = new JPanel();
         stockPricePanel.add(new JLabel("Stock price:"));
-        stockPriceLabel = new JLabel("—");
+        stockPriceLabel = new JLabel(SPACE_PLACEHOLDER);
         stockPricePanel.add(stockPriceLabel);
         this.add(stockPricePanel);
 
         final JPanel quantityPanel = new JPanel();
         quantityPanel.add(new JLabel("Quantity to sell:"));
-        quantityField = new JTextField(10);
+        quantityField = new JTextField(ten);
         quantityPanel.add(quantityField);
         this.add(quantityPanel);
 
         final JPanel totalPricePanel = new JPanel();
         totalPricePanel.add(new JLabel("Total price:"));
-        totalPriceLabel = new JLabel("—");
+        totalPriceLabel = new JLabel(SPACE_PLACEHOLDER);
         totalPricePanel.add(totalPriceLabel);
         this.add(totalPricePanel);
 
@@ -97,7 +97,7 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                         state.setErrorMessage(null);
                         state.setPriceError(null);
                         state.setCurrentPrice(0.0);
-                        stockPriceLabel.setText("—");
+                        stockPriceLabel.setText(SPACE_PLACEHOLDER);
 
                         // Populate stock selector based on selected portfolio
                         final String selectedPortfolio = (String) portfolioSelector.getSelectedItem();
@@ -109,7 +109,7 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                             }
                         }
 
-                        totalPriceLabel.setText("—");
+                        totalPriceLabel.setText(SPACE_PLACEHOLDER);
                         sellAssetViewModel.setState(state);
                     }
                 }
@@ -143,7 +143,6 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                     final String portfolioName = (String) portfolioSelector.getSelectedItem();
                     final String stockName = (String) stockSelector.getSelectedItem();
                     final double quantity = Double.parseDouble(quantityField.getText());
-//                    sellAssetController.execute(userName, portfolioName, stockName, quantity);
                     sellAssetController.execute(portfolioName, stockName, quantity);
 
                 }
@@ -172,20 +171,24 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                 updateTotal();
             }
         });
-        currentStockPrice = 0.0;
     }
 
     private void updateTotal() {
         try {
             final double qty = Double.parseDouble(quantityField.getText());
             final double total = qty * sellAssetViewModel.getState().getCurrentPrice();
-            totalPriceLabel.setText("$" + String.format("%.2f", total));
+            totalPriceLabel.setText(DOLLAR_PLACEHOLDER + String.format(DECIMAL_PLACEHOLDER, total));
         }
         catch (final Exception ex) {
-            totalPriceLabel.setText("—");
+            totalPriceLabel.setText(SPACE_PLACEHOLDER);
         }
     }
 
+    /**
+     * Action performed.
+     *
+     * @param evt the event to be processed
+     */
     public void actionPerformed(final ActionEvent evt) {
         System.out.println("Click " + evt.getActionCommand());
     }
@@ -193,13 +196,8 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
         final SellAssetState state = sellAssetViewModel.getState();
-        this.currentStockPrice = state.getCurrentPrice();
 
         // Update portfolio list if present
-        if (state.getUsername() != null) {
-            userName = state.getUsername();
-        }
-
         if (state.getPortfolios() != null) {
             // Save current selection
             final String currentSelection = (String) portfolioSelector.getSelectedItem();
@@ -208,12 +206,13 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
             boolean needsUpdate = false;
 
             // Expected count includes the blank entry
-            int expectedCount = state.getPortfolios().length + 1;
+            final int expectedCount = state.getPortfolios().length + 1;
 
             // If actual count differs, update needed
             if (portfolioSelector.getItemCount() != expectedCount) {
                 needsUpdate = true;
-            } else {
+            }
+            else {
                 // Compare portfolio entries shifted by +1 because index 0 is the blank
                 for (int i = 0; i < state.getPortfolios().length; i++) {
                     if (!state.getPortfolios()[i].equals(portfolioSelector.getItemAt(i + 1))) {
@@ -225,8 +224,8 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
             if (needsUpdate) {
                 // Build list with blank first
-                String[] portfolios = state.getPortfolios();
-                String[] withBlank = new String[portfolios.length + 1];
+                final String[] portfolios = state.getPortfolios();
+                final String[] withBlank = new String[portfolios.length + 1];
                 withBlank[0] = "";
                 System.arraycopy(portfolios, 0, withBlank, 1, portfolios.length);
 
@@ -237,8 +236,6 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                     portfolioSelector.setSelectedItem(currentSelection);
                 }
             }
-
-
         }
 
         // Handle success message
@@ -252,8 +249,8 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
             // Clear the message immediately after showing
             quantityField.setText("");
-            stockPriceLabel.setText("—");
-            totalPriceLabel.setText("—");
+            stockPriceLabel.setText(SPACE_PLACEHOLDER);
+            totalPriceLabel.setText(SPACE_PLACEHOLDER);
             state.setMessage(null);
             sellAssetViewModel.setState(state);
             return;
@@ -283,8 +280,8 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
                     JOptionPane.ERROR_MESSAGE
             );
 
-            stockPriceLabel.setText("—");
-            totalPriceLabel.setText("—");
+            stockPriceLabel.setText(SPACE_PLACEHOLDER);
+            totalPriceLabel.setText(SPACE_PLACEHOLDER);
 
             // Clear after showing
             state.setPriceError(null);
@@ -294,22 +291,27 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
         // Update price label only if valid price
         if (state.getCurrentPrice() > 0) {
-            stockPriceLabel.setText("$" + String.format("%.2f", state.getCurrentPrice()));
+            stockPriceLabel.setText(DOLLAR_PLACEHOLDER + String.format(DECIMAL_PLACEHOLDER, state.getCurrentPrice()));
 
             // Recompute total if quantity entered
             try {
                 final double qty = Double.parseDouble(quantityField.getText());
                 final double total = qty * state.getCurrentPrice();
-                totalPriceLabel.setText("$" + String.format("%.2f", total));
+                totalPriceLabel.setText(DOLLAR_PLACEHOLDER + String.format(DECIMAL_PLACEHOLDER, total));
             }
             catch (final Exception ignored) {
-                totalPriceLabel.setText("—");
+                totalPriceLabel.setText(SPACE_PLACEHOLDER);
             }
         }
     }
 
+    /**
+     * Return the name of the view.
+     *
+     * @return name of the view
+     */
     public String getViewName() {
-        return viewName;
+        return "sellasset";
     }
 
     public void setSellAssetController(final SellAssetController sellAssetController) {
