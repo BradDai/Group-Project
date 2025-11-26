@@ -40,6 +40,7 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
     private double currentStockPrice;
     private String userName;
+    private String[] portfolios;
 
     public SellAssetView(final SellAssetViewModel sellAssetViewModel) {
         this.sellAssetViewModel = sellAssetViewModel;
@@ -205,11 +206,17 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
             // Only update if the list actually changed
             boolean needsUpdate = false;
-            if (portfolioSelector.getItemCount() != state.getPortfolios().length) {
+
+            // Expected count includes the blank entry
+            int expectedCount = state.getPortfolios().length + 1;
+
+            // If actual count differs, update needed
+            if (portfolioSelector.getItemCount() != expectedCount) {
                 needsUpdate = true;
             } else {
+                // Compare portfolio entries shifted by +1 because index 0 is the blank
                 for (int i = 0; i < state.getPortfolios().length; i++) {
-                    if (!state.getPortfolios()[i].equals(portfolioSelector.getItemAt(i))) {
+                    if (!state.getPortfolios()[i].equals(portfolioSelector.getItemAt(i + 1))) {
                         needsUpdate = true;
                         break;
                     }
@@ -217,18 +224,21 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
             }
 
             if (needsUpdate) {
-                portfolioSelector.setModel(new DefaultComboBoxModel<>(state.getPortfolios()));
+                // Build list with blank first
+                String[] portfolios = state.getPortfolios();
+                String[] withBlank = new String[portfolios.length + 1];
+                withBlank[0] = "";
+                System.arraycopy(portfolios, 0, withBlank, 1, portfolios.length);
 
-                // Restore previous selection if it still exists
-                if (currentSelection != null) {
-                    for (int i = 0; i < portfolioSelector.getItemCount(); i++) {
-                        if (portfolioSelector.getItemAt(i).equals(currentSelection)) {
-                            portfolioSelector.setSelectedIndex(i);
-                            break;
-                        }
-                    }
+                portfolioSelector.setModel(new DefaultComboBoxModel<>(withBlank));
+
+                // Restore only if user already selected a NON-BLANK value
+                if (currentSelection != null && !currentSelection.isEmpty()) {
+                    portfolioSelector.setSelectedItem(currentSelection);
                 }
             }
+
+
         }
 
         // Handle success message
