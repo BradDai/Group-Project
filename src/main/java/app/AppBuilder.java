@@ -362,17 +362,32 @@ public AppBuilder addSellAssetUseCase() {
         return this;
     }
 
-    public AppBuilder addTransferUseCase() {
-        final TransferOutputBoundary transferOutputBoundary = new TransferPresenter(
+//    public AppBuilder addTransferUseCase() {
+//        final TransferOutputBoundary transferOutputBoundary = new TransferPresenter(
+//            transferViewModel, loggedInViewModel, viewManagerModel);
+//
+//        final TransferInputBoundary transferInteractor = new TransferInteractor(
+//            subAccountDataAccess, transferOutputBoundary);
+//
+//        final TransferController transferController = new TransferController(transferInteractor);
+//        transferView.setTransferController(transferController);
+//        return this;
+//    }
+public AppBuilder addTransferUseCase() {
+    final TransferOutputBoundary transferOutputBoundary = new TransferPresenter(
             transferViewModel, loggedInViewModel, viewManagerModel);
 
-        final TransferInputBoundary transferInteractor = new TransferInteractor(
-            subAccountDataAccess, transferOutputBoundary);
+    final TransferInputBoundary transferInteractor = new TransferInteractor(
+            subAccountDataAccess,          // implements TransferDataAccessInterface
+            transferOutputBoundary,
+            transactionDataAccessObject    // 👈 SAME field you pass to BuyAssetInteractor
+    );
 
-        final TransferController transferController = new TransferController(transferInteractor);
-        transferView.setTransferController(transferController);
-        return this;
-    }
+    final TransferController transferController = new TransferController(transferInteractor);
+    transferView.setTransferController(transferController);
+    return this;
+}
+
 
     public AppBuilder addSwitchHistoryUseCase() {
         final SwitchHistoryOutputBoundary switchHistoryOutputBoundary = new SwitchHistoryPresenter(

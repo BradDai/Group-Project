@@ -1,46 +1,7 @@
-//
-//package use_case.transaction_history;
-//
-//import data_access.TransactionDataAccessInterface;
-//import interface_adapter.history.HistoryState;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//public class TransactionHistoryInteractor implements TransactionHistoryInputBoundary {
-//
-//    private final TransactionHistoryOutputBoundary presenter;
-//
-//    public TransactionHistoryInteractor(TransactionDataAccessInterface transactionDataAccessObject, TransactionHistoryOutputBoundary presenter) {
-//        this.presenter = presenter;
-//    }
-//
-//    @Override
-//    public void execute(TransactionHistoryInputData inputData) {
-//
-//        // ===== DEBUG: incoming request =====
-//        System.out.println("[Interactor] execute() called");
-//        System.out.println("  portfolio = " + inputData.getPortfolio());
-//        System.out.println("  asset     = " + inputData.getAsset());
-//        System.out.println("  startDate = " + inputData.getStartDate());
-//        System.out.println("  endDate   = " + inputData.getEndDate());
-//
-//        // ==== FAKE ROWS JUST FOR DEMO ====
-//        List<HistoryState.Row> rows = new ArrayList<>();
-//
-//        HistoryState.Row r1 = new HistoryState.Row();
-//        r1.id = "T1";
-//        r1.dateTime = "2025-11-02";
-//        r1.asset = "AAPL";
-//        r1.type = "BUY";
-//        r1.quantity = 10
 package use_case.transaction_history;
 
 import data_access.TransactionDataAccessInterface;
-import entity.transaction.BuyTransaction;
-import entity.transaction.ConvertTransaction;
-import entity.transaction.SellTransaction;
-import entity.transaction.Transaction;
+import entity.transaction.*;
 import interface_adapter.history.HistoryState;
 import interface_adapter.logged_in.LoggedInViewModel;
 
@@ -108,29 +69,29 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
                 row.quantity = st.getQuantity();
                 row.totalValue = st.getTotalValue();
             }
-            // ⭐ NEW: handle currency conversions
+            // ⭐ handle currency conversions
             else if (tx instanceof ConvertTransaction ct) {
                 row.asset = ct.getFromCurrency() + "->" + ct.getToCurrency();
                 row.type = ct.getTransactionType();      // "CONVERT"
-                row.quantity = ct.getFromAmount();       // amount of source currency
-                row.totalValue = ct.getToAmount();       // amount of target currency
+                row.quantity = ct.getFromAmount();       // source amount
+                row.totalValue = ct.getToAmount();       // target amount
+            }
+            // ⭐ NEW: handle transfers
+            else if (tx instanceof TransferTransaction tt) {
+                row.asset = tt.getAssetSymbol();         // stock symbol or currency code
+                row.type = "TRANSFER";
+                row.quantity = tt.getQuantity();         // amount moved
+                row.totalValue = 0.0;                    // or whatever you decide
             } else {
-                // other types (transfer etc.) – minimal info
+                // any other future types
                 row.asset = "";
                 row.type = tx.getTransactionType();
                 row.quantity = 0.0;
                 row.totalValue = 0.0;
             }
-
-            System.out.println("  [row] id=" + row.id +
-                    ", dateTime=" + row.dateTime +
-                    ", asset=" + row.asset +
-                    ", type=" + row.type +
-                    ", qty=" + row.quantity +
-                    ", total=" + row.totalValue);
-
             rows.add(row);
         }
+
 
         // build output & send to presenter
         String msg = "Loaded " + rows.size() + " transactions for portfolio " + portfolio;
