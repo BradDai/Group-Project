@@ -504,14 +504,33 @@ public AppBuilder addSellAssetUseCase() {
         return this;
     }
 
+//    public AppBuilder addExchangeUseCase() {
+//        final ExchangeOutputBoundary exchangeOutputBoundary =
+//            new ExchangePresenter(exchangeViewModel, loggedInViewModel);
+//
+//        final ExchangeInputBoundary exchangeInteractor =
+//            new ExchangeInteractor(exchangeOutputBoundary, subAccountDataAccess);
+//
+//        final ExchangeController exchangeController = new ExchangeController(exchangeInteractor);
+//        exchangeView.setExchangeController(exchangeController);
+//        return this;
+//    }
+
     public AppBuilder addExchangeUseCase() {
         final ExchangeOutputBoundary exchangeOutputBoundary =
-            new ExchangePresenter(exchangeViewModel, loggedInViewModel);
+                new ExchangePresenter(exchangeViewModel, loggedInViewModel);
 
         final ExchangeInputBoundary exchangeInteractor =
-            new ExchangeInteractor(exchangeOutputBoundary, subAccountDataAccess);
+                new ExchangeInteractor(
+                        exchangeOutputBoundary,
+                        subAccountDataAccess,
+                        transactionDataAccessObject
+                );
 
-        final ExchangeController exchangeController = new ExchangeController(exchangeInteractor);
+        final ExchangeController exchangeController =
+                new ExchangeController(exchangeInteractor, loggedInViewModel);
+
+
         exchangeView.setExchangeController(exchangeController);
         return this;
     }

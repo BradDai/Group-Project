@@ -38,6 +38,7 @@ package use_case.transaction_history;
 
 import data_access.TransactionDataAccessInterface;
 import entity.transaction.BuyTransaction;
+import entity.transaction.ConvertTransaction;
 import entity.transaction.SellTransaction;
 import entity.transaction.Transaction;
 import interface_adapter.history.HistoryState;
@@ -96,20 +97,25 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
             row.id = tx.getTransactionId();
             row.dateTime = tx.getDate().toString();
 
-            if (tx instanceof BuyTransaction) {
-                BuyTransaction bt = (BuyTransaction) tx;
+            if (tx instanceof BuyTransaction bt) {
                 row.asset = bt.getAssetSymbol();
                 row.type = "BUY";
                 row.quantity = bt.getQuantity();
                 row.totalValue = bt.getTotalValue();
-            } else if (tx instanceof SellTransaction) {
-                SellTransaction st = (SellTransaction) tx;
+            } else if (tx instanceof SellTransaction st) {
                 row.asset = st.getAssetSymbol();
                 row.type = "SELL";
                 row.quantity = st.getQuantity();
                 row.totalValue = st.getTotalValue();
+            }
+            // ⭐ NEW: handle currency conversions
+            else if (tx instanceof ConvertTransaction ct) {
+                row.asset = ct.getFromCurrency() + "->" + ct.getToCurrency();
+                row.type = ct.getTransactionType();      // "CONVERT"
+                row.quantity = ct.getFromAmount();       // amount of source currency
+                row.totalValue = ct.getToAmount();       // amount of target currency
             } else {
-                // other types (transfer/convert) – for now show minimal info
+                // other types (transfer etc.) – minimal info
                 row.asset = "";
                 row.type = tx.getTransactionType();
                 row.quantity = 0.0;
