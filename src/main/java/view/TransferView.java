@@ -11,17 +11,16 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import data_access.Constants;
-import interface_adapter.SwitchLoggedInController;
-import interface_adapter.transfer.TransferController;
-import interface_adapter.transfer.TransferException;
-import interface_adapter.transfer.TransferState;
-import interface_adapter.transfer.TransferViewModel;
-import view.transfer_components.BalancePanel;
-import view.transfer_components.CurrencyPanel;
-import view.transfer_components.StockPanel;
-import view.transfer_components.TopPanel;
-import view.transfer_components.TransferButtonPanel;
+import dataaccess.Constants;
+import interfaceadapter.SwitchLoggedInController;
+import interfaceadapter.transfer.TransferController;
+import interfaceadapter.transfer.TransferState;
+import interfaceadapter.transfer.TransferViewModel;
+import view.transfercomponents.BalancePanel;
+import view.transfercomponents.CurrencyPanel;
+import view.transfercomponents.StockPanel;
+import view.transfercomponents.TopPanel;
+import view.transfercomponents.TransferButtonPanel;
 
 /**
  * Main Transfer view delegating UI components to sub-panels.
@@ -97,7 +96,7 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
         // Validation Listener
         currencyPanel.addAmountChangeListener(() -> currencyPanel.validateAmount(buttonPanel));
 
-        buttonPanel.addConfirmListener(this::actionPerformedConfirm);
+        buttonPanel.addConfirmListener(actionEvent -> actionPerformedConfirm());
 
         buttonPanel.addCancelListener(evt -> {
             if (switchLoggedInController != null) {
@@ -193,10 +192,8 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
             catch (final NumberFormatException numberFormatException) {
                 currencyPanel.showError(Constants.ERROR_INVALID_AMOUNT);
             }
-            catch (final TransferException transferException) {
-                // Show the error message from the exception
-                currencyPanel.showError(transferException.getMessage());
-            }
+            // Show the error message from the exception
+
         }
     }
 
@@ -205,7 +202,7 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
         System.out.println("Click " + e.getActionCommand());
     }
 
-    private void actionPerformedConfirm(final ActionEvent actionEvent) {
+    private void actionPerformedConfirm() {
         executeTransfer();
     }
 

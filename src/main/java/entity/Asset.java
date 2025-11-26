@@ -2,32 +2,12 @@ package entity;
 
 
 public class Asset {
-    private String type;
+    private final String type;
     private double quantity;
 
     public Asset(final String type, final double quantity) {
         this.type = type;
         this.quantity = quantity;
-    }
-
-    /**
-     * Creates a new asset category if none was presented. with the given non-empty name and non-empty password.
-     *
-     * @param type     the name of the asset
-     * @param quantity the quantity of asset gained
-     * @throws IllegalArgumentException if the type of quantity are empty
-     */
-
-    public Asset addNewAsset(final String type, final Double quantity, final String price) {
-        if ("".equals(type)) {
-            throw new IllegalArgumentException("Type cannot be empty");
-        }
-        if ("".equals(quantity)) {
-            throw new IllegalArgumentException("Quantity cannot be empty");
-        }
-        this.quantity = quantity;
-        this.type = type;
-        return this;
     }
 
     public String getType() {
@@ -40,15 +20,6 @@ public class Asset {
 
     public void setQuantity(final double quantity) {
         this.quantity = quantity;
-    }
-
-    public Asset addAsset(final Asset[] xxx, final String type, final int quantity) {
-        for (final Asset asset : xxx) {
-            if (asset.type.equals(type)) {
-                asset.quantity += quantity;
-            }
-        }
-        return this;
     }
 
 }

@@ -99,10 +99,9 @@ public class SubAccount {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SubAccount)) {
+        if (!(o instanceof final SubAccount that)) {
             return false;
         }
-        final SubAccount that = (SubAccount) o;
         return name.equalsIgnoreCase(that.name);
     }
 
