@@ -75,11 +75,18 @@ public class SellAssetState {
     }
 
     // helper to get stocks for a given portfolio
+    /**
+     * Helper to get stocks for a given portfolio.
+     *
+     * @param portfolioName the name of portfolio
+     * @return              the stock of given portfolio
+     */
     public String[] getStocksOfPortfolio(final String portfolioName) {
-        if (portfolioStocks == null) {
-            return null;
+        String[] result = null;
+        if (portfolioStocks != null) {
+            result = portfolioStocks.getOrDefault(portfolioName, new String[0]);
         }
-        return portfolioStocks.getOrDefault(portfolioName, new String[0]);
+        return result;
     }
 
 }

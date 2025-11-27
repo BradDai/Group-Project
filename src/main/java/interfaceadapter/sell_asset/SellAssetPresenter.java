@@ -29,8 +29,8 @@ public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPri
         // Construct a user-friendly message
         final String msg = "Successfully sold " + data.quantitySold() + " shares of "
             + data.assetName() + ". Total received: $"
-            + String.format("%.2f", data.totalPrice()) +
-            ". Remaining: " + data.remainingQuantity();
+            + String.format("%.2f", data.totalPrice())
+            + ". Remaining: " + data.remainingQuantity();
 
         state.setMessage(msg);
         state.setErrorMessage(null);
@@ -49,7 +49,7 @@ public class SellAssetPresenter implements SellAssetOutputBoundary, SellAssetPri
     public void prepareFailureView(final String errorMessage) {
         final SellAssetState state = sellAssetViewModel.getState();
         state.setErrorMessage(errorMessage);
-        state.setMessage(null);  // clear success message
+        state.setMessage(null);
 
         sellAssetViewModel.setState(state);
         sellAssetViewModel.firePropertyChanged();
