@@ -10,7 +10,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import interface_adapter.ViewManagerModel;
+import interfaceadapter.ViewManagerModel;
 
 /**
  * The View Manager for the program. It listens for property change events
@@ -19,13 +19,11 @@ import interface_adapter.ViewManagerModel;
 public class ViewManager implements PropertyChangeListener {
     private final CardLayout cardLayout;
     private final JPanel views;
-    private final ViewManagerModel viewManagerModel;
 
     public ViewManager(final JPanel views, final CardLayout cardLayout, final ViewManagerModel viewManagerModel) {
         this.views = views;
         this.cardLayout = cardLayout;
-        this.viewManagerModel = viewManagerModel;
-        this.viewManagerModel.addPropertyChangeListener(this);
+        viewManagerModel.addPropertyChangeListener(this);
     }
 
     @Override

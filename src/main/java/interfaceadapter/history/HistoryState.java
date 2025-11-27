@@ -1,0 +1,42 @@
+package interfaceadapter.history;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class HistoryState {
+
+    private String message = "";
+    private List<Row> rows = new ArrayList<>();
+
+    // Row structure for each transaction
+    public static class Row {
+        public String id;
+        public String dateTime;
+        public String asset;
+        public String type;
+        public double quantity;
+        public double totalValue;
+    }
+
+    public HistoryState() {
+    }
+
+    // message
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(final String message) {
+        this.message = message;
+    }
+
+    // rows
+    public List<Row> getRows() {
+        return rows;
+    }
+
+    public void setRows(final List<Row> rows) {
+        this.rows = rows;
+    }
+}
+

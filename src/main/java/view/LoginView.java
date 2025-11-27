@@ -15,17 +15,14 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import interface_adapter.login.LoginController;
-import interface_adapter.login.LoginState;
-import interface_adapter.login.LoginViewModel;
+import interfaceadapter.login.LoginController;
+import interfaceadapter.login.LoginState;
+import interfaceadapter.login.LoginViewModel;
 
 /**
  * The View for when the user is logging into the program.
  */
 public class LoginView extends JPanel implements ActionListener, PropertyChangeListener {
-
-    private final String viewName = "log in";
-    private final LoginViewModel loginViewModel;
 
     private final JTextField usernameInputField = new JTextField(15);
     private final JLabel usernameErrorField = new JLabel();
@@ -39,8 +36,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
     public LoginView(final LoginViewModel loginViewModel) {
 
-        this.loginViewModel = loginViewModel;
-        this.loginViewModel.addPropertyChangeListener(this);
+        loginViewModel.addPropertyChangeListener(this);
 
         final JLabel title = new JLabel("Login Screen");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -161,6 +157,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     }
 
     public String getViewName() {
+        final String viewName = "log in";
         return viewName;
     }
 

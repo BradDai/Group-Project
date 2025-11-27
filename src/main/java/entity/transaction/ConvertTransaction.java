@@ -30,18 +30,18 @@ public class ConvertTransaction extends Transaction {
         // For the base Transaction, we treat it as happening within one portfolio.
         // We leave assetSymbol/price/total as null; we'll override the getters below.
         super(
-                transactionId,
-                date,
-                portfolio,          // fromPortfolio
-                portfolio,          // toPortfolio
-                null,               // assetSymbol (N/A for base)
-                0.0,                // quantity (we override getQuantity)
-                null,               // pricePerUnit (we override getPricePerUnit if needed)
-                null,               // totalValue (we override getTotalValue)
-                fromCurrency,
-                toCurrency,
-                exchangeRate,
-                fromAmount
+            transactionId,
+            date,
+            portfolio,          // fromPortfolio
+            portfolio,          // toPortfolio
+            null,               // assetSymbol (N/A for base)
+            0.0,                // quantity (we override getQuantity)
+            null,               // pricePerUnit (we override getPricePerUnit if needed)
+            null,               // totalValue (we override getTotalValue)
+            fromCurrency,
+            toCurrency,
+            exchangeRate,
+            fromAmount
         );
 
         if (fromAmount <= 0) {
@@ -65,7 +65,7 @@ public class ConvertTransaction extends Transaction {
     @Override
     public String getDescription() {
         return String.format("Converted %.2f %s to %.2f %s (rate: %.4f)",
-                fromAmount, fromCurrency, toAmount, toCurrency, exchangeRate);
+            fromAmount, fromCurrency, toAmount, toCurrency, exchangeRate);
     }
 
     // ⭐ NEW: make history table show meaningful values

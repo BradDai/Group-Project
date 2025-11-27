@@ -6,107 +6,111 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import data_access.*;
+import org.jetbrains.annotations.NotNull;
+
+import dataaccess.FileSubAccountDataAccessJSON;
+import dataaccess.FileTransactionDataAccess;
+import dataaccess.FileUserDataAccessObject;
+import dataaccess.TransactionDataAccessInterface;
+import dataaccess.TwelveDataPriceGateway;
 import entity.UserFactory;
-import interface_adapter.SwitchLoggedInController;
-import interface_adapter.SwitchLoggedInPresenter;
-import interface_adapter.ViewManagerModel;
-import interface_adapter.buyasset.BuyAssetController;
-import interface_adapter.buyasset.BuyAssetPresenter;
-import interface_adapter.buyasset.BuyAssetViewModel;
-import interface_adapter.buyasset.GetPriceController;
-import interface_adapter.buyasset.GetPricePresenter;
-import interface_adapter.exchange.ExchangeController;
-import interface_adapter.exchange.ExchangePresenter;
-import interface_adapter.exchange.ExchangeViewModel;
-import interface_adapter.history.HistoryViewModel;
-import interface_adapter.history.TransactionHistoryController;
-import interface_adapter.history.TransactionHistoryPresenter;
-import interface_adapter.logged_in.ChangePasswordController;
-import interface_adapter.logged_in.ChangePasswordPresenter;
-import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.logged_in.SwitchBuyAssetController;
-import interface_adapter.logged_in.SwitchBuyAssetPresenter;
-import interface_adapter.logged_in.SwitchExchangeController;
-import interface_adapter.logged_in.SwitchExchangePresenter;
-import interface_adapter.logged_in.SwitchHistoryController;
-import interface_adapter.logged_in.SwitchHistoryPresenter;
-import interface_adapter.logged_in.SwitchSellAssetController;
-import interface_adapter.logged_in.SwitchSellAssetPresenter;
-import interface_adapter.logged_in.SwitchTransferController;
-import interface_adapter.logged_in.SwitchTransferPresenter;
-import interface_adapter.login.LoginController;
-import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginViewModel;
-import interface_adapter.logout.LogoutController;
-import interface_adapter.logout.LogoutPresenter;
-import interface_adapter.sell_asset.SellAssetController;
-import interface_adapter.sell_asset.SellAssetPresenter;
-import interface_adapter.sell_asset.SellAssetViewModel;
-import interface_adapter.signup.SignupController;
-import interface_adapter.signup.SignupPresenter;
-import interface_adapter.signup.SignupViewModel;
-import interface_adapter.subaccount.create.CreateSubAccountController;
-import interface_adapter.subaccount.create.CreateSubAccountPresenter;
-import interface_adapter.subaccount.delete.DeleteSubAccountController;
-import interface_adapter.subaccount.delete.DeleteSubAccountPresenter;
-import interface_adapter.transfer.TransferController;
-import interface_adapter.transfer.TransferPresenter;
-import interface_adapter.transfer.TransferViewModel;
-import use_case.SubAccount.create.CreateSubAccountInputBoundary;
-import use_case.SubAccount.create.CreateSubAccountInteractor;
-import use_case.SubAccount.create.CreateSubAccountOutputBoundary;
-import use_case.SubAccount.delete.DeleteSubAccountInputBoundary;
-import use_case.SubAccount.delete.DeleteSubAccountInteractor;
-import use_case.SubAccount.delete.DeleteSubAccountOutputBoundary;
-import use_case.buyasset.BuyAssetInputBoundary;
-import use_case.buyasset.BuyAssetInteractor;
-import use_case.change_password.ChangePasswordInputBoundary;
-import use_case.change_password.ChangePasswordInteractor;
-import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.exchange.ExchangeInputBoundary;
-import use_case.exchange.ExchangeInteractor;
-import use_case.exchange.ExchangeOutputBoundary;
-import use_case.get_price.GetPriceInputBoundary;
-import use_case.get_price.GetPriceInteractor;
-import use_case.get_price.PriceGateway;
-import use_case.login.LoginInputBoundary;
-import use_case.login.LoginInteractor;
-import use_case.login.LoginOutputBoundary;
-import use_case.logout.LogoutInputBoundary;
-import use_case.logout.LogoutInteractor;
-import use_case.logout.LogoutOutputBoundary;
-import use_case.sell_asset.SellAssetInputBoundary;
-import use_case.sell_asset.SellAssetInteractor;
-import use_case.sell_asset.SellAssetOutputBoundary;
-import use_case.sell_asset.SellAssetPriceOutputBoundary;
-import use_case.signup.SignupInputBoundary;
-import use_case.signup.SignupInteractor;
-import use_case.signup.SignupOutputBoundary;
-import use_case.switch_buyasset.SwitchBuyAssetInputBoundary;
-import use_case.switch_buyasset.SwitchBuyAssetInteractor;
-import use_case.switch_buyasset.SwitchBuyAssetOutputBoundary;
-import use_case.switch_exchange.SwitchExchangeInputBoundary;
-import use_case.switch_exchange.SwitchExchangeInteractor;
-import use_case.switch_exchange.SwitchExchangeOutputBoundary;
-import use_case.switch_history.SwitchHistoryInputBoundary;
-import use_case.switch_history.SwitchHistoryInteractor;
-import use_case.switch_history.SwitchHistoryOutputBoundary;
-import use_case.switch_loggedin.SwitchLoggedInInputBoundary;
-import use_case.switch_loggedin.SwitchLoggedInInteractor;
-import use_case.switch_loggedin.SwitchLoggedInOutputBoundary;
-import use_case.switch_sellasset.SwitchSellAssetInputBoundary;
-import use_case.switch_sellasset.SwitchSellAssetInteractor;
-import use_case.switch_sellasset.SwitchSellAssetOutputBoundary;
-import use_case.switch_transfer.SwitchTransferInputBoundary;
-import use_case.switch_transfer.SwitchTransferInteractor;
-import use_case.switch_transfer.SwitchTransferOutputBoundary;
-import use_case.transaction_history.TransactionHistoryInputBoundary;
-import use_case.transaction_history.TransactionHistoryInteractor;
-import use_case.transaction_history.TransactionHistoryOutputBoundary;
-import use_case.transfer.TransferInputBoundary;
-import use_case.transfer.TransferInteractor;
-import use_case.transfer.TransferOutputBoundary;
+import interfaceadapter.SwitchLoggedInController;
+import interfaceadapter.SwitchLoggedInPresenter;
+import interfaceadapter.ViewManagerModel;
+import interfaceadapter.buyasset.BuyAssetController;
+import interfaceadapter.buyasset.BuyAssetPresenter;
+import interfaceadapter.buyasset.BuyAssetViewModel;
+import interfaceadapter.buyasset.GetPriceController;
+import interfaceadapter.buyasset.GetPricePresenter;
+import interfaceadapter.exchange.ExchangeController;
+import interfaceadapter.exchange.ExchangePresenter;
+import interfaceadapter.exchange.ExchangeViewModel;
+import interfaceadapter.history.HistoryViewModel;
+import interfaceadapter.history.TransactionHistoryController;
+import interfaceadapter.history.TransactionHistoryPresenter;
+import interfaceadapter.logged_in.ChangePasswordController;
+import interfaceadapter.logged_in.ChangePasswordPresenter;
+import interfaceadapter.logged_in.LoggedInViewModel;
+import interfaceadapter.logged_in.SwitchBuyAssetController;
+import interfaceadapter.logged_in.SwitchBuyAssetPresenter;
+import interfaceadapter.logged_in.SwitchExchangeController;
+import interfaceadapter.logged_in.SwitchExchangePresenter;
+import interfaceadapter.logged_in.SwitchHistoryController;
+import interfaceadapter.logged_in.SwitchHistoryPresenter;
+import interfaceadapter.logged_in.SwitchSellAssetController;
+import interfaceadapter.logged_in.SwitchSellAssetPresenter;
+import interfaceadapter.logged_in.SwitchTransferController;
+import interfaceadapter.logged_in.SwitchTransferPresenter;
+import interfaceadapter.login.LoginController;
+import interfaceadapter.login.LoginPresenter;
+import interfaceadapter.login.LoginViewModel;
+import interfaceadapter.logout.LogoutController;
+import interfaceadapter.logout.LogoutPresenter;
+import interfaceadapter.sell_asset.SellAssetController;
+import interfaceadapter.sell_asset.SellAssetPresenter;
+import interfaceadapter.sell_asset.SellAssetViewModel;
+import interfaceadapter.signup.SignupController;
+import interfaceadapter.signup.SignupPresenter;
+import interfaceadapter.signup.SignupViewModel;
+import interfaceadapter.subaccount.create.CreateSubAccountController;
+import interfaceadapter.subaccount.create.CreateSubAccountPresenter;
+import interfaceadapter.subaccount.delete.DeleteSubAccountController;
+import interfaceadapter.subaccount.delete.DeleteSubAccountPresenter;
+import interfaceadapter.transfer.TransferController;
+import interfaceadapter.transfer.TransferPresenter;
+import interfaceadapter.transfer.TransferViewModel;
+import usecase.SubAccount.create.CreateSubAccountInputBoundary;
+import usecase.SubAccount.create.CreateSubAccountInteractor;
+import usecase.SubAccount.create.CreateSubAccountOutputBoundary;
+import usecase.SubAccount.delete.DeleteSubAccountInputBoundary;
+import usecase.SubAccount.delete.DeleteSubAccountInteractor;
+import usecase.SubAccount.delete.DeleteSubAccountOutputBoundary;
+import usecase.buyasset.BuyAssetInputBoundary;
+import usecase.buyasset.BuyAssetInteractor;
+import usecase.change_password.ChangePasswordInputBoundary;
+import usecase.change_password.ChangePasswordInteractor;
+import usecase.change_password.ChangePasswordOutputBoundary;
+import usecase.exchange.ExchangeInputBoundary;
+import usecase.exchange.ExchangeInteractor;
+import usecase.exchange.ExchangeOutputBoundary;
+import usecase.get_price.GetPriceInputBoundary;
+import usecase.get_price.GetPriceInteractor;
+import usecase.get_price.PriceGateway;
+import usecase.login.LoginInputBoundary;
+import usecase.login.LoginInteractor;
+import usecase.login.LoginOutputBoundary;
+import usecase.logout.LogoutInputBoundary;
+import usecase.logout.LogoutInteractor;
+import usecase.logout.LogoutOutputBoundary;
+import usecase.sell_asset.SellAssetInputBoundary;
+import usecase.sell_asset.SellAssetInteractor;
+import usecase.signup.SignupInputBoundary;
+import usecase.signup.SignupInteractor;
+import usecase.signup.SignupOutputBoundary;
+import usecase.switch_buyasset.SwitchBuyAssetInputBoundary;
+import usecase.switch_buyasset.SwitchBuyAssetInteractor;
+import usecase.switch_buyasset.SwitchBuyAssetOutputBoundary;
+import usecase.switch_exchange.SwitchExchangeInputBoundary;
+import usecase.switch_exchange.SwitchExchangeInteractor;
+import usecase.switch_exchange.SwitchExchangeOutputBoundary;
+import usecase.switch_history.SwitchHistoryInputBoundary;
+import usecase.switch_history.SwitchHistoryInteractor;
+import usecase.switch_history.SwitchHistoryOutputBoundary;
+import usecase.switch_loggedin.SwitchLoggedInInputBoundary;
+import usecase.switch_loggedin.SwitchLoggedInInteractor;
+import usecase.switch_loggedin.SwitchLoggedInOutputBoundary;
+import usecase.switch_sellasset.SwitchSellAssetInputBoundary;
+import usecase.switch_sellasset.SwitchSellAssetInteractor;
+import usecase.switch_sellasset.SwitchSellAssetOutputBoundary;
+import usecase.switch_transfer.SwitchTransferInputBoundary;
+import usecase.switch_transfer.SwitchTransferInteractor;
+import usecase.switch_transfer.SwitchTransferOutputBoundary;
+import usecase.transaction_history.TransactionHistoryInputBoundary;
+import usecase.transaction_history.TransactionHistoryInteractor;
+import usecase.transaction_history.TransactionHistoryOutputBoundary;
+import usecase.transfer.TransferInputBoundary;
+import usecase.transfer.TransferInteractor;
+import usecase.transfer.TransferOutputBoundary;
 import view.BuyAssetView;
 import view.ExchangeView;
 import view.HistoryView;
@@ -129,7 +133,7 @@ public class AppBuilder {
     private static final String TWELVE_DATA_API_KEY = "ebcea301f0ad46579daa6b6dea349164";
 
     private final TransactionDataAccessInterface transactionDataAccessObject =
-            new FileTransactionDataAccess("data/transactions");
+        new FileTransactionDataAccess("data/transactions");
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -194,16 +198,16 @@ public class AppBuilder {
     }
 
     public AppBuilder addTransactionHistoryUsecase() {
-        TransactionHistoryOutputBoundary presenter =
-                new TransactionHistoryPresenter(historyViewModel);
+        final TransactionHistoryOutputBoundary presenter =
+            new TransactionHistoryPresenter(historyViewModel);
 
-        TransactionHistoryInputBoundary interactor =
-                new TransactionHistoryInteractor(transactionDataAccessObject,
-                        presenter,
-                        loggedInViewModel);
+        final TransactionHistoryInputBoundary interactor =
+            new TransactionHistoryInteractor(transactionDataAccessObject,
+                presenter,
+                loggedInViewModel);
 
-        TransactionHistoryController controller =
-                new TransactionHistoryController(interactor);
+        final TransactionHistoryController controller =
+            new TransactionHistoryController(interactor);
 
         historyView.setTransactionHistoryController(controller);
         return this;
@@ -266,43 +270,50 @@ public class AppBuilder {
     }
 
     public AppBuilder addBuyAssetUseCase() {
-    // --- DELETE THE OLD BLOCK THAT WAS HERE ---
+        // --- DELETE THE OLD BLOCK THAT WAS HERE ---
 
-    // Keep this new block (it has the updated transactionDataAccessObject)
-        BuyAssetPresenter presenter = new BuyAssetPresenter(buyAssetViewModel, loggedInViewModel, subAccountDataAccess);
+        // Keep this new block (it has the updated transactionDataAccessObject)
+        final BuyAssetPresenter presenter =
+            new BuyAssetPresenter(buyAssetViewModel, loggedInViewModel, subAccountDataAccess);
 
-        BuyAssetInputBoundary interactor =
-                new BuyAssetInteractor(
-                    subAccountDataAccess,
-                    transactionDataAccessObject,   // ⭐ This is the new part you likely wanted
-                    presenter
-                );
+        final BuyAssetInputBoundary interactor =
+            new BuyAssetInteractor(
+                subAccountDataAccess,
+                transactionDataAccessObject,   // ⭐ This is the new part you likely wanted
+                presenter
+            );
 
-        BuyAssetController controller = new BuyAssetController(interactor, loggedInViewModel);
+        final BuyAssetController controller = new BuyAssetController(interactor, loggedInViewModel);
         buyAssetView.setBuyAssetController(controller);
         return this;
     }
 
-public AppBuilder addSellAssetUseCase() {
-    // One presenter that implements BOTH SellAssetOutputBoundary
-    // and SellAssetPriceOutputBoundary
-    final SellAssetPresenter sellAssetPresenter =
+    public AppBuilder addSellAssetUseCase() {
+        // One presenter that implements BOTH SellAssetOutputBoundary
+        // and SellAssetPriceOutputBoundary
+        final SellAssetPresenter sellAssetPresenter =
             new SellAssetPresenter(sellAssetViewModel, loggedInViewModel, subAccountDataAccess);
 
-    final SellAssetInputBoundary sellAssetInteractor =
+        final SellAssetController sellAssetController = getSellAssetController(sellAssetPresenter);
+
+        sellAssetView.setSellAssetController(sellAssetController);
+        return this;
+    }
+
+    @NotNull
+    private SellAssetController getSellAssetController(final SellAssetPresenter sellAssetPresenter) {
+        final SellAssetInputBoundary sellAssetInteractor =
             new SellAssetInteractor(
-                    subAccountDataAccess,   // implements SellAssetDataAccessInterface
-                    transactionDataAccessObject,  // ⭐ SAME DAO used in BuyAssetInteractor
-                    sellAssetPresenter,     // SellAssetOutputBoundary
-                    sellAssetPresenter      // SellAssetPriceOutputBoundary
+                subAccountDataAccess,   // implements SellAssetDataAccessInterface
+                transactionDataAccessObject,  // ⭐ SAME DAO used in BuyAssetInteractor
+                sellAssetPresenter,     // SellAssetOutputBoundary
+                sellAssetPresenter      // SellAssetPriceOutputBoundary
             );
 
-    final SellAssetController sellAssetController =
+        final SellAssetController sellAssetController =
             new SellAssetController(sellAssetInteractor, loggedInViewModel);
-
-    sellAssetView.setSellAssetController(sellAssetController);
-    return this;
-}
+        return sellAssetController;
+    }
 
     public AppBuilder addSwitchExchangeUseCase() {
         final SwitchExchangeOutputBoundary switchExchangeOutputBoundary = new SwitchExchangePresenter(
@@ -312,7 +323,8 @@ public AppBuilder addSellAssetUseCase() {
         final SwitchExchangeInputBoundary switchExchangeInteractor = new SwitchExchangeInteractor(
             switchExchangeOutputBoundary);
 
-        final SwitchExchangeController switchExchangeController = new SwitchExchangeController(switchExchangeInteractor);
+        final SwitchExchangeController switchExchangeController =
+            new SwitchExchangeController(switchExchangeInteractor);
         loggedInView.setSwitchExchangeController(switchExchangeController);
         return this;
     }
@@ -325,25 +337,26 @@ public AppBuilder addSellAssetUseCase() {
         final SwitchTransferInputBoundary switchTransferInteractor = new SwitchTransferInteractor(
             switchTransferOutputBoundary, subAccountDataAccess);
 
-        final SwitchTransferController switchTransferController = new SwitchTransferController(switchTransferInteractor);
+        final SwitchTransferController switchTransferController =
+            new SwitchTransferController(switchTransferInteractor);
         loggedInView.setSwitchTransferController(switchTransferController);
         return this;
     }
 
-public AppBuilder addTransferUseCase() {
-    final TransferOutputBoundary transferOutputBoundary = new TransferPresenter(
+    public AppBuilder addTransferUseCase() {
+        final TransferOutputBoundary transferOutputBoundary = new TransferPresenter(
             transferViewModel, loggedInViewModel, viewManagerModel);
 
-    final TransferInputBoundary transferInteractor = new TransferInteractor(
+        final TransferInputBoundary transferInteractor = new TransferInteractor(
             subAccountDataAccess,          // implements TransferDataAccessInterface
             transferOutputBoundary,
             transactionDataAccessObject    // 👈 SAME field you pass to BuyAssetInteractor
-    );
+        );
 
-    final TransferController transferController = new TransferController(transferInteractor);
-    transferView.setTransferController(transferController);
-    return this;
-}
+        final TransferController transferController = new TransferController(transferInteractor);
+        transferView.setTransferController(transferController);
+        return this;
+    }
 
 
     public AppBuilder addSwitchHistoryUseCase() {
@@ -367,7 +380,8 @@ public AppBuilder addTransferUseCase() {
         final SwitchBuyAssetInputBoundary switchBuyAssetInteractor = new SwitchBuyAssetInteractor(
             switchBuyAssetOutputBoundary);
 
-        final SwitchBuyAssetController switchBuyAssetController = new SwitchBuyAssetController(switchBuyAssetInteractor);
+        final SwitchBuyAssetController switchBuyAssetController =
+            new SwitchBuyAssetController(switchBuyAssetInteractor);
         loggedInView.setSwitchBuyAssetController(switchBuyAssetController);
         return this;
     }
@@ -380,7 +394,8 @@ public AppBuilder addTransferUseCase() {
         final SwitchSellAssetInputBoundary switchSellAssetInteractor = new SwitchSellAssetInteractor(
             switchSellAssetOutputBoundary, subAccountDataAccess);
 
-        final SwitchSellAssetController switchSellAssetController = new SwitchSellAssetController(switchSellAssetInteractor);
+        final SwitchSellAssetController switchSellAssetController =
+            new SwitchSellAssetController(switchSellAssetInteractor);
         loggedInView.setSwitchSellAssetController(switchSellAssetController);
         return this;
     }
@@ -395,7 +410,8 @@ public AppBuilder addTransferUseCase() {
             switchLoggedInOutputBoundary,
             subAccountDataAccess);
 
-        final SwitchLoggedInController switchLoggedInController = new SwitchLoggedInController(switchLoggedInInteractor);
+        final SwitchLoggedInController switchLoggedInController =
+            new SwitchLoggedInController(switchLoggedInInteractor);
         exchangeView.setSwitchLoggedInController(switchLoggedInController);
         return this;
     }
@@ -471,24 +487,25 @@ public AppBuilder addTransferUseCase() {
         final ChangePasswordInputBoundary changePasswordInteractor =
             new ChangePasswordInteractor(userDataAccessObject, changePasswordOutputBoundary, userFactory);
 
-        final ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
+        final ChangePasswordController changePasswordController =
+            new ChangePasswordController(changePasswordInteractor);
         loggedInView.setChangePasswordController(changePasswordController);
         return this;
     }
 
     public AppBuilder addExchangeUseCase() {
         final ExchangeOutputBoundary exchangeOutputBoundary =
-                new ExchangePresenter(exchangeViewModel, loggedInViewModel);
+            new ExchangePresenter(exchangeViewModel, loggedInViewModel);
 
         final ExchangeInputBoundary exchangeInteractor =
-                new ExchangeInteractor(
-                        exchangeOutputBoundary,
-                        subAccountDataAccess,
-                        transactionDataAccessObject
-                );
+            new ExchangeInteractor(
+                exchangeOutputBoundary,
+                subAccountDataAccess,
+                transactionDataAccessObject
+            );
 
         final ExchangeController exchangeController =
-                new ExchangeController(exchangeInteractor, loggedInViewModel);
+            new ExchangeController(exchangeInteractor, loggedInViewModel);
 
 
         exchangeView.setExchangeController(exchangeController);
