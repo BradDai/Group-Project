@@ -29,75 +29,122 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
 
     @Override
     public void execute(final SellAssetInputData sellAssetInputData) {
+        final boolean isValid = validateInput(sellAssetInputData);
+        if (isValid) {
+            processSale(sellAssetInputData);
+        }
+    }
+
+    private boolean validateInput(final SellAssetInputData data) {
         boolean valid = true;
 
-        final String username = sellAssetInputData.getUsername();
-        final String portfolioName = sellAssetInputData.getportfolioName();
-        final String stockName = sellAssetInputData.getAssetName();
-        final double quantityToSell = sellAssetInputData.getQuantityToSell();
-        final double currentQuantity =
-                dataAccess.getStockQuantity(username, portfolioName, stockName);
+        valid &= checkUsername(data.getUsername());
+        valid &= checkPortfolio(data.getportfolioName());
+        valid &= checkStockName(data.getAssetName());
+        valid &= checkQuantityPositive(data.getQuantityToSell());
+        valid &= checkQuantityAvailable(
+                data.getQuantityToSell(),
+                this.dataAccess.getStockQuantity(data.getUsername(), data.getportfolioName(), data.getAssetName())
+        );
+        valid &= checkPriceLoaded(stockPrice);
 
-        // validation
+        return valid;
+    }
+
+    private boolean checkUsername(final String username) {
+        boolean valid = true;
         if (username == null || username.isEmpty()) {
             sellAssetOutputBoundary.prepareFailureView("No user logged in.");
             valid = false;
         }
+        return valid;
+    }
+
+    private boolean checkPortfolio(final String portfolioName) {
+        boolean valid = true;
         if (portfolioName == null || portfolioName.isEmpty()) {
             sellAssetOutputBoundary.prepareFailureView("Please choose a portfolio.");
             valid = false;
         }
+        return valid;
+    }
+
+    private boolean checkStockName(final String stockName) {
+        boolean valid = true;
         if (stockName == null || stockName.isEmpty()) {
             sellAssetOutputBoundary.prepareFailureView("Please choose an asset.");
             valid = false;
         }
-        if (quantityToSell <= 0) {
-            sellAssetOutputBoundary.prepareFailureView(
-                    "Invalid quantity: quantity to sell must be positive.");
+        return valid;
+    }
+
+    private boolean checkQuantityPositive(final double quantity) {
+        boolean valid = true;
+        if (quantity <= 0) {
+            sellAssetOutputBoundary.prepareFailureView("Invalid quantity: quantity must be positive.");
             valid = false;
         }
-        if (quantityToSell > currentQuantity) {
+        return valid;
+    }
+
+    private boolean checkQuantityAvailable(final double quantity, final double current) {
+        boolean valid = true;
+        if (quantity > current) {
             sellAssetOutputBoundary.prepareFailureView(
-                    "Invalid quantity: quantity to sell cannot exceed current quantity ("
-                            + currentQuantity + ").");
+                    "Invalid quantity: cannot exceed current quantity (" + current + ")."
+            );
             valid = false;
         }
-        if (stockPrice <= 0) {
+        return valid;
+    }
+
+    private boolean checkPriceLoaded(final double price) {
+        boolean valid = true;
+        if (price <= 0) {
             sellAssetOutputBoundary.prepareFailureView("Price not loaded.");
             valid = false;
         }
+        return valid;
+    }
 
-        // update holdings & cash
-        if (valid) {
-            final double newQuantity = currentQuantity - quantityToSell;
-            final double totalPrice = quantityToSell * stockPrice;
+    private void processSale(final SellAssetInputData data) {
+        final String username = data.getUsername();
+        final String portfolioName = data.getportfolioName();
+        final String stockName = data.getAssetName();
+        final double quantityToSell = data.getQuantityToSell();
+        final double currentQuantity =
+                this.dataAccess.getStockQuantity(username, portfolioName, stockName);
 
-            dataAccess.updateStockQuantity(username, portfolioName, stockName, newQuantity);
-            if (newQuantity == 0) {
-                dataAccess.removeStock(username, portfolioName, stockName);
-            }
-            dataAccess.addCashToPortfolio(username, portfolioName, totalPrice);
+        final double newQuantity = currentQuantity - quantityToSell;
+        final double totalPrice = quantityToSell * stockPrice;
 
-            // ============================================================
-            // ⭐ NEW: Save SELL transaction into transactionDataAccess
-            // ============================================================
-            final SellTransaction tx = new SellTransaction(
-                    generateTransactionId(),
-                    LocalDateTime.now(),
-                    portfolioName,
-                    "Stock",
-                    stockName,
-                    quantityToSell,
-                    stockPrice
-            );
-            transactionDataAccess.save(username, tx);
-            // ============================================================
-
-            final SellAssetOutputData outputData = new SellAssetOutputData(
-                    username, stockName, quantityToSell, totalPrice, newQuantity
-            );
-            sellAssetOutputBoundary.prepareSuccessView(outputData);
+        dataAccess.updateStockQuantity(username, portfolioName, stockName, newQuantity);
+        if (newQuantity == 0) {
+            dataAccess.removeStock(username, portfolioName, stockName);
         }
+        dataAccess.addCashToPortfolio(username, portfolioName, totalPrice);
+
+        saveTransaction(username, portfolioName, stockName, quantityToSell);
+
+        final SellAssetOutputData outputData =
+                new SellAssetOutputData(username, stockName, quantityToSell, totalPrice, newQuantity);
+        sellAssetOutputBoundary.prepareSuccessView(outputData);
+    }
+
+    private void saveTransaction(final String username,
+                                 final String portfolioName,
+                                 final String stockName,
+                                 final double quantityToSell) {
+        final SellTransaction tx = new SellTransaction(
+                generateTransactionId(),
+                LocalDateTime.now(),
+                portfolioName,
+                "Stock",
+                stockName,
+                quantityToSell,
+                stockPrice
+        );
+        transactionDataAccess.save(username, tx);
     }
 
     private String generateTransactionId() {
@@ -107,9 +154,7 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
     @Override
     public void fetchPrice(final String stockName) {
         try {
-            // Jack's API key
-            final String apiKey = "88ae0ec531a04cbc80652a7a22487707";
-            final JSONObject json = getJsonObject(stockName, apiKey);
+            final JSONObject json = getJsonObject(stockName);
             stockPrice = json.getDouble("price");
             final int intHundred = 100;
             final double doubleHundred = 100.0;
@@ -126,9 +171,9 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
     }
 
     @NotNull
-    private static JSONObject getJsonObject(String stockName, String apiKey) throws IOException {
+    private static JSONObject getJsonObject(String stockName) throws IOException {
         final String url = "https://api.twelvedata.com/price?symbol="
-                + stockName + "&apikey=" + apiKey;
+                + stockName + "&apikey=" + "88ae0ec531a04cbc80652a7a22487707";
 
         final java.net.URL requestUrl = new java.net.URL(url);
         final java.net.HttpURLConnection connection =
@@ -147,7 +192,6 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
         }
         in.close();
 
-        final JSONObject json = new JSONObject(response.toString());
-        return json;
+        return new JSONObject(response.toString());
     }
 }
