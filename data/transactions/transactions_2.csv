@@ -1,0 +1,5 @@
+transactionId,dateTime,fromPortfolio,toPortfolio,transactionType,assetType,assetSymbol,quantity,pricePerUnit,totalValue
+TX-1764227358447,2025-11-27T02:09:18.447306,,ttt,BUY,Stock,AAPL,4.0,277.54999,1110.19996
+TX-1764227385250,2025-11-27T02:09:45.250304,,Main USD Portfolio,BUY,Stock,MSFT,4.0,485.5,1942.0
+TX-1764227404849,2025-11-27T02:10:04.849135,,Main USD Portfolio,BUY,Stock,MSFT,4.0,485.5,1942.0
+TX-1764228418811,2025-11-27T02:26:58.817953,Main USD Portfolio,,SELL,Stock,MSFT,6.0,485.5,2913.0
