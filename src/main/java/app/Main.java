@@ -1,45 +1,26 @@
 package app;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
+/**
+ * Entry point for the banking application.
+ */
 public class Main {
-    static void main(final String[] args) {
-        final AppBuilder appBuilder = new AppBuilder();
-        final JFrame application = appBuilder
-            .addLoginView()
-            .addSignupView()
-            .addLoggedInView()
-            .addExchangeView()
-            .addTransferView()
-            .addHistoryView()
-            .addBuyAssetView()
-            .addSellAssetView()
-            .addGetPriceUseCase()
-            .addBuyAssetUseCase()
-            .addSignupUseCase()
-            .addLoginUseCase()
-            .addSellAssetUseCase()
-            .addExchangeUseCase()
-            .addTransferUseCase()
-            .addTransactionHistoryUsecase()
-            .addCreateSubAccountUseCase()
-            .addDeleteSubAccountUseCase()
-            .addChangePasswordUseCase()
-            .addLogoutUseCase()
-            .addSwitchLoggedInUseCase()
-            .addSwitchLoggedInUseCase2()
-            .addSwitchLoggedInUseCase3()
-            .addSwitchLoggedInUseCase4()
-            .addSwitchLoggedInUseCase5()
-            .addSwitchExchangeUseCase()
-            .addSwitchTransferUseCase()
-            .addSwitchHistoryUseCase()
-            .addSwitchBuyAssetUseCase()
-            .addSwitchSellAssetUseCase()
-            .build();
 
-        application.pack();
-        application.setLocationRelativeTo(null);
-        application.setVisible(true);
+    /**
+     * Builds the app.
+     * @param args arguments.
+     */
+    public static void main(final String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            final AppBuilder appBuilder = new AppBuilder();
+            final JFrame application = appBuilder.build();
+
+            application.pack();
+            application.setLocationRelativeTo(null);
+            application.setLocationRelativeTo(null);
+            application.setVisible(true);
+        });
     }
 }
