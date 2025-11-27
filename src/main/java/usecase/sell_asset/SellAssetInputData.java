@@ -18,6 +18,10 @@ public class SellAssetInputData {
         return userName;
     }
 
+    /**
+     * Return the portfolio name.
+     * @return the portfolio name
+     */
     public String getportfolioName() {
         return portfolioName;
     }

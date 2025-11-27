@@ -10,6 +10,11 @@ public class SwitchSellAssetController {
         this.switchSellAssetUseCaseInteractor = switchSellAssetUseCaseInteractor;
     }
 
+    /**
+     * Method to switch to sell asset view.
+     *
+     * @param username the username
+     */
     public void switchToSellAssetView(final String username) {
 
         switchSellAssetUseCaseInteractor.switchToSellAssetView(username);

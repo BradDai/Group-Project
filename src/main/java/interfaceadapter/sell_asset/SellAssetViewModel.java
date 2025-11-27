@@ -19,10 +19,18 @@ public class SellAssetViewModel extends ViewModel<SellAssetState> {
         return sellAssetState;
     }
 
+    /**
+     * The property change listener.
+     * @param listener The PropertyChangeListener to be added
+     */
+    @Override
     public void addPropertyChangeListener(final PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
+    /**
+     * Fire property Changed.
+     */
     public void firePropertyChanged() {
         propertyChangeSupport.firePropertyChange("state", null, this.sellAssetState);
     }
