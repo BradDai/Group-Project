@@ -18,6 +18,12 @@ import usecase.SubAccount.SubAccountDataAccessInterface;
 
 public class FileSubAccountDataAccess implements SubAccountDataAccessInterface {
 
+    private static final int PARTS_EXPECTED = 4;
+    private static final int INDEX_USERNAME = 0;
+    private static final int INDEX_SUB_NAME = 1;
+    private static final int INDEX_BALANCE = 2;
+    private static final int INDEX_UNDELETABLE = 3;
+
     private final Path filePath;
     private final Map<String, List<SubAccount>> data = new HashMap<>();
 
@@ -27,53 +33,57 @@ public class FileSubAccountDataAccess implements SubAccountDataAccessInterface {
     }
 
     private void loadFromFile() {
-        if (!Files.exists(filePath)) {
-            return;
-        }
-        try (final BufferedReader reader = Files.newBufferedReader(filePath)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isBlank()) {
-                    continue;
-                }
-                final String[] parts = line.split(",", -1);
-                if (parts.length != 4) {
-                    continue;
-                }
-                final String username = parts[0].trim();
-                final String subName = parts[1].trim();
-                final String balStr = parts[2].trim();
-                final String undeletableStr = parts[3].trim();
+        if (Files.exists(filePath)) {
+            try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.isBlank()) {
+                        continue;
+                    }
 
-                if (username.isEmpty() || subName.isEmpty()) {
-                    continue;
+                    final String[] parts = line.split(",", -1);
+                    if (parts.length != PARTS_EXPECTED) {
+                        continue;
+                    }
+
+                    final String username = parts[INDEX_USERNAME].trim();
+                    final String subName = parts[INDEX_SUB_NAME].trim();
+                    final String balStr = parts[INDEX_BALANCE].trim();
+                    final String undeletableStr = parts[INDEX_UNDELETABLE].trim();
+
+                    if (username.isEmpty() || subName.isEmpty()) {
+                        continue;
+                    }
+
+                    BigDecimal balance;
+                    try {
+                        balance = new BigDecimal(balStr);
+                    }
+                    catch (final NumberFormatException evt) {
+                        balance = BigDecimal.ZERO;
+                    }
+
+                    final boolean undeletable = Boolean.parseBoolean(undeletableStr);
+
+                    final SubAccount subAccount =
+                            new SubAccount(subName, balance, undeletable);
+
+                    final List<SubAccount> list = data.computeIfAbsent(
+                            username,
+                            userKey -> new ArrayList<>());
+
+                    list.remove(subAccount);
+                    list.add(subAccount);
                 }
-
-                BigDecimal balance;
-                try {
-                    balance = new BigDecimal(balStr);
-                }
-                catch (final NumberFormatException e) {
-                    balance = BigDecimal.ZERO;
-                }
-
-                final boolean undeletable = Boolean.parseBoolean(undeletableStr);
-
-                final SubAccount sa = new SubAccount(subName, balance, undeletable);
-
-                final List<SubAccount> list = data.computeIfAbsent(username,
-                    u -> new ArrayList<>());
-                list.remove(sa);
-                list.add(sa);
             }
-        }
-        catch (final IOException e) {
-            throw new UncheckedIOException(e);
+            catch (final IOException evt) {
+                throw new UncheckedIOException(evt);
+            }
         }
     }
 
     private void saveToFile() {
-        try (final BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
             for (final Map.Entry<String, List<SubAccount>> entry : data.entrySet()) {
                 final String username = entry.getKey();
                 for (final SubAccount sa : entry.getValue()) {
@@ -87,8 +97,8 @@ public class FileSubAccountDataAccess implements SubAccountDataAccessInterface {
                 }
             }
         }
-        catch (final IOException e) {
-            throw new UncheckedIOException(e);
+        catch (final IOException evt) {
+            throw new UncheckedIOException(evt);
         }
     }
 
@@ -96,13 +106,13 @@ public class FileSubAccountDataAccess implements SubAccountDataAccessInterface {
     public boolean exists(final String username, final String subName) {
         return data.getOrDefault(username, List.of())
             .stream()
-            .anyMatch(sa -> sa.getName().equalsIgnoreCase(subName));
+            .anyMatch(sub -> sub.getName().equalsIgnoreCase(subName));
     }
 
     @Override
     public void save(final String username, final SubAccount subAccount) {
         final List<SubAccount> list = data.computeIfAbsent(username,
-            u -> new ArrayList<>());
+            uuu -> new ArrayList<>());
         list.remove(subAccount);
         list.add(subAccount);
         saveToFile();
@@ -121,10 +131,10 @@ public class FileSubAccountDataAccess implements SubAccountDataAccessInterface {
     @Override
     public void delete(final String username, final String subName) {
         final List<SubAccount> list = data.get(username);
-        if (list == null) {
-            return;
+
+        if (list != null) {
+            list.removeIf(sub -> sub.getName().equalsIgnoreCase(subName));
+            saveToFile();
         }
-        list.removeIf(sa -> sa.getName().equalsIgnoreCase(subName));
-        saveToFile();
     }
 }

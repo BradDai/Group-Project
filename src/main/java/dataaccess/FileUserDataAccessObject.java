@@ -51,7 +51,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         }
         else {
 
-            try (final BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
                 final String header = reader.readLine();
 
                 if (!header.equals(HEADER)) {
