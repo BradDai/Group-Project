@@ -75,7 +75,10 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         // ---- Asset chooser ----
         final JPanel assetMenu = new JPanel();
         assetMenu.add(new JLabel("Choose asset:"));
-        final String[] assetSymbols = {"", "AAPL", "TSLA", "MSFT", "BTC/USD"};
+        final String[] assetSymbols = {"", "AAPL", "MSFT", "TSLA", "AMZN", "GOOGL", "NVDA", "META",
+                "NFLX", "AMD", "INTC", "BABA", "SHOP", "UBER",
+                "SPY", "QQQ", "VTI",
+                "BTC/USD", "ETH/USD"};
         assetComboBox = new JComboBox<>(assetSymbols);
         assetMenu.add(assetComboBox);
         this.add(assetMenu);
@@ -210,7 +213,7 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         }
 
         portfolioComboBox.removeAllItems();
-        portfolioComboBox.addItem(""); // empty first option
+        portfolioComboBox.addItem("");
 
         final List<SubAccount> accounts = loggedInViewModel.getState().getSubAccounts();
         if (accounts != null) {

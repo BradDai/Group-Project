@@ -28,8 +28,11 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
     private final Path transactionsDirectory;
 
     /**
+     * For file transaction.
+     *
      * @param directoryPath directory where transaction files are stored,
      *                      e.g. "data/transactions"
+     * @throws RuntimeException happens if a directory cant be created.
      */
     public FileTransactionDataAccess(final String directoryPath) {
         this.transactionsDirectory = Paths.get(directoryPath);
@@ -38,8 +41,8 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                 Files.createDirectories(transactionsDirectory);
             }
         }
-        catch (final IOException e) {
-            throw new RuntimeException("Could not create transactions directory", e);
+        catch (final IOException evt) {
+            throw new RuntimeException("Could not create transactions directory", evt);
         }
     }
 
@@ -57,77 +60,96 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
     @Override
     public List<Transaction> getByPortfolio(final String userId, final String portfolioId) {
         return loadUserTransactions(userId)
-            .stream()
-            .filter(tx ->
-                portfolioId.equals(tx.getFromPortfolio()) ||
-                    portfolioId.equals(tx.getToPortfolio()))
-            .collect(Collectors.toList());
+                .stream()
+                .filter(ttx -> {
+                    return portfolioId.equals(ttx.getFromPortfolio())
+                            || portfolioId.equals(ttx.getToPortfolio());
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Transaction> getByFilters(final String userId,
                                           final String portfolioId,
-                                          final String assetSymbol,   // may be null
+                                          final String assetSymbol,
                                           final LocalDate startDate,
                                           final LocalDate endDate) {
 
         return loadUserTransactions(userId)
-            .stream()
-            // portfolio filter
-            .filter(tx ->
-                portfolioId.equals(tx.getFromPortfolio()) ||
-                    portfolioId.equals(tx.getToPortfolio()))
-            // asset filter (safe when assetSymbol or tx asset is null)
-            .filter(tx -> {
-                // if the caller didn't filter by asset, accept everything
-                if (assetSymbol == null || assetSymbol.isBlank()) {
-                    return true;
-                }
-
-                String txAsset = null;
-
-                if (tx instanceof final BuyTransaction bt) {
-                    txAsset = bt.getAssetSymbol();
-                }
-                else if (tx instanceof final SellTransaction st) {
-                    txAsset = st.getAssetSymbol();
-                }
-                else if (tx instanceof final ConvertTransaction ct) {
-                    // store "FROM->TO" for currency conversions
-                    txAsset = ct.getFromCurrency() + "->" + ct.getToCurrency();
-                }
-                else if (tx instanceof final TransferTransaction tt) {
-                    txAsset = tt.getAssetSymbol();
-                }
-
-                // if transaction has no asset symbol, it can't match the filter
-                if (txAsset == null || txAsset.isBlank()) {
-                    return false;
-                }
-
-                // compare transaction asset with the filter string
-                return txAsset.equalsIgnoreCase(assetSymbol);
-            })
-            // date filter
-            .filter(tx -> {
-                final LocalDate d = tx.getDate().toLocalDate();
-                if (startDate != null && d.isBefore(startDate)) {
-                    return false;
-                }
-                return endDate == null || !d.isAfter(endDate);
-            })
-            .collect(Collectors.toList());
+                .stream()
+                .filter(ttx -> {
+                    return matchesPortfolio(ttx, portfolioId);
+                })
+                .filter(ttx -> {
+                    return matchesAssetFilter(ttx, assetSymbol);
+                })
+                .filter(ttx -> {
+                    return isWithinDateRange(ttx, startDate, endDate);
+                })
+                .collect(Collectors.toList());
     }
 
+    private boolean matchesPortfolio(final Transaction ttx,
+                                     final String portfolioId) {
+        return portfolioId.equals(ttx.getFromPortfolio())
+                || portfolioId.equals(ttx.getToPortfolio());
+    }
 
-    // ---------- internal helpers ----------
+    private String extractAssetKey(final Transaction ttx) {
+        String result = null;
+
+        if (ttx instanceof final BuyTransaction bt) {
+            result = bt.getAssetSymbol();
+        }
+        else if (ttx instanceof final SellTransaction st) {
+            result = st.getAssetSymbol();
+        }
+        else if (ttx instanceof final ConvertTransaction ct) {
+            result = ct.getFromCurrency() + "-> " + ct.getToCurrency();
+        }
+        else if (ttx instanceof final TransferTransaction tt) {
+            result = tt.getAssetSymbol();
+        }
+
+        return result;
+    }
+
+    private boolean matchesAssetFilter(final Transaction ttx,
+                                       final String assetSymbol) {
+
+        if (assetSymbol == null || assetSymbol.isBlank()) {
+            // No asset filter applied
+            return true;
+        }
+
+        final String txAsset = extractAssetKey(ttx);
+
+        return txAsset != null
+                && !txAsset.isBlank()
+                && txAsset.equalsIgnoreCase(assetSymbol);
+    }
+
+    private boolean isWithinDateRange(final Transaction ttx,
+                                      final LocalDate startDate,
+                                      final LocalDate endDate) {
+
+        final LocalDate d = ttx.getDate().toLocalDate();
+
+        if (startDate != null && d.isBefore(startDate)) {
+            return false;
+        }
+        if (endDate != null && d.isAfter(endDate)) {
+            return false;
+        }
+        return true;
+    }
 
     private List<Transaction> loadUserTransactions(final String userId) {
         final Path file = getUserFilePath(userId);
         final List<Transaction> result = new ArrayList<>();
 
         if (!Files.exists(file)) {
-            return result; // no transactions yet
+            return result;
         }
 
         try {
@@ -137,7 +159,6 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                 if (first) {
                     first = false;
                     if (line.startsWith("transactionId,")) {
-                        // header line, skip
                         continue;
                     }
                 }
@@ -160,14 +181,11 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
     private void writeUserTransactions(final String userId, final List<Transaction> transactions) {
         final Path file = getUserFilePath(userId);
         final List<String> lines = new ArrayList<>();
-        // header
-        lines.add("transactionId,dateTime,fromPortfolio,toPortfolio,transactionType," +
-            "assetType,assetSymbol,quantity,pricePerUnit,totalValue");
-
+        lines.add("transactionId,dateTime,fromPortfolio,toPortfolio,transactionType,"
+                + "assetType,assetSymbol,quantity,pricePerUnit,totalValue");
         for (final Transaction tx : transactions) {
             lines.add(toCsvLine(tx));
         }
-
         try {
             Files.write(file, lines, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE,
@@ -181,9 +199,10 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
 
     /**
      * Parse a CSV line into the correct Transaction subclass.
+     * @param line A string.
      */
     private Transaction parseCsvLine(final String line) {
-        final String[] parts = line.split(",", -1); // keep empty fields
+        final String[] parts = line.split(",", -1);
 
         final String transactionId = parts[0];
         final LocalDateTime dateTime = LocalDateTime.parse(parts[1]);

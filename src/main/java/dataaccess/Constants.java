@@ -2,10 +2,6 @@ package dataaccess;
 
 public final class Constants {
 
-    private Constants() {
-
-    }
-
     // View
     public static final String VIEW_NAME = "transfer";
 
@@ -56,4 +52,8 @@ public final class Constants {
     // Indices for dropdown initialization
     public static final int INDEX_FIRST = 0;
     public static final int INDEX_SECOND = 1;
+
+    private Constants() {
+        // prevent instantiation
+    }
 }
