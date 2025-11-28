@@ -45,20 +45,20 @@ public class MoneyUseCaseConfigurator {
     }
 
     private void addExchangeUseCase() {
-        ExchangeOutputBoundary outputBoundary =
+        final ExchangeOutputBoundary outputBoundary =
                 new ExchangePresenter(
                         views.getMoneyViews().getExchangeViewModel(),
                         views.getLoggedInViews().getLoggedInViewModel()
                 );
 
-        ExchangeInputBoundary interactor =
+        final ExchangeInputBoundary interactor =
                 new ExchangeInteractor(
                         outputBoundary,
                         subAccountDataAccess,
                         transactionDataAccessObject
                 );
 
-        ExchangeController controller =
+        final ExchangeController controller =
                 new ExchangeController(
                         interactor,
                         views.getLoggedInViews().getLoggedInViewModel()
@@ -68,21 +68,21 @@ public class MoneyUseCaseConfigurator {
     }
 
     private void addTransferUseCase() {
-        TransferOutputBoundary outputBoundary =
+        final TransferOutputBoundary outputBoundary =
                 new TransferPresenter(
                         views.getMoneyViews().getTransferViewModel(),
                         views.getLoggedInViews().getLoggedInViewModel(),
                         viewManagerModel
                 );
 
-        TransferInputBoundary interactor =
+        final TransferInputBoundary interactor =
                 new TransferInteractor(
                         subAccountDataAccess,
                         outputBoundary,
                         transactionDataAccessObject
                 );
 
-        TransferController controller =
+        final TransferController controller =
                 new TransferController(interactor);
         views.getMoneyViews().getTransferView().setTransferController(controller);
     }

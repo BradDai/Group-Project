@@ -29,19 +29,19 @@ public class SwitchSellAssetUseCaseConfigurator {
      */
 
     public void wireUseCase() {
-        SwitchSellAssetPresenter presenter =
+        final SwitchSellAssetPresenter presenter =
                 new SwitchSellAssetPresenter(
                         views.getAssetViews().getSellAssetViewModel(),
                         viewManagerModel
                 );
 
-        SwitchSellAssetInteractor interactor =
+        final SwitchSellAssetInteractor interactor =
                 new SwitchSellAssetInteractor(
                         presenter,
                         subAccountDataAccess
                 );
 
-        SwitchSellAssetController controller =
+        final SwitchSellAssetController controller =
                 new SwitchSellAssetController(interactor);
         views.getLoggedInViews().getLoggedInView().setSwitchSellAssetController(controller);
     }

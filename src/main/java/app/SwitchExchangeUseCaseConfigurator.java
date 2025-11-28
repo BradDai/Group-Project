@@ -26,18 +26,18 @@ public class SwitchExchangeUseCaseConfigurator {
 
     public void wireUseCase() {
         // Presenter
-        SwitchExchangePresenter presenter =
+        final SwitchExchangePresenter presenter =
                 new SwitchExchangePresenter(
                         views.getMoneyViews().getExchangeViewModel(),
                         viewManagerModel
                 );
 
         // Interactor (we don't need to mention the interface type here)
-        SwitchExchangeInteractor interactor =
+        final SwitchExchangeInteractor interactor =
                 new SwitchExchangeInteractor(presenter);
 
         // Controller
-        SwitchExchangeController controller =
+        final SwitchExchangeController controller =
                 new SwitchExchangeController(interactor);
 
         views.getLoggedInViews().getLoggedInView().setSwitchExchangeController(controller);

@@ -45,35 +45,35 @@ public class LogoutChangePasswordUseCaseConfigurator {
     }
 
     private void addLogoutUseCase() {
-        LogoutOutputBoundary outputBoundary =
+        final LogoutOutputBoundary outputBoundary =
                 new LogoutPresenter(
                         viewManagerModel,
                         views.getLoggedInViews().getLoggedInViewModel(),
                         views.getAuthViews().getLoginViewModel()
                 );
 
-        LogoutInputBoundary interactor =
+        final LogoutInputBoundary interactor =
                 new LogoutInteractor(userDataAccessObject, outputBoundary);
 
-        LogoutController controller = new LogoutController(interactor);
+        final LogoutController controller = new LogoutController(interactor);
         views.getLoggedInViews().getLoggedInView().setLogoutController(controller);
     }
 
     private void addChangePasswordUseCase() {
-        ChangePasswordOutputBoundary outputBoundary =
+        final ChangePasswordOutputBoundary outputBoundary =
                 new ChangePasswordPresenter(
                         viewManagerModel,
                         views.getLoggedInViews().getLoggedInViewModel()
                 );
 
-        ChangePasswordInputBoundary interactor =
+        final ChangePasswordInputBoundary interactor =
                 new ChangePasswordInteractor(
                         userDataAccessObject,
                         outputBoundary,
                         userFactory
                 );
 
-        ChangePasswordController controller =
+        final ChangePasswordController controller =
                 new ChangePasswordController(interactor);
         views.getLoggedInViews().getLoggedInView().setChangePasswordController(controller);
     }

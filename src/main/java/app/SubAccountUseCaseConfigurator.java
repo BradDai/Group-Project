@@ -37,35 +37,35 @@ public class SubAccountUseCaseConfigurator {
     }
 
     private void addCreateSubAccountUseCase() {
-        CreateSubAccountOutputBoundary outputBoundary =
+        final CreateSubAccountOutputBoundary outputBoundary =
                 new CreateSubAccountPresenter(
                         views.getLoggedInViews().getLoggedInViewModel()
                 );
 
-        CreateSubAccountInputBoundary interactor =
+        final CreateSubAccountInputBoundary interactor =
                 new CreateSubAccountInteractor(
                         subAccountDataAccess,
                         outputBoundary
                 );
 
-        CreateSubAccountController controller =
+        final CreateSubAccountController controller =
                 new CreateSubAccountController(interactor);
         views.getLoggedInViews().getLoggedInView().setCreateSubAccountController(controller);
     }
 
     private void addDeleteSubAccountUseCase() {
-        DeleteSubAccountOutputBoundary presenter =
+        final DeleteSubAccountOutputBoundary presenter =
                 new DeleteSubAccountPresenter(
                         views.getLoggedInViews().getLoggedInViewModel()
                 );
 
-        DeleteSubAccountInputBoundary interactor =
+        final DeleteSubAccountInputBoundary interactor =
                 new DeleteSubAccountInteractor(
                         subAccountDataAccess,
                         presenter
                 );
 
-        DeleteSubAccountController controller =
+        final DeleteSubAccountController controller =
                 new DeleteSubAccountController(interactor);
         views.getLoggedInViews().getLoggedInView().setDeleteSubAccountController(controller);
     }

@@ -54,7 +54,7 @@ public class AppBuilder {
         // Set up all views and use cases.
         configurator.configure();
 
-        JFrame application = new JFrame("Banking Simulation");
+        final JFrame application = new JFrame("Banking Simulation");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         application.add(cardPanel);
 
