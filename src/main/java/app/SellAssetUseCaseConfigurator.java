@@ -30,14 +30,14 @@ public class SellAssetUseCaseConfigurator {
      */
 
     public void wireUseCases() {
-        SellAssetPresenter presenter =
+        final SellAssetPresenter presenter =
                 new SellAssetPresenter(
                         views.getAssetViews().getSellAssetViewModel(),
                         views.getLoggedInViews().getLoggedInViewModel(),
                         subAccountDataAccess
                 );
 
-        SellAssetInputBoundary interactor =
+        final SellAssetInputBoundary interactor =
                 new SellAssetInteractor(
                         subAccountDataAccess,
                         transactionDataAccessObject,
@@ -45,7 +45,7 @@ public class SellAssetUseCaseConfigurator {
                         presenter
                 );
 
-        SellAssetController controller =
+        final SellAssetController controller =
                 new SellAssetController(
                         interactor,
                         views.getLoggedInViews().getLoggedInViewModel()

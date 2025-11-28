@@ -27,19 +27,19 @@ public class HistoryUseCaseConfigurator {
      */
 
     public void wireUseCases() {
-        TransactionHistoryOutputBoundary presenter =
+        final TransactionHistoryOutputBoundary presenter =
                 new TransactionHistoryPresenter(
                         views.getHistoryViews().getHistoryViewModel()
                 );
 
-        TransactionHistoryInputBoundary interactor =
+        final TransactionHistoryInputBoundary interactor =
                 new TransactionHistoryInteractor(
                         transactionDataAccessObject,
                         presenter,
                         views.getLoggedInViews().getLoggedInViewModel()
                 );
 
-        TransactionHistoryController controller =
+        final TransactionHistoryController controller =
                 new TransactionHistoryController(interactor);
         views.getHistoryViews().getHistoryView().setTransactionHistoryController(controller);
     }

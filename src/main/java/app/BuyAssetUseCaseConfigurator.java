@@ -30,21 +30,21 @@ public class BuyAssetUseCaseConfigurator {
      */
 
     public void wireUseCases() {
-        BuyAssetPresenter presenter =
+        final BuyAssetPresenter presenter =
                 new BuyAssetPresenter(
                         views.getAssetViews().getBuyAssetViewModel(),
                         views.getLoggedInViews().getLoggedInViewModel(),
                         subAccountDataAccess
                 );
 
-        BuyAssetInputBoundary interactor =
+        final BuyAssetInputBoundary interactor =
                 new BuyAssetInteractor(
                         subAccountDataAccess,
                         transactionDataAccessObject,
                         presenter
                 );
 
-        BuyAssetController controller =
+        final BuyAssetController controller =
                 new BuyAssetController(
                         interactor,
                         views.getLoggedInViews().getLoggedInViewModel()

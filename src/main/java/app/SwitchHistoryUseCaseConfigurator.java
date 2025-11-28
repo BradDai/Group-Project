@@ -25,16 +25,16 @@ public class SwitchHistoryUseCaseConfigurator {
      */
 
     public void wireUseCase() {
-        SwitchHistoryPresenter presenter =
+        final SwitchHistoryPresenter presenter =
                 new SwitchHistoryPresenter(
                         views.getHistoryViews().getHistoryViewModel(),
                         viewManagerModel
                 );
 
-        SwitchHistoryInteractor interactor =
+        final SwitchHistoryInteractor interactor =
                 new SwitchHistoryInteractor(presenter);
 
-        SwitchHistoryController controller =
+        final SwitchHistoryController controller =
                 new SwitchHistoryController(interactor);
         views.getLoggedInViews().getLoggedInView().setSwitchHistoryController(controller);
     }

@@ -40,14 +40,14 @@ public class SwitchLoggedInFromViewsConfigurator {
     }
 
     private SwitchLoggedInController createController() {
-        SwitchLoggedInOutputBoundary outputBoundary =
+        final SwitchLoggedInOutputBoundary outputBoundary =
                 new SwitchLoggedInPresenter(
                         views.getLoggedInViews().getLoggedInViewModel(),
                         viewManagerModel,
                         subAccountDataAccess
                 );
 
-        SwitchLoggedInInputBoundary interactor =
+        final SwitchLoggedInInputBoundary interactor =
                 new SwitchLoggedInInteractor(
                         outputBoundary,
                         subAccountDataAccess

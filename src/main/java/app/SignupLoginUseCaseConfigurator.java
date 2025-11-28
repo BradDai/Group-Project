@@ -49,14 +49,14 @@ public class SignupLoginUseCaseConfigurator {
     }
 
     private void addSignupUseCase() {
-        SignupOutputBoundary outputBoundary =
+        final SignupOutputBoundary outputBoundary =
                 new SignupPresenter(
                         viewManagerModel,
                         views.getAuthViews().getSignupViewModel(),
                         views.getAuthViews().getLoginViewModel()
                 );
 
-        SignupInputBoundary interactor =
+        final SignupInputBoundary interactor =
                 new SignupInteractor(
                         userDataAccessObject,
                         outputBoundary,
@@ -64,12 +64,12 @@ public class SignupLoginUseCaseConfigurator {
                         subAccountDataAccess
                 );
 
-        SignupController controller = new SignupController(interactor);
+        final SignupController controller = new SignupController(interactor);
         views.getAuthViews().getSignupView().setSignupController(controller);
     }
 
     private void addLoginUseCase() {
-        LoginOutputBoundary outputBoundary =
+        final LoginOutputBoundary outputBoundary =
                 new LoginPresenter(
                         viewManagerModel,
                         views.getLoggedInViews().getLoggedInViewModel(),
@@ -77,14 +77,14 @@ public class SignupLoginUseCaseConfigurator {
                         views.getAuthViews().getSignupViewModel()
                 );
 
-        LoginInputBoundary interactor =
+        final LoginInputBoundary interactor =
                 new LoginInteractor(
                         userDataAccessObject,
                         outputBoundary,
                         subAccountDataAccess
                 );
 
-        LoginController controller = new LoginController(interactor);
+        final LoginController controller = new LoginController(interactor);
         views.getAuthViews().getLoginView().setLoginController(controller);
     }
 }

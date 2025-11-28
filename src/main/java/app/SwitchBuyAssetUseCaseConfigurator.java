@@ -25,16 +25,16 @@ public class SwitchBuyAssetUseCaseConfigurator {
      */
 
     public void wireUseCase() {
-        SwitchBuyAssetPresenter presenter =
+        final SwitchBuyAssetPresenter presenter =
                 new SwitchBuyAssetPresenter(
                         views.getAssetViews().getBuyAssetViewModel(),
                         viewManagerModel
                 );
 
-        SwitchBuyAssetInteractor interactor =
+        final SwitchBuyAssetInteractor interactor =
                 new SwitchBuyAssetInteractor(presenter);
 
-        SwitchBuyAssetController controller =
+        final SwitchBuyAssetController controller =
                 new SwitchBuyAssetController(interactor);
         views.getLoggedInViews().getLoggedInView().setSwitchBuyAssetController(controller);
     }

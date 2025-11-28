@@ -29,19 +29,19 @@ public class SwitchTransferUseCaseConfigurator {
      */
 
     public void wireUseCase() {
-        SwitchTransferPresenter presenter =
+        final SwitchTransferPresenter presenter =
                 new SwitchTransferPresenter(
                         views.getMoneyViews().getTransferViewModel(),
                         viewManagerModel
                 );
 
-        SwitchTransferInteractor interactor =
+        final SwitchTransferInteractor interactor =
                 new SwitchTransferInteractor(
                         presenter,
                         subAccountDataAccess
                 );
 
-        SwitchTransferController controller =
+        final SwitchTransferController controller =
                 new SwitchTransferController(interactor);
         views.getLoggedInViews().getLoggedInView().setSwitchTransferController(controller);
     }

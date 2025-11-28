@@ -27,14 +27,14 @@ public class GetPriceUseCaseConfigurator {
      */
 
     public void wireUseCases() {
-        GetPricePresenter presenter =
+        final GetPricePresenter presenter =
                 new GetPricePresenter(views.getAssetViews().getBuyAssetViewModel());
 
-        PriceGateway gateway = new TwelveDataPriceGateway(twelveDataApiKey);
-        GetPriceInputBoundary interactor =
+        final PriceGateway gateway = new TwelveDataPriceGateway(twelveDataApiKey);
+        final GetPriceInputBoundary interactor =
                 new GetPriceInteractor(gateway, presenter);
 
-        GetPriceController controller = new GetPriceController(interactor);
+        final GetPriceController controller = new GetPriceController(interactor);
         views.getAssetViews().getBuyAssetView().setGetPriceController(controller);
     }
 }
