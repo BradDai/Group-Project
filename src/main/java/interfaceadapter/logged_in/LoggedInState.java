@@ -20,10 +20,8 @@ public class LoggedInState {
         password = copy.password;
         passwordError = copy.passwordError;
 
-        // --- FIX: Copy these missing fields ---
         subAccountError = copy.subAccountError;
 
-        // Create a new list containing the same elements (shallow copy of list)
         if (copy.subAccounts != null) {
             this.subAccounts = new ArrayList<>(copy.subAccounts);
         }
@@ -34,7 +32,6 @@ public class LoggedInState {
 
     private String currentPortfolioName = "";
 
-    // Because of the previous copy constructor, the default constructor must be explicit.
     public LoggedInState() {
     }
 

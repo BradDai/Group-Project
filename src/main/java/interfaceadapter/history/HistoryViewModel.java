@@ -14,10 +14,8 @@ public class HistoryViewModel extends ViewModel {
     private HistoryState state = new HistoryState();
 
     public HistoryViewModel() {
-        super(VIEW_NAME);   // same pattern as your other ViewModels
+        super(VIEW_NAME);
     }
-
-
 
     public HistoryState getState() {
         return state;
@@ -25,9 +23,8 @@ public class HistoryViewModel extends ViewModel {
 
     public void setState(final HistoryState state) {
         this.state = state;
-        firePropertyChanged();   // notify listeners
+        firePropertyChanged();
     }
-
 
     public void addPropertyChangeListener(final PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
@@ -41,7 +38,6 @@ public class HistoryViewModel extends ViewModel {
      * Called by the presenter after updating the state.
      */
     public void firePropertyChanged() {
-        // "state" is the property name the view listens to
         support.firePropertyChange("state", null, state);
     }
 }

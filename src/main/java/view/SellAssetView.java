@@ -32,7 +32,6 @@ public class SellAssetView extends JPanel implements ActionListener, PropertyCha
 
     private SellAssetController sellAssetController;
 
-    // variables for functionality
     private final JComboBox<String> portfolioSelector;
     private final JComboBox<String> stockSelector;
 

@@ -112,7 +112,6 @@ public class SubAccount {
 
     @Override
     public String toString() {
-        return "SubAccount{name='" + name + "', currencies=" + currencies +
-            ", undeletable=" + undeletable + "}";
+        return "SubAccount{name='" + name + "', currencies=" + currencies + ", undeletable=" + undeletable + "}";
     }
 }

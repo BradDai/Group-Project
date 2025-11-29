@@ -10,10 +10,6 @@ import entity.SubAccount;
  */
 public record LoginOutputData(String username, List<SubAccount> subAccounts) {
 
-    public LoginOutputData(final String username) {
-        this(username, Collections.emptyList());
-    }
-
     public LoginOutputData(final String username, final List<SubAccount> subAccounts) {
         this.username = username;
         this.subAccounts = subAccounts == null

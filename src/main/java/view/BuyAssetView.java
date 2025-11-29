@@ -38,7 +38,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
     private final JTextField quantityField;
     private final JLabel totalLabel;
 
-    // (Not really needed, but keeping since it was in your original file)
     private static final String API_KEY = "ebcea301f0ad46579daa6b6dea349164";
 
     public BuyAssetView(final BuyAssetViewModel buyAssetViewModel) {
@@ -47,7 +46,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // ---- Back button ----
         final JPanel buttons = new JPanel();
         back = new JButton("Back");
         buttons.add(back);
@@ -64,16 +62,13 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
             }
         });
 
-        // ---- Portfolio chooser ----
         final JPanel portfolioPanel = new JPanel();
         portfolioPanel.add(new JLabel("Choose portfolio:"));
         portfolioComboBox = new JComboBox<>();
-        // first entry empty (forces explicit choice)
         portfolioComboBox.addItem("");
         portfolioPanel.add(portfolioComboBox);
         this.add(portfolioPanel);
 
-        // ---- Asset chooser ----
         final JPanel assetMenu = new JPanel();
         assetMenu.add(new JLabel("Choose asset:"));
         final String[] assetSymbols = {"", "AAPL", "MSFT", "TSLA", "AMZN", "GOOGL", "NVDA", "META",
@@ -84,14 +79,12 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         assetMenu.add(assetComboBox);
         this.add(assetMenu);
 
-        // ---- Quantity input (JTextField instead of JComboBox) ----
         final JPanel quantityMenu = new JPanel();
         quantityMenu.add(new JLabel("Quantity:"));
         quantityField = new JTextField(10);
         quantityMenu.add(quantityField);
         this.add(quantityMenu);
 
-        // Instant updates while typing
         quantityField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -109,18 +102,15 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
             }
         });
 
-        // ---- Price / total labels ----
         priceLabel = new JLabel("Price: -");
         this.add(priceLabel);
 
         totalLabel = new JLabel("Total: -");
         this.add(totalLabel);
 
-        // ---- Purchase button ----
         final JButton purchaseButton = new JButton("Purchase");
         this.add(purchaseButton);
 
-        // ---- Listeners ----
         assetComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -136,7 +126,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         });
     }
 
-    // ================== Internal helpers ==================
 
     private void onAssetSelected() {
         final String symbol = (String) assetComboBox.getSelectedItem();
@@ -181,7 +170,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
     }
 
     private void onPurchase() {
-        // Make sure we read the latest quantity from the text field.
         onQuantityChanged();
 
         final BuyAssetState state = buyAssetViewModel.getState();
@@ -197,7 +185,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
             return;
         }
 
-        // ---- Basic validation mirroring your interactor checks ----
         if (username == null || username.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No user logged in.");
             return;
@@ -223,7 +210,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
             return;
         }
 
-        // ---- Call interactor through controller ----
         buyAssetController.execute(
                 username,
                 portfolioName,
@@ -249,8 +235,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         }
     }
 
-    // ================== PropertyChangeListener ==================
-
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
         final BuyAssetState state = buyAssetViewModel.getState();
@@ -268,8 +252,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         priceLabel.setText(state.price > 0 ? "Price: " + state.price : "Price: -");
         totalLabel.setText(state.total > 0 ? "Total: " + state.total : "Total: -");
     }
-
-    // ================== Wiring methods ==================
 
     public void setGetPriceController(final GetPriceController controller) {
         this.getPriceController = controller;

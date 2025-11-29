@@ -145,7 +145,6 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
 
             if (stockPanel.isVisible()) {
                 final String sel = stockPanel.getSelectedStock();
-                // If sel is null, asset remains empty string, returning 0 balance.
                 if (sel != null) {
                     asset = sel;
                 }
@@ -177,13 +176,11 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
             final String to = topPanel.getToPortfolio();
             try {
                 if (stockPanel.isVisible()) {
-                    // Execute Stock Transfer
                     transferController.executeStockTransfer(
                         username, from, to, stockPanel.getSelectedStock(), stockPanel.getAmount()
                     );
                 }
                 else {
-                    // Execute Currency Transfer
                     transferController.executeCurrencyTransfer(
                         username, from, to, currencyPanel.getSelectedCurrency(), currencyPanel.getAmount()
                     );
@@ -192,8 +189,6 @@ public class TransferView extends JPanel implements ActionListener, PropertyChan
             catch (final NumberFormatException numberFormatException) {
                 currencyPanel.showError(Constants.ERROR_INVALID_AMOUNT);
             }
-            // Show the error message from the exception
-
         }
     }
 

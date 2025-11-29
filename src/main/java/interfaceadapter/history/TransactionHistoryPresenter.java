@@ -27,7 +27,6 @@ public class TransactionHistoryPresenter implements TransactionHistoryOutputBoun
     @Override
     public void presentPortfolioOptions(final ArrayList<String> portfolioNames) {
 
-
         HistoryState state = historyViewModel.getState();
         state.setPortfolioOptions(portfolioNames);
 

@@ -252,7 +252,6 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
                     errorLabel.setText("Exchange controller not set.");
                 }
                 else {
-//                    exchangeController.convert(username, accountName, from, to, amount);
                     exchangeController.convert(accountName, from, to, amount);
 
                 }
@@ -332,6 +331,5 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
 
     @Override
     public void actionPerformed(final ActionEvent evt) {
-        // This method is not needed to be used.
     }
 }

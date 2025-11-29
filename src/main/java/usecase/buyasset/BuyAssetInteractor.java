@@ -13,17 +13,16 @@ import usecase.SubAccount.SubAccountDataAccessInterface;
 public class BuyAssetInteractor implements BuyAssetInputBoundary {
 
     private final SubAccountDataAccessInterface subAccountDAO;
-    private final TransactionDataAccessInterface transactionDAO;   // ⭐ NEW
+    private final TransactionDataAccessInterface transactionDAO;
     private final BuyAssetOutputBoundary presenter;
 
     public BuyAssetInteractor(final SubAccountDataAccessInterface subAccountDAO,
-                              final TransactionDataAccessInterface transactionDAO,  // ⭐ NEW
+                              final TransactionDataAccessInterface transactionDAO,
                               final BuyAssetOutputBoundary presenter) {
         this.subAccountDAO = subAccountDAO;
-        this.transactionDAO = transactionDAO;  // ⭐ NEW
+        this.transactionDAO = transactionDAO;
         this.presenter = presenter;
     }
-
 
     @Override
     public void execute(final BuyAssetInputData inputData) {
@@ -85,17 +84,14 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
 
         subAccountDAO.save(username, target);
 
-        // ============================================================
-        // ⭐ NEW: Save real transaction into transactionDAO
-        // ============================================================
         final BuyTransaction tx = new BuyTransaction(
-            generateTransactionId(),       // You can implement UUID-based ID
+            generateTransactionId(),
             LocalDateTime.now(),
-            portfolioName,                 // toPortfolio = portfolio receiving asset
-            "STOCK",                       // assetType
-            symbol,                        // assetSymbol
-            qty,                           // quantity
-            price                          // price per unit
+            portfolioName,
+            "STOCK",
+            symbol,
+            qty,
+            price
         );
 
         System.out.println("[BuyAssetInteractor] Saving transaction: " + tx.getTransactionId());
@@ -104,7 +100,7 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
             new BuyTransaction(
                 "TX-" + System.currentTimeMillis(),
                 LocalDateTime.now(),
-                portfolioName,           // toPortfolio
+                portfolioName,
                 "Stock",
                 symbol,
                 qty,
@@ -112,12 +108,9 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
             )
         );
 
-        // ============================================================
-
         presenter.presentSuccess(
             new BuyAssetOutputData(
-                "Purchased " + qty + " of " + symbol +
-                    " for $" + cost + " in " + portfolioName + ".",
+                "Purchased " + qty + " of " + symbol + " for $" + cost + " in " + portfolioName + ".",
                 username
             )
         );

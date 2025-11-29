@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BuyAssetInteractorTest {
 
-    // Shared test state used by our anonymous fakes
     private List<SubAccount> storedAccounts;
     private int txSaveCount;
 
@@ -83,9 +82,7 @@ class BuyAssetInteractorTest {
         interactor = new BuyAssetInteractor(subAccountDAO, transactionDAO, presenter);
     }
 
-    // ============================================================
     //  SUCCESS CASE
-    // ============================================================
 
     @Test
     void execute_successfulPurchase_updatesBalance_presentsSuccess() {
@@ -112,9 +109,7 @@ class BuyAssetInteractorTest {
         assertTrue(presenter.lastOutputData.message().contains("Purchased 2 of AAPL"));
     }
 
-    // ============================================================
     //  FAILURE: INSUFFICIENT FUNDS
-    // ============================================================
 
     @Test
     void execute_insufficientFunds_presentsFail_noBalanceChange_noTransaction() {
@@ -138,9 +133,7 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // ============================================================
     //  FAILURE: INVALID QUANTITY
-    // ============================================================
 
     @Test
     void execute_invalidQuantity_presentsFail_andDoesNotTouchDAOs() {
@@ -164,9 +157,7 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // ============================================================
     //  FAILURE: NO USER
-    // ============================================================
 
     @Test
     void execute_noUserLoggedIn_presentsFail_andDoesNotTouchDAOs() {
@@ -181,9 +172,7 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // ============================================================
     //  FAILURE: NO PORTFOLIO
-    // ============================================================
 
     @Test
     void execute_noPortfolioChosen_presentsFail_andDoesNotCallDAOs() {
@@ -198,9 +187,7 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // ============================================================
     //  FAILURE: NO SYMBOL
-    // ============================================================
 
     @Test
     void execute_noSymbolChosen_presentsFail_andDoesNotCallDAOs() {
@@ -215,9 +202,7 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // ============================================================
     //  FAILURE: PRICE NOT LOADED
-    // ============================================================
 
     @Test
     void execute_priceNotLoaded_presentsFail_andDoesNotCallDAOs() {
@@ -232,9 +217,7 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // ============================================================
     //  FAILURE: PORTFOLIO NOT FOUND
-    // ============================================================
 
     @Test
     void execute_portfolioNotFound_presentsFail_andDoesNotSaveTransaction() {
@@ -244,7 +227,7 @@ class BuyAssetInteractorTest {
                 "Other", new BigDecimal("1000.00"), false
         );
         storedAccounts.clear();
-        storedAccounts.add(other);   // Only "Other" exists
+        storedAccounts.add(other);
 
         BuyAssetInputData input = new BuyAssetInputData(
                 username, "Main", "AAPL", 1, 100.0
@@ -258,9 +241,7 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // ============================================================
     //  TEST PRESENTER
-    // ============================================================
 
     private static class TestBuyAssetPresenter implements BuyAssetOutputBoundary {
 
@@ -279,11 +260,10 @@ class BuyAssetInteractorTest {
             failMessage = errorMessage;
         }
     }
-    // username == "" instead of null
     @Test
     void execute_emptyUsername_presentsFail_andDoesNotTouchDAOs() {
         BuyAssetInputData input = new BuyAssetInputData(
-                "",           // empty username
+                "",
                 "Main",
                 "AAPL",
                 1,
@@ -297,12 +277,12 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // portfolioName == null instead of ""
+
     @Test
     void execute_nullPortfolioChosen_presentsFail_andDoesNotCallDAOs() {
         BuyAssetInputData input = new BuyAssetInputData(
                 "alice",
-                null,         // null portfolioName
+                null,
                 "AAPL",
                 1,
                 100.0
@@ -315,13 +295,13 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // symbol == null instead of ""
+
     @Test
     void execute_nullSymbolChosen_presentsFail_andDoesNotCallDAOs() {
         BuyAssetInputData input = new BuyAssetInputData(
                 "alice",
                 "Main",
-                null,         // null symbol
+                null,
                 1,
                 100.0
         );
@@ -333,7 +313,6 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // qty < 0 instead of just 0
     @Test
     void execute_negativeQuantity_presentsFail_andDoesNotTouchDAOs() {
         SubAccount acc = new SubAccount("Main", new BigDecimal("500.00"), false);
@@ -344,7 +323,7 @@ class BuyAssetInteractorTest {
                 "alice",
                 "Main",
                 "AAPL",
-                -1,          // negative quantity
+                -1,
                 50.0
         );
 
@@ -356,7 +335,6 @@ class BuyAssetInteractorTest {
         assertEquals(0, txSaveCount);
     }
 
-    // price < 0 instead of just 0
     @Test
     void execute_negativePrice_presentsFail_andDoesNotCallDAOs() {
         BuyAssetInputData input = new BuyAssetInputData(
@@ -364,7 +342,7 @@ class BuyAssetInteractorTest {
                 "Main",
                 "AAPL",
                 1,
-                -1.0         // negative price
+                -1.0
         );
 
         interactor.execute(input);

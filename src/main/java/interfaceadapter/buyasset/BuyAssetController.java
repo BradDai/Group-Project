@@ -8,7 +8,6 @@ public class BuyAssetController {
 
     private final BuyAssetInputBoundary interactor;
 
-    // NOTE: new constructor takes LoggedInViewModel as well
     public BuyAssetController(final BuyAssetInputBoundary interactor,
                               final LoggedInViewModel loggedInViewModel) {
         this.interactor = interactor;

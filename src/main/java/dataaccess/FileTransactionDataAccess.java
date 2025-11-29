@@ -221,7 +221,7 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
             case "BUY" -> new BuyTransaction(
                     transactionId,
                     dateTime,
-                    toPortfolio,      // portfolio receiving the asset
+                    toPortfolio,
                     assetType,
                     assetSymbol,
                     quantity,
@@ -268,7 +268,7 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                         .setQuantity(quantity)
                         .build();
             }
-            default -> null; // unknown types are ignored
+            default -> null;
         };
     }
 
@@ -299,8 +299,8 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
             // Represent currency conversion as a pair
             assetType = "CURRENCY";
             assetSymbol = ct.getFromCurrency() + "->" + ct.getToCurrency();
-            quantity = ct.getFromAmount();        // source amount
-            pricePerUnit = ct.getExchangeRate();  // FX rate
+            quantity = ct.getFromAmount();
+            pricePerUnit = ct.getExchangeRate();
             totalValue = ct.getToAmount();
         }
         else if (tx instanceof final TransferTransaction tt) {
