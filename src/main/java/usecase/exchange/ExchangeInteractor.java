@@ -96,7 +96,6 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
                 currencies
             );
 
-            //  NEW: record convert transaction in history
             final ConvertTransaction tx = new ConvertTransaction(
                 "TX-" + System.currentTimeMillis(),
                 LocalDateTime.now(),
