@@ -10,6 +10,11 @@ public class DeleteSubAccountController {
         this.interactor = interactor;
     }
 
+    /**
+     * Y.
+     * @param username .
+     * @param subName .
+     */
     public void execute(final String username, final String subName) {
         final DeleteSubAccountInputData inputData = new DeleteSubAccountInputData(username, subName);
         interactor.execute(inputData);

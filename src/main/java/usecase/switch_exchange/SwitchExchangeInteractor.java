@@ -10,6 +10,7 @@ public class SwitchExchangeInteractor implements SwitchExchangeInputBoundary {
 
     /**
      * I.
+     * @param username .
      */
     public void switchToExchangeView(final String username) {
         switchExchangePresenter.switchToExchangeView(username);

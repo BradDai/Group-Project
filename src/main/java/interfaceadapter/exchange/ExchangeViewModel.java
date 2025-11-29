@@ -28,19 +28,33 @@ public class ExchangeViewModel {
         return rawRate;
     }
 
+    /**
+     * Y.
+     */
     public void firePropertyChangedRate() {
         support.firePropertyChange("exchangeRate", null, exchangeRate);
     }
 
+    /**
+     * Y.
+     */
     public void firePropertyChangedState() {
         support.firePropertyChange("exchangeState", null, this.exchangeState);
     }
 
+    /**
+     * Y.
+     * @param state .
+     */
     public void setState(final ExchangeState state) {
         this.exchangeState = state;
         support.firePropertyChange("exchangeState", null, this.exchangeState);
     }
 
+    /**
+     * I.
+     * @param listener .
+     */
     public void addPropertyChangeListener(final PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }

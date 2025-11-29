@@ -19,6 +19,12 @@ public interface TransactionDataAccessInterface {
      */
     void save(String userId, Transaction transaction);
 
+    /**
+     * I.
+     * @param userId .
+     * @param portfolioId .
+     * @return .
+     */
     List<Transaction> getByPortfolio(String userId, String portfolioId);
 
     /**

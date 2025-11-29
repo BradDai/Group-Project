@@ -12,14 +12,14 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
 
     private final ExchangeOutputBoundary exchangePresenter;
     private final ExchangeDataAccessInterface exchangeDataAccess;
-    private final TransactionDataAccessInterface transactionDAO;
+    private final TransactionDataAccessInterface transactionDao;
 
     public ExchangeInteractor(final ExchangeOutputBoundary exchangePresenter,
                               final ExchangeDataAccessInterface exchangeDataAccess,
-                              final TransactionDataAccessInterface transactionDAO) {
+                              final TransactionDataAccessInterface transactionDao) {
         this.exchangePresenter = exchangePresenter;
         this.exchangeDataAccess = exchangeDataAccess;
-        this.transactionDAO = transactionDAO;
+        this.transactionDao = transactionDao;
     }
 
     @Override
@@ -41,8 +41,8 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
             }
 
         }
-        catch (final Exception e) {
-            exchangePresenter.presentFailure("Error fetching rate: " + e.getMessage());
+        catch (final Exception evt) {
+            exchangePresenter.presentFailure("Error fetching rate: " + evt.getMessage());
         }
     }
 
@@ -96,7 +96,6 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
                 currencies
             );
 
-            //  NEW: record convert transaction in history
             final ConvertTransaction tx = new ConvertTransaction(
                 "TX-" + System.currentTimeMillis(),
                 LocalDateTime.now(),
@@ -107,7 +106,7 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
                 rate
             );
 
-            transactionDAO.save(inputData.username(), tx);
+            transactionDao.save(inputData.username(), tx);
 
             final List<SubAccount> updatedSubAccounts =
                 exchangeDataAccess.getSubAccountsOf(inputData.username());

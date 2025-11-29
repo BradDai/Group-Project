@@ -10,6 +10,10 @@ public class GetPriceController {
         this.interactor = interactor;
     }
 
+    /**
+     * I.
+     * @param symbol .
+     */
     public void execute(final String symbol) {
         interactor.execute(new GetPriceInputData(symbol));
     }

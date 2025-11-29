@@ -49,12 +49,12 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
 
         setLayout(new BorderLayout());
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton back = new JButton("Back");
+        final JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JButton back = new JButton("Back");
         topPanel.add(back);
         add(topPanel, BorderLayout.NORTH);
 
-        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         filterPanel.add(new JLabel("Portfolio ID:"));
         portfolioComboBox = new JComboBox<>();
@@ -65,12 +65,12 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         assetField = new javax.swing.JTextField(10);
         filterPanel.add(assetField);
 
-        SpinnerDateModel fromModel = new SpinnerDateModel();
-        SpinnerDateModel toModel = new SpinnerDateModel();
+        final SpinnerDateModel fromModel = new SpinnerDateModel();
+        final SpinnerDateModel toModel = new SpinnerDateModel();
         fromDateSpinner = new JSpinner(fromModel);
         toDateSpinner = new JSpinner(toModel);
-        JSpinner.DateEditor fromEditor = new JSpinner.DateEditor(fromDateSpinner, "yyyy-MM-dd");
-        JSpinner.DateEditor toEditor = new JSpinner.DateEditor(toDateSpinner, "yyyy-MM-dd");
+        final JSpinner.DateEditor fromEditor = new JSpinner.DateEditor(fromDateSpinner, "yyyy-MM-dd");
+        final JSpinner.DateEditor toEditor = new JSpinner.DateEditor(toDateSpinner, "yyyy-MM-dd");
         fromDateSpinner.setEditor(fromEditor);
         toDateSpinner.setEditor(toEditor);
 
@@ -79,8 +79,8 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         filterPanel.add(new JLabel("To:"));
         filterPanel.add(toDateSpinner);
 
-        JButton loadButton = new JButton("Load");
-        JButton clearButton = new JButton("Clear");
+        final JButton loadButton = new JButton("Load");
+        final JButton clearButton = new JButton("Clear");
         filterPanel.add(loadButton);
         filterPanel.add(clearButton);
 
@@ -94,10 +94,10 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
                 return false;
             }
         };
-        JTable table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
+        final JTable table = new JTable(tableModel);
+        final JScrollPane scrollPane = new JScrollPane(table);
 
-        JPanel bottomPanel = new JPanel(new BorderLayout());
+        final JPanel bottomPanel = new JPanel(new BorderLayout());
         messageLabel = new JLabel(" ");
         bottomPanel.add(messageLabel, BorderLayout.NORTH);
         bottomPanel.add(scrollPane, BorderLayout.CENTER);
@@ -122,16 +122,20 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
             }
 
             @Override
-            public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) { }
+            public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+
+            }
 
             @Override
-            public void popupMenuCanceled(final PopupMenuEvent e) { }
+            public void popupMenuCanceled(final PopupMenuEvent e) {
+
+            }
         });
     }
 
     private void onLoadClicked() {
-        String portfolioId = (String) portfolioComboBox.getSelectedItem();
-        String asset = assetField.getText().trim();
+        final String portfolioId = (String) portfolioComboBox.getSelectedItem();
+        final String asset = assetField.getText().trim();
 
         if (portfolioId == null || portfolioId.isBlank()) {
             JOptionPane.showMessageDialog(
@@ -143,9 +147,9 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
             return;
         }
 
-        String fromDateStr = ((JSpinner.DateEditor) fromDateSpinner.getEditor())
+        final String fromDateStr = ((JSpinner.DateEditor) fromDateSpinner.getEditor())
                 .getFormat().format(fromDateSpinner.getValue());
-        String toDateStr = ((JSpinner.DateEditor) toDateSpinner.getEditor())
+        final String toDateStr = ((JSpinner.DateEditor) toDateSpinner.getEditor())
                 .getFormat().format(toDateSpinner.getValue());
 
         if (transactionHistoryController != null) {
@@ -155,7 +159,8 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
                     fromDateStr,
                     toDateStr
             );
-        } else {
+        }
+        else {
             JOptionPane.showMessageDialog(
                     this,
                     "TransactionHistoryController is null – check wiring.",
@@ -178,7 +183,7 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
             return;
         }
 
-        HistoryState state = historyViewModel.getState();
+        final HistoryState state = historyViewModel.getState();
         if (state == null) {
             return;
         }
@@ -197,7 +202,7 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
             });
         }
 
-        List<String> options = state.getPortfolioOptions();
+        final List<String> options = state.getPortfolioOptions();
         if (options != null) {
             Object previous = portfolioComboBox.getSelectedItem();
 
@@ -215,7 +220,6 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
 
     @Override
     public void actionPerformed(final ActionEvent evt) {
-        // no-op
     }
 
     public String getViewName() {
@@ -230,10 +234,3 @@ public class HistoryView extends JPanel implements ActionListener, PropertyChang
         this.transactionHistoryController = controller;
     }
 }
-
-
-
-
-
-
-

@@ -6,6 +6,8 @@ import entity.SubAccount;
 
 /**
  * Output data that Presenter will use to update ViewModel.
+ * @param username .
+ * @param allSubAccounts .
  */
 public record CreateSubAccountOutputData(String username, List<SubAccount> allSubAccounts) {
 

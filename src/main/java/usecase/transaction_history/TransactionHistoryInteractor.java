@@ -148,7 +148,3 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
         return LocalDate.parse(sss);
     }
 }
-
-
-
-

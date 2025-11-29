@@ -1,4 +1,4 @@
-/// **
+// **
 // * Abstract base class representing a transaction.
 // */
 
@@ -104,4 +104,9 @@ public abstract class Transaction {
         return amount;
     }
 
-    public abstract String getTransactionType(); }
+    /**
+     * I.
+     * @return
+     */
+    public abstract String getTransactionType();
+}

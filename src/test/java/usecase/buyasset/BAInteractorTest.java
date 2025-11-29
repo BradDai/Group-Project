@@ -102,7 +102,7 @@ class BuyAssetInteractorTest {
 
         interactor.execute(input);
 
-        assertEquals(new BigDecimal("800.00"), acc.getBalanceUSD());
+        assertEquals(new BigDecimal("800.00"), acc.getBalanceUsd());
         assertTrue(presenter.successCalled);
         assertNull(presenter.failMessage);
         assertNotNull(presenter.lastOutputData);
@@ -127,7 +127,7 @@ class BuyAssetInteractorTest {
 
         interactor.execute(input);
 
-        assertEquals(new BigDecimal("50.00"), acc.getBalanceUSD());
+        assertEquals(new BigDecimal("50.00"), acc.getBalanceUsd());
         assertFalse(presenter.successCalled);
         assertEquals("Insufficient funds.", presenter.failMessage);
         assertEquals(0, txSaveCount);
@@ -151,7 +151,7 @@ class BuyAssetInteractorTest {
 
         interactor.execute(input);
 
-        assertEquals(new BigDecimal("500.00"), acc.getBalanceUSD());
+        assertEquals(new BigDecimal("500.00"), acc.getBalanceUsd());
         assertFalse(presenter.successCalled);
         assertEquals("Quantity must be positive.", presenter.failMessage);
         assertEquals(0, txSaveCount);
@@ -237,7 +237,7 @@ class BuyAssetInteractorTest {
 
         assertFalse(presenter.successCalled);
         assertEquals("Portfolio not found.", presenter.failMessage);
-        assertEquals(new BigDecimal("1000.00"), other.getBalanceUSD());
+        assertEquals(new BigDecimal("1000.00"), other.getBalanceUsd());
         assertEquals(0, txSaveCount);
     }
 
@@ -329,7 +329,7 @@ class BuyAssetInteractorTest {
 
         interactor.execute(input);
 
-        assertEquals(new BigDecimal("500.00"), acc.getBalanceUSD());
+        assertEquals(new BigDecimal("500.00"), acc.getBalanceUsd());
         assertFalse(presenter.successCalled);
         assertEquals("Quantity must be positive.", presenter.failMessage);
         assertEquals(0, txSaveCount);

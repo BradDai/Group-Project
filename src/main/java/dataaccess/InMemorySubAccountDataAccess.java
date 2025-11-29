@@ -16,12 +16,12 @@ public class InMemorySubAccountDataAccess implements SubAccountDataAccessInterfa
     public boolean exists(final String username, final String subName) {
         return data.getOrDefault(username, List.of())
             .stream()
-            .anyMatch(sa -> sa.getName().equalsIgnoreCase(subName));
+            .anyMatch(ssa -> ssa.getName().equalsIgnoreCase(subName));
     }
 
     @Override
     public void save(final String username, final SubAccount sub) {
-        final List<SubAccount> list = data.computeIfAbsent(username, u -> new ArrayList<>());
+        final List<SubAccount> list = data.computeIfAbsent(username, uuu -> new ArrayList<>());
         list.remove(sub);
         list.add(sub);
     }
@@ -42,6 +42,6 @@ public class InMemorySubAccountDataAccess implements SubAccountDataAccessInterfa
         if (list == null) {
             return;
         }
-        list.removeIf(sa -> sa.getName().equalsIgnoreCase(subName));
+        list.removeIf(ssa -> ssa.getName().equalsIgnoreCase(subName));
     }
 }

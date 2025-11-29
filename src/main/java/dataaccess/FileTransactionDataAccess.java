@@ -83,11 +83,12 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
     /**
      * Portfolio filter.
      * If portfolioId is null/blank, we treat it as "no portfolio filter".
+     * @param portfolioId .
+     * @param ttx .
      */
     private boolean matchesPortfolio(final Transaction ttx,
                                      final String portfolioId) {
         if (portfolioId == null || portfolioId.isBlank()) {
-            // no filter: match everything
             return true;
         }
         return portfolioId.equals(ttx.getFromPortfolio())
@@ -105,7 +106,7 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         }
         else if (ttx instanceof final ConvertTransaction ct) {
             // keep consistent with toCsvLine: "FROM->TO" (no extra space)
-            result = ct.getFromCurrency() + "->" + ct.getToCurrency();
+            result = ct.getFromCurrency() + " ->" + ct.getToCurrency();
         }
         else if (ttx instanceof final TransferTransaction tt) {
             result = tt.getAssetSymbol();
@@ -171,8 +172,8 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                 }
             }
         }
-        catch (final IOException e) {
-            throw new RuntimeException("Failed to read transactions for user " + userId, e);
+        catch (final IOException evt) {
+            throw new RuntimeException("Failed to read transactions for user " + userId, evt);
         }
 
         return result;
@@ -192,8 +193,8 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                     StandardOpenOption.TRUNCATE_EXISTING,
                     StandardOpenOption.WRITE);
         }
-        catch (final IOException e) {
-            throw new RuntimeException("Failed to write transactions for user " + userId, e);
+        catch (final IOException evt) {
+            throw new RuntimeException("Failed to write transactions for user " + userId, evt);
         }
     }
 
@@ -272,8 +273,8 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         };
     }
 
-    private String toCsvLine(final Transaction tx) {
-        final String transactionType = tx.getTransactionType();
+    private String toCsvLine(final Transaction ttx) {
+        final String transactionType = ttx.getTransactionType();
 
         String assetType = "";
         String assetSymbol = "";
@@ -281,21 +282,21 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         double pricePerUnit = 0;
         double totalValue = 0;
 
-        if (tx instanceof final BuyTransaction bt) {
+        if (ttx instanceof final BuyTransaction bt) {
             assetType = nullToEmpty(bt.getAssetType());
             assetSymbol = nullToEmpty(bt.getAssetSymbol());
             quantity = bt.getQuantity();
             pricePerUnit = bt.getPricePerUnit();
             totalValue = bt.getTotalValue();
         }
-        else if (tx instanceof final SellTransaction st) {
+        else if (ttx instanceof final SellTransaction st) {
             assetType = nullToEmpty(st.getAssetType());
             assetSymbol = nullToEmpty(st.getAssetSymbol());
             quantity = st.getQuantity();
             pricePerUnit = st.getPricePerUnit();
             totalValue = st.getTotalValue();
         }
-        else if (tx instanceof final ConvertTransaction ct) {
+        else if (ttx instanceof final ConvertTransaction ct) {
             // Represent currency conversion as a pair
             assetType = "CURRENCY";
             assetSymbol = ct.getFromCurrency() + "->" + ct.getToCurrency();
@@ -303,7 +304,7 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
             pricePerUnit = ct.getExchangeRate();
             totalValue = ct.getToAmount();
         }
-        else if (tx instanceof final TransferTransaction tt) {
+        else if (ttx instanceof final TransferTransaction tt) {
             assetType = nullToEmpty(tt.getAssetType());
             assetSymbol = nullToEmpty(tt.getAssetSymbol());
             quantity = tt.getQuantity();
@@ -312,10 +313,10 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         }
 
         return String.join(",",
-                nullToEmpty(tx.getTransactionId()),
-                tx.getDate().toString(),
-                nullToEmpty(tx.getFromPortfolio()),
-                nullToEmpty(tx.getToPortfolio()),
+                nullToEmpty(ttx.getTransactionId()),
+                ttx.getDate().toString(),
+                nullToEmpty(ttx.getFromPortfolio()),
+                nullToEmpty(ttx.getToPortfolio()),
                 transactionType,
                 assetType,
                 assetSymbol,
@@ -325,18 +326,18 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         );
     }
 
-    private String nullToEmpty(final String s) {
-        return s == null ? "" : s;
+    private String nullToEmpty(final String sss) {
+        return sss == null ? "" : sss;
     }
 
-    private String emptyToNull(final String s) {
-        return (s == null || s.isEmpty()) ? null : s;
+    private String emptyToNull(final String sss) {
+        return (sss == null || sss.isEmpty()) ? null : sss;
     }
 
-    private double parseDoubleSafe(final String s) {
-        if (s == null || s.isBlank()) {
+    private double parseDoubleSafe(final String sss) {
+        if (sss == null || sss.isBlank()) {
             return 0.0;
         }
-        return Double.parseDouble(s);
+        return Double.parseDouble(sss);
     }
 }

@@ -40,6 +40,3 @@ public class HistoryViewConfigurator {
         return historyView;
     }
 }
-
-
-

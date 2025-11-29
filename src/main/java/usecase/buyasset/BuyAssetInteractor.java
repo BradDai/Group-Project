@@ -70,12 +70,12 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
 
         final BigDecimal cost = BigDecimal.valueOf(price).multiply(BigDecimal.valueOf(qty));
 
-        if (target.getBalanceUSD().compareTo(cost) < 0) {
+        if (target.getBalanceUsd().compareTo(cost) < 0) {
             presenter.presentFail("Insufficient funds.");
             return;
         }
 
-        final BigDecimal newBal = target.getBalanceUSD().subtract(cost);
+        final BigDecimal newBal = target.getBalanceUsd().subtract(cost);
         target.setBalanceUsd(newBal);
 
         // update holdings

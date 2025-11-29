@@ -8,25 +8,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-
 public class SubAccount {
     private final String name;
-    private BigDecimal balanceUSD;
+    private BigDecimal balanceUsd;
     private final boolean undeletable;
     private final Map<String, BigDecimal> currencies = new HashMap<>();
     private final List<Asset> assets = new ArrayList<>();
 
-    public SubAccount(final String name, final BigDecimal balanceUSD, final boolean undeletable) {
+    public SubAccount(final String name, final BigDecimal balanceUsd, final boolean undeletable) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("name required");
         }
-        if (balanceUSD == null || balanceUSD.signum() < 0) {
-            throw new IllegalArgumentException("balance must be >= 0");
+        if (balanceUsd == null || balanceUsd.signum() < 0) {
+            throw new IllegalArgumentException("balance must be >= 0.");
         }
         this.name = name.trim();
-        this.balanceUSD = balanceUSD;
+        this.balanceUsd = balanceUsd;
         this.undeletable = undeletable;
-        currencies.put("USD", balanceUSD);
+        currencies.put("USD ", balanceUsd);
     }
 
     public String getName() {
@@ -34,9 +33,9 @@ public class SubAccount {
         return name;
     }
 
-    public BigDecimal getBalanceUSD() {
+    public BigDecimal getBalanceUsd() {
 
-        return balanceUSD;
+        return balanceUsd;
     }
 
     public boolean isUndeletable() {
@@ -57,7 +56,7 @@ public class SubAccount {
         if (newBalance == null || newBalance.signum() < 0) {
             throw new IllegalArgumentException("balance must be >= 0");
         }
-        this.balanceUSD = newBalance;
+        this.balanceUsd = newBalance;
         currencies.put("USD", newBalance);
     }
 
@@ -89,7 +88,7 @@ public class SubAccount {
         }
         currencies.put(currencyCode.toUpperCase(), amount);
         if ("USD".equalsIgnoreCase(currencyCode)) {
-            this.balanceUSD = amount;
+            this.balanceUsd = amount;
         }
     }
 
@@ -190,7 +189,7 @@ public class SubAccount {
         }
 
         // Add cash proceeds
-        final BigDecimal newBalance = getBalanceUSD().add(BigDecimal.valueOf(saleProceeds));
+        final BigDecimal newBalance = getBalanceUsd().add(BigDecimal.valueOf(saleProceeds));
         setBalanceUsd(newBalance);
     }
 

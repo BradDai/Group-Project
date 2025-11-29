@@ -53,8 +53,7 @@ public class ExchangePresenter implements ExchangeOutputBoundary {
         state.setErrorMessage("");
 
         final String msg = String.format(
-                "Converted %.2f %s to %.2f %s in '%s' (rate: 1 %s = %.4f %s). " +
-                        "New balances: %s: %.2f, %s: %.2f",
+                "Converted %.2f %s to %.2f %s in '%s' (rate: 1 %s = %.4f %s). " + "New balances: %s: %.2f, %s: %.2f",
                 outputData.getAmountGiven(),
                 outputData.getFrom(),
                 outputData.getAmountReceived(),

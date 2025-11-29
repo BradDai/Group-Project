@@ -30,7 +30,7 @@ public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary
         }
         final List<SubAccount> current = subAccountDataAccess.getSubAccountsOf(username);
         final SubAccount target = current.stream()
-            .filter(sa -> sa.getName().equalsIgnoreCase(name))
+            .filter(ssa -> ssa.getName().equalsIgnoreCase(name))
             .findFirst()
             .orElse(null);
         if (target == null) {
@@ -41,7 +41,7 @@ public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary
             presenter.prepareFailView("This subaccount cannot be deleted.");
             return;
         }
-        if (target.getBalanceUSD().compareTo(BigDecimal.ZERO) != 0) {
+        if (target.getBalanceUsd().compareTo(BigDecimal.ZERO) != 0) {
             presenter.prepareFailView("Can't delete a subaccount with non-zero balance.");
             return;
         }

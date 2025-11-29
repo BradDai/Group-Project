@@ -12,6 +12,7 @@ public class SwitchExchangeController {
 
     /**
      * I.
+     * @param username .
      */
     public void switchToExchangeView(final String username) {
         switchExchangeUseCaseInteractor.switchToExchangeView(username);

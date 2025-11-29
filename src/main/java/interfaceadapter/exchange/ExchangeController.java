@@ -16,20 +16,32 @@ public class ExchangeController {
         this.loggedInViewModel = loggedInViewModel;
     }
 
+    /**
+     * Y.
+     * @param from .
+     * @param to .
+     */
     public void getExchangeRate(final String from, final String to) {
         final ExchangeInputData inputData = new ExchangeInputData(from, to);
         exchangeInputBoundary.fetchExchangeRate(inputData);
     }
 
+    /**
+     * Y.
+     * @param accountName .
+     * @param from .
+     * @param tto .
+     * @param amount .
+     */
     public void convert(final String accountName,
                         final String from,
-                        final String to,
+                        final String tto,
                         final double amount) {
 
         final String username = loggedInViewModel.getState().getUsername();
 
         final ExchangeConversionInputData inputData =
-            new ExchangeConversionInputData(username, accountName, from, to, amount);
+            new ExchangeConversionInputData(username, accountName, from, tto, amount);
         exchangeInputBoundary.convert(inputData);
     }
 }

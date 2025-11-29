@@ -37,8 +37,3 @@ public class TransactionHistoryController {
         interactor.loadPortfolioOptions();
     }
 }
-
-
-
-
-

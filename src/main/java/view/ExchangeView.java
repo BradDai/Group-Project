@@ -15,13 +15,10 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import interfaceadapter.SwitchLoggedInController;
 import interfaceadapter.exchange.ExchangeController;
 import interfaceadapter.exchange.ExchangeState;
@@ -29,6 +26,7 @@ import interfaceadapter.exchange.ExchangeViewModel;
 
 public class ExchangeView extends JPanel implements ActionListener, PropertyChangeListener {
 
+    private static final String ACCOUNT_DATA = "subaccounts.json";
     private static final String VIEW_NAME = "exchange";
     private final transient ExchangeViewModel exchangeViewModel;
     private transient ExchangeController exchangeController;
@@ -45,8 +43,6 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     private final JLabel errorLabel;
     private final JLabel confirmationLabel;
     private final JLabel summaryLabel;
-
-    private static final String ACCOUNT_DATA = "subaccounts.json";
 
     public ExchangeView(final ExchangeViewModel exchangeViewModel) {
         this.exchangeViewModel = exchangeViewModel;
@@ -65,20 +61,28 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
 
         final JLabel givenCurrencyLabel = new JLabel("Convert:");
         final JLabel gottenCurrencyLabel = new JLabel("To:");
-        balanceLabel = new JLabel(" ");
+        balanceLabel = new JLabel("  ");
 
         final JLabel amountLabel = new JLabel("Amount Of Currency To Be Converted:");
         amountField = new JTextField(15);
 
         amountField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e) { updatePreview(); }
-            @Override public void removeUpdate(DocumentEvent e) { updatePreview(); }
-            @Override public void changedUpdate(DocumentEvent e) { updatePreview(); }
+            @Override public void insertUpdate(DocumentEvent e) {
+                updatePreview();
+            }
+
+            @Override public void removeUpdate(DocumentEvent e) {
+                updatePreview();
+            }
+
+            @Override public void changedUpdate(DocumentEvent e) {
+                updatePreview();
+            }
         });
 
-        summaryLabel = new JLabel(" ");
-        errorLabel = new JLabel(" ");
-        confirmationLabel = new JLabel(" ");
+        summaryLabel = new JLabel("  ");
+        errorLabel = new JLabel("  ");
+        confirmationLabel = new JLabel("  ");
 
         final JPanel balancePanel = new JPanel();
         balancePanel.add(balanceLabel);
@@ -129,13 +133,13 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         back.addActionListener(evt -> switchLoggedInController.switchToLoggedInView());
         selectedAccount.addActionListener(actionEvent -> loadCurrenciesForSelectedAccount());
 
-        givenCurrency.addActionListener(e -> {
+        givenCurrency.addActionListener(evt -> {
             updateBalance();
             triggerRateQuery();
             updatePreview();
         });
 
-        gottenCurrency.addActionListener(e -> {
+        gottenCurrency.addActionListener(evt -> {
             triggerRateQuery();
             updatePreview();
         });
@@ -156,7 +160,7 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
                 final JSONArray accounts = root.getJSONArray(username);
                 for (int i = 0; i < accounts.length(); i++) {
                     final JSONObject acc = accounts.getJSONObject(i);
-                    selectedAccount.addItem(acc.getString("name"));
+                    selectedAccount.addItem(acc.getString("Name"));
                 }
             }
 
@@ -299,7 +303,7 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
             return;
         }
 
-        double amount;
+        final double amount;
         try {
             amount = Double.parseDouble(text);
         }
@@ -334,8 +338,8 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     public void propertyChange(final PropertyChangeEvent evt) {
 
         if ("exchangeRate".equals(evt.getPropertyName())) {
-            resultLabel.setText(evt.getNewValue().toString()); // ✔ show formatted rate
-            updatePreview();                                  // ✔ uses rawRate
+            resultLabel.setText(evt.getNewValue().toString());
+            updatePreview();
         }
         else if ("exchangeState".equals(evt.getPropertyName())) {
             final ExchangeState state = exchangeViewModel.getExchangeState();
@@ -354,6 +358,10 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         this.switchLoggedInController = switchLoggedInController;
     }
 
+    /**
+     * L.
+     * @param exchangeController .
+     */
     public void setExchangeController(final ExchangeController exchangeController) {
         this.exchangeController = exchangeController;
         triggerRateQuery();

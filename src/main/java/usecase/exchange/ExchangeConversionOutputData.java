@@ -18,7 +18,7 @@ public class ExchangeConversionOutputData {
 
     public ExchangeConversionOutputData(final String accountName,
                                         final String from,
-                                        final String to,
+                                        final String tto,
                                         final double amountGiven,
                                         final double amountReceived,
                                         final double rateUsed,
@@ -27,7 +27,7 @@ public class ExchangeConversionOutputData {
                                         final List<SubAccount> updatedAccounts) {
         this.accountName = accountName;
         this.from = from;
-        this.to = to;
+        this.to = tto;
         this.amountGiven = amountGiven;
         this.amountReceived = amountReceived;
         this.rateUsed = rateUsed;

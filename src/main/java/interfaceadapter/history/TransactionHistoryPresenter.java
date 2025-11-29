@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import usecase.transaction_history.TransactionHistoryOutputBoundary;
 import usecase.transaction_history.TransactionHistoryOutputData;
 
-
 public class TransactionHistoryPresenter implements TransactionHistoryOutputBoundary {
 
     private final HistoryViewModel historyViewModel;
@@ -35,7 +34,3 @@ public class TransactionHistoryPresenter implements TransactionHistoryOutputBoun
         historyViewModel.firePropertyChanged();
     }
 }
-
-
-
-

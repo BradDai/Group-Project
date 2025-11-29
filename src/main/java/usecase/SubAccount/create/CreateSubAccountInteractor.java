@@ -11,10 +11,9 @@ import usecase.SubAccount.SubAccountDataAccessInterface;
  */
 public class CreateSubAccountInteractor implements CreateSubAccountInputBoundary {
 
+    private static final int MAX_SUBACCOUNTS = 5;
     private final SubAccountDataAccessInterface subAccountDataAccess;
     private final CreateSubAccountOutputBoundary presenter;
-
-    private static final int MAX_SUBACCOUNTS = 5;
 
     public CreateSubAccountInteractor(final SubAccountDataAccessInterface subAccountDataAccess,
                                       final CreateSubAccountOutputBoundary presenter) {
@@ -41,9 +40,9 @@ public class CreateSubAccountInteractor implements CreateSubAccountInputBoundary
             presenter.prepareFailView("Subaccount with this name already exists.");
             return;
         }
-        final SubAccount newSA =
+        final SubAccount newSa =
             new SubAccount(newName.trim(), BigDecimal.ZERO, false);
-        subAccountDataAccess.save(username, newSA);
+        subAccountDataAccess.save(username, newSa);
         final List<SubAccount> all = subAccountDataAccess.getSubAccountsOf(username);
         final CreateSubAccountOutputData outputData =
             new CreateSubAccountOutputData(username, all);

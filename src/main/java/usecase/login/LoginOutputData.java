@@ -7,6 +7,8 @@ import entity.SubAccount;
 
 /**
  * Output Data for the Login Use Case.
+ * @param username .
+ * @param subAccounts .
  */
 public record LoginOutputData(String username, List<SubAccount> subAccounts) {
 

@@ -38,6 +38,7 @@ import interfaceadapter.subaccount.delete.DeleteSubAccountController;
 public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
 
     public static final String VIEW_NAME = "logged in";
+    private static final int MAX_SUBACCOUNTS = 5;
     private final LoggedInViewModel loggedInViewModel;
     private ChangePasswordController changePasswordController;
     private CreateSubAccountController createSubAccountController;
@@ -51,7 +52,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     private final JLabel userLabel = new JLabel("User");
 
-    private static final int MAX_SUBACCOUNTS = 5;
     private final JLabel[] subAccountNameLabels = new JLabel[MAX_SUBACCOUNTS];
     private final JLabel[] subAccountCurrencyLabels = new JLabel[MAX_SUBACCOUNTS];
     private final JLabel[] subAccountStockLabels = new JLabel[MAX_SUBACCOUNTS];
@@ -90,7 +90,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             if (i == 0) {
                 nameLabel.setText("Main USD Portfolio");
                 currencyLabel.setText("Currency  USD: 1,000,000.00");
-                stockLabel.setText("Stock: (none)");
+                stockLabel.setText("Stock: (none) ");
             }
             else {
                 nameLabel.setText("Empty slot");
@@ -219,6 +219,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.deleteSubAccountController = deleteSubAccountController;
     }
 
+    /**
+     * L.
+     * @param exchangeController .
+     */
     public void setExchangeController(final ExchangeController exchangeController) {
     }
 

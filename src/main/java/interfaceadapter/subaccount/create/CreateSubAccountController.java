@@ -11,6 +11,11 @@ public class CreateSubAccountController {
         this.interactor = interactor;
     }
 
+    /**
+     * T.
+     * @param username .
+     * @param newSubAccountName .
+     */
     public void execute(final String username, final String newSubAccountName) {
         final CreateSubAccountInputData data =
             new CreateSubAccountInputData(username, newSubAccountName);

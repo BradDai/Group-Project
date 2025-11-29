@@ -90,7 +90,7 @@ public class FileSubAccountDataAccess implements SubAccountDataAccessInterface {
                     final String line = String.join(",",
                         username,
                         sa.getName(),
-                        sa.getBalanceUSD().toString(),
+                        sa.getBalanceUsd().toString(),
                         Boolean.toString(sa.isUndeletable()));
                     writer.write(line);
                     writer.newLine();

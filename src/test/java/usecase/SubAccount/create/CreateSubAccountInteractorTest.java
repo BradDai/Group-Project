@@ -77,7 +77,7 @@ class CreateSubAccountInteractorTest {
         assertEquals(1, accounts.size());
         SubAccount sa = accounts.get(0);
         assertEquals("Growth Portfolio", sa.getName());
-        assertEquals(BigDecimal.ZERO, sa.getBalanceUSD());
+        assertEquals(BigDecimal.ZERO, sa.getBalanceUsd());
         assertFalse(sa.isUndeletable());
         assertNotNull(presenter.successData);
         assertNull(presenter.errorMessage);

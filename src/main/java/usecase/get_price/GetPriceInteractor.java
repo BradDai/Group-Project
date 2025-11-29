@@ -18,8 +18,8 @@ public class GetPriceInteractor implements GetPriceInputBoundary {
             final double price = gateway.getPrice(inputData.symbol());
             presenter.presentPrice(new GetPriceOutputData(price));
         }
-        catch (final IOException e) {
-            presenter.presentError(e.getMessage());
+        catch (final IOException evt) {
+            presenter.presentError(evt.getMessage());
         }
     }
 }

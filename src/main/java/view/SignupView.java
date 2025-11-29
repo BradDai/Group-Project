@@ -182,7 +182,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
             usernameInputField.setText("");
             passwordInputField.setText("");
             repeatPasswordInputField.setText("");
-            SignupState state = signupViewModel.getState();
+            final SignupState state = signupViewModel.getState();
             state.setUsername("");
             state.setPassword("");
             state.setRepeatPassword("");
@@ -200,6 +200,10 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         }
     }
 
+    /**
+     * I.
+     * @return .
+     */
     public String getViewName() {
         final String viewName = "sign up";
         return viewName;

@@ -13,6 +13,7 @@ public interface LoginInputBoundary {
     void execute(LoginInputData loginInputData);
 
     /**
+     * L.
      * Implements the cancel button in the login view
      */
     void switchToSignupView();

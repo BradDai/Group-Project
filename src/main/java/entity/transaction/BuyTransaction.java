@@ -1,7 +1,3 @@
-/// **
-// * Represents a buy transaction where an asset is purchased.
-// */
-
 package entity.transaction;
 
 import java.time.LocalDateTime;

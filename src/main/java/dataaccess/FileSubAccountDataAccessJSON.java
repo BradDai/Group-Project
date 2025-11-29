@@ -168,7 +168,7 @@ public class FileSubAccountDataAccessJSON implements
                     final JSONObject saJson = new JSONObject();
                     saJson.put("name", sa.getName());
                     saJson.put("balanceUSD",
-                            sa.getBalanceUSD().toString());
+                            sa.getBalanceUsd().toString());
                     saJson.put("undeletable", sa.isUndeletable());
 
                     final JSONObject curObj = new JSONObject();

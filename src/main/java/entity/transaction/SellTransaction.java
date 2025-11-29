@@ -22,23 +22,23 @@ public class SellTransaction extends Transaction {
      * @param assetSymbol   symbol of the asset
      * @param quantity      amount sold
      * @param pricePerUnit  price per unit of asset
+     * @throws IllegalArgumentException .
      */
     public SellTransaction(final String transactionId, final LocalDateTime date,
                            final String fromPortfolio, final String assetType, final String assetSymbol,
                            final double quantity, final double pricePerUnit) {
-//        super(transactionId, date, fromPortfolio, null);
         super(
             transactionId,
             date,
-            fromPortfolio,              // fromPortfolio
-            null,                       // toPortfolio
-            assetSymbol,                // assetSymbol
-            quantity,                   // quantity
-            pricePerUnit,               // priceAtTime
-            quantity * pricePerUnit,    // totalValue
-            null,                       // fromCurrency
-            null,                       // toCurrency
-            null,                       // rate
+            fromPortfolio,
+            null,
+            assetSymbol,
+            quantity,
+            pricePerUnit,
+            quantity * pricePerUnit,
+            null,
+            null,
+            null,
             null
         );
 

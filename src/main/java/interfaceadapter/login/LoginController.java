@@ -28,6 +28,7 @@ public class LoginController {
     }
 
     /**
+     * L.
      * Implements the cancel button in the login view, switching back to the signup
      */
     public void switchToSignupView() {
