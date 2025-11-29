@@ -8,7 +8,6 @@ public class HistoryState {
     private String message = "";
     private List<Row> rows = new ArrayList<>();
 
-    // Row structure for each transaction
     public static class Row {
         public String id;
         public String dateTime;
@@ -18,25 +17,29 @@ public class HistoryState {
         public double totalValue;
     }
 
-    public HistoryState() {
-    }
+    private List<String> portfolioOptions = new ArrayList<>();
 
-    // message
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(final String message) {
-        this.message = message;
-    }
-
-    // rows
     public List<Row> getRows() {
         return rows;
     }
 
-    public void setRows(final List<Row> rows) {
+    public void setRows(List<Row> rows) {
         this.rows = rows;
     }
-}
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public List<String> getPortfolioOptions() {
+        return portfolioOptions;
+    }
+
+    public void setPortfolioOptions(List<String> portfolioOptions) {
+        this.portfolioOptions = portfolioOptions;
+    }
+}

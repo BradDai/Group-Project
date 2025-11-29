@@ -7,7 +7,7 @@ import interfaceadapter.ViewModel;
 
 public class HistoryViewModel extends ViewModel {
 
-    // view name used by ViewManager
+
     public static final String VIEW_NAME = "history";
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -17,7 +17,7 @@ public class HistoryViewModel extends ViewModel {
         super(VIEW_NAME);   // same pattern as your other ViewModels
     }
 
-    // --- State getters / setters ---
+
 
     public HistoryState getState() {
         return state;
@@ -25,10 +25,9 @@ public class HistoryViewModel extends ViewModel {
 
     public void setState(final HistoryState state) {
         this.state = state;
-        firePropertyChanged();   // notify listeners whenever state changes
+        firePropertyChanged();   // notify listeners
     }
 
-    // --- PropertyChangeSupport wiring ---
 
     public void addPropertyChangeListener(final PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);

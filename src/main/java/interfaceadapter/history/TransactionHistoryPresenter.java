@@ -3,6 +3,8 @@ package interfaceadapter.history;
 import usecase.transaction_history.TransactionHistoryOutputBoundary;
 import usecase.transaction_history.TransactionHistoryOutputData;
 
+import java.util.ArrayList;
+
 public class TransactionHistoryPresenter implements TransactionHistoryOutputBoundary {
 
     private final HistoryViewModel historyViewModel;
@@ -13,22 +15,27 @@ public class TransactionHistoryPresenter implements TransactionHistoryOutputBoun
 
     @Override
     public void present(final TransactionHistoryOutputData outputData) {
-        System.out.println("[Presenter] present() called");
-        System.out.println("[Presenter] rows size = " + outputData.rows().size());
-        System.out.println("[Presenter] message   = " + outputData.message());
 
-        // Get current state and update it
-        final HistoryState state = historyViewModel.getState();
+        HistoryState state = historyViewModel.getState();
         state.setRows(outputData.rows());
         state.setMessage(outputData.message());
 
-        // IMPORTANT: update VM and fire change
-        historyViewModel.setState(state);          // stores new state
-        historyViewModel.firePropertyChanged();    // notifies HistoryView
+        historyViewModel.setState(state);
+        historyViewModel.firePropertyChanged();
+    }
 
-        System.out.println("[Presenter] ViewModel updated & property change fired");
+    @Override
+    public void presentPortfolioOptions(final ArrayList<String> portfolioNames) {
+
+
+        HistoryState state = historyViewModel.getState();
+        state.setPortfolioOptions(portfolioNames);
+
+        historyViewModel.setState(state);
+        historyViewModel.firePropertyChanged();
     }
 }
+
 
 
 
