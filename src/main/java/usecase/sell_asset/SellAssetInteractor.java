@@ -2,11 +2,14 @@ package usecase.sell_asset;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import dataaccess.TransactionDataAccessInterface;
+import entity.Stock;
+import entity.SubAccount;
 import entity.transaction.SellTransaction;
 
 public class SellAssetInteractor implements SellAssetInputBoundary {
@@ -29,24 +32,97 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
 
     @Override
     public void execute(final SellAssetInputData sellAssetInputData) {
-        final boolean isValid = validateInput(sellAssetInputData);
-        if (isValid) {
-            processSale(sellAssetInputData);
+        // 1. Validate input
+        if (!validateInput(sellAssetInputData)) {
+            return;
         }
+
+        // 2. Load the SubAccount entity
+        final String username = sellAssetInputData.getUsername();
+        final String portfolioName = sellAssetInputData.getportfolioName();
+        final String stockName = sellAssetInputData.getAssetName();
+        final double quantityToSell = sellAssetInputData.getQuantityToSell();
+
+        final SubAccount portfolio = loadPortfolio(username, portfolioName);
+        if (portfolio == null) {
+            sellAssetOutputBoundary.prepareFailureView("Portfolio not found.");
+            return;
+        }
+
+        // 3. Check if portfolio has the stock
+        if (!portfolio.hasStock(stockName)) {
+            sellAssetOutputBoundary.prepareFailureView("Stock not found in portfolio.");
+            return;
+        }
+
+        final Stock stock = portfolio.findStock(stockName);
+
+        // 4. Validate using entity business logic
+        if (!stock.canSell(quantityToSell)) {
+            sellAssetOutputBoundary.prepareFailureView(
+                    "Cannot sell " + quantityToSell + " units. Available: " + stock.getQuantity()
+            );
+            return;
+        }
+
+        // 5. Execute the sale using entity methods
+        try {
+            portfolio.sellStock(stockName, quantityToSell, stockPrice);
+        }
+        catch (final IllegalArgumentException ex) {
+            sellAssetOutputBoundary.prepareFailureView(ex.getMessage());
+            return;
+        }
+
+        // 6. Save the updated entity
+        dataAccess.save(username, portfolio);
+
+        // 7. Save transaction
+        saveTransaction(username, portfolioName, stockName, quantityToSell);
+
+        // 8. Prepare success response
+        final double totalPrice = quantityToSell * stockPrice;
+        final double remainingQuantity = portfolio.getStockQuantity(stockName);
+
+        final SellAssetOutputData outputData = new SellAssetOutputData(
+                username, stockName, quantityToSell, totalPrice, remainingQuantity
+        );
+        sellAssetOutputBoundary.prepareSuccessView(outputData);
+    }
+
+    private SubAccount loadPortfolio(final String username, final String portfolioName) {
+        final List<SubAccount> accounts = dataAccess.getSubAccountsOf(username);
+        SubAccount portfolio = null;
+        for (final SubAccount sa : accounts) {
+            if (sa.getName().equalsIgnoreCase(portfolioName)) {
+                portfolio = sa;
+            }
+        }
+        return portfolio;
     }
 
     private boolean validateInput(final SellAssetInputData data) {
         boolean valid = true;
 
-        valid &= checkUsername(data.getUsername());
-        valid &= checkPortfolio(data.getportfolioName());
-        valid &= checkStockName(data.getAssetName());
-        valid &= checkQuantityPositive(data.getQuantityToSell());
-        valid &= checkQuantityAvailable(
-                data.getQuantityToSell(),
-                this.dataAccess.getStockQuantity(data.getUsername(), data.getportfolioName(), data.getAssetName())
-        );
-        valid &= checkPriceLoaded(stockPrice);
+        if (!checkUsername(data.getUsername())) {
+            valid = false;
+        }
+
+        if (!checkPortfolio(data.getportfolioName())) {
+            valid = false;
+        }
+
+        if (!checkStockName(data.getAssetName())) {
+            valid = false;
+        }
+
+        if (!checkQuantityPositive(data.getQuantityToSell())) {
+            valid = false;
+        }
+
+        if (!checkPriceLoaded(stockPrice)) {
+            valid = false;
+        }
 
         return valid;
     }
@@ -87,17 +163,6 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
         return valid;
     }
 
-    private boolean checkQuantityAvailable(final double quantity, final double current) {
-        boolean valid = true;
-        if (quantity > current) {
-            sellAssetOutputBoundary.prepareFailureView(
-                    "Invalid quantity: cannot exceed current quantity (" + current + ")."
-            );
-            valid = false;
-        }
-        return valid;
-    }
-
     private boolean checkPriceLoaded(final double price) {
         boolean valid = true;
         if (price <= 0) {
@@ -105,30 +170,6 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
             valid = false;
         }
         return valid;
-    }
-
-    private void processSale(final SellAssetInputData data) {
-        final String username = data.getUsername();
-        final String portfolioName = data.getportfolioName();
-        final String stockName = data.getAssetName();
-        final double quantityToSell = data.getQuantityToSell();
-        final double currentQuantity =
-                this.dataAccess.getStockQuantity(username, portfolioName, stockName);
-
-        final double newQuantity = currentQuantity - quantityToSell;
-        final double totalPrice = quantityToSell * stockPrice;
-
-        dataAccess.updateStockQuantity(username, portfolioName, stockName, newQuantity);
-        if (newQuantity == 0) {
-            dataAccess.removeStock(username, portfolioName, stockName);
-        }
-        dataAccess.addCashToPortfolio(username, portfolioName, totalPrice);
-
-        saveTransaction(username, portfolioName, stockName, quantityToSell);
-
-        final SellAssetOutputData outputData =
-                new SellAssetOutputData(username, stockName, quantityToSell, totalPrice, newQuantity);
-        sellAssetOutputBoundary.prepareSuccessView(outputData);
     }
 
     private void saveTransaction(final String username,

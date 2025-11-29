@@ -115,4 +115,74 @@ public class SubAccount {
         return "SubAccount{name='" + name + "', currencies=" + currencies +
             ", undeletable=" + undeletable + "}";
     }
+
+    /**
+     * For the sell asset use case.
+     * @param symbol the symbol of the stock
+     * @return the stock
+     */
+    public Stock findStock(final String symbol) {
+        Stock result = null;
+        for (final Asset asset : assets) {
+            if (asset instanceof Stock) {
+                final Stock stock = (Stock) asset;
+                if (stock.getCompanySymbol().equalsIgnoreCase(symbol)) {
+                    result = stock;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * For the sell asset use case.
+     * @param symbol the symbol of the stock
+     * @return True if the portfolio have the stock.
+     */
+    public boolean hasStock(final String symbol) {
+        return findStock(symbol) != null;
+    }
+
+    /**
+     * Sell stock logic for the sell asset use case.
+     * @param symbol the symbol of the stock
+     * @param quantity the quantity to sell
+     * @param pricePerUnit the price per unit
+     * @throws IllegalArgumentException if the stock is not found
+     */
+    public void sellStock(final String symbol, final double quantity, final double pricePerUnit) {
+        final Stock stock = findStock(symbol);
+        if (stock == null) {
+            throw new IllegalArgumentException("Stock not found: " + symbol);
+        }
+
+        final double saleProceeds = quantity * pricePerUnit;
+
+        // Reduce stock quantity
+        stock.sell(quantity);
+
+        // Remove if empty
+        if (stock.isEmpty()) {
+            removeAsset(stock);
+        }
+
+        // Add cash proceeds
+        final BigDecimal newBalance = getBalanceUSD().add(BigDecimal.valueOf(saleProceeds));
+        setBalanceUSD(newBalance);
+    }
+
+    /**
+     * Get the quantity of stock.
+     * @param symbol the symbol of the stock
+     * @return the quantity of stock
+     */
+    public double getStockQuantity(final String symbol) {
+        final Stock stock = findStock(symbol);
+        double quantity = 0.0;
+        if (stock != null) {
+            quantity = stock.getQuantity();
+        }
+
+        return quantity;
+    }
 }

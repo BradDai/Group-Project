@@ -1,6 +1,8 @@
 package usecase.sell_asset;
 
-public interface SellAssetDataAccessInterface {
+import usecase.SubAccount.SubAccountDataAccessInterface;
+
+public interface SellAssetDataAccessInterface extends SubAccountDataAccessInterface {
     /**
      * Get the available portfolios under the user 'username'.
      *
