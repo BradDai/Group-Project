@@ -12,8 +12,16 @@ public class BuyAssetController {
                               final LoggedInViewModel loggedInViewModel) {
         this.interactor = interactor;
     }
+    /**
+     * Execute.
+     *
+     * @param username .
+     * @param portfolioName .
+     * @param symbol .
+     * @param quantity .
+     * @param price .
+     */
 
-    // View now only needs to pass symbol, quantity, price
     public void execute(final String username, final String portfolioName,
                         final String symbol, final int quantity, final double price) {
 

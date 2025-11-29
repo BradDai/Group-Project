@@ -19,6 +19,9 @@ public class SwitchLoggedInPresenter implements SwitchLoggedInOutputBoundary {
         this.subAccountDataAccess = subAccountDataAccess;
     }
 
+    /**
+     * T.
+     */
     public void switchToLoggedInView() {
         // Refresh the subaccounts before switching
         final LoggedInState state = loggedInViewModel.getState();

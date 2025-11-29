@@ -12,15 +12,15 @@ import usecase.SubAccount.SubAccountDataAccessInterface;
 
 public class BuyAssetInteractor implements BuyAssetInputBoundary {
 
-    private final SubAccountDataAccessInterface subAccountDAO;
-    private final TransactionDataAccessInterface transactionDAO;
+    private final SubAccountDataAccessInterface subAccountDao;
+    private final TransactionDataAccessInterface transactionDao;
     private final BuyAssetOutputBoundary presenter;
 
-    public BuyAssetInteractor(final SubAccountDataAccessInterface subAccountDAO,
-                              final TransactionDataAccessInterface transactionDAO,
+    public BuyAssetInteractor(final SubAccountDataAccessInterface subAccountDao,
+                              final TransactionDataAccessInterface transactionDao,
                               final BuyAssetOutputBoundary presenter) {
-        this.subAccountDAO = subAccountDAO;
-        this.transactionDAO = transactionDAO;
+        this.subAccountDao = subAccountDao;
+        this.transactionDao = transactionDao;
         this.presenter = presenter;
     }
 
@@ -54,7 +54,7 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
             return;
         }
 
-        final List<SubAccount> accounts = subAccountDAO.getSubAccountsOf(username);
+        final List<SubAccount> accounts = subAccountDao.getSubAccountsOf(username);
         SubAccount target = null;
         for (final SubAccount sa : accounts) {
             if (sa.getName().equalsIgnoreCase(portfolioName)) {
@@ -76,13 +76,13 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
         }
 
         final BigDecimal newBal = target.getBalanceUSD().subtract(cost);
-        target.setBalanceUSD(newBal);
+        target.setBalanceUsd(newBal);
 
         // update holdings
         final Stock stock = new Stock(symbol, qty, symbol);
         target.addOrIncreaseAsset(stock);
 
-        subAccountDAO.save(username, target);
+        subAccountDao.save(username, target);
 
         final BuyTransaction tx = new BuyTransaction(
             generateTransactionId(),
@@ -96,7 +96,7 @@ public class BuyAssetInteractor implements BuyAssetInputBoundary {
 
         System.out.println("[BuyAssetInteractor] Saving transaction: " + tx.getTransactionId());
 
-        transactionDAO.save(username,
+        transactionDao.save(username,
             new BuyTransaction(
                 "TX-" + System.currentTimeMillis(),
                 LocalDateTime.now(),

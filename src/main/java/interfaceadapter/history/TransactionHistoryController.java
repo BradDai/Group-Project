@@ -11,6 +11,13 @@ public class TransactionHistoryController {
         this.interactor = interactor;
     }
 
+    /**
+     * L.
+     * @param portfolio .
+     * @param asset .
+     * @param startDate .
+     * @param endDate .
+     */
     public void loadHistory(final String portfolio,
                             final String asset,
                             final String startDate,
@@ -22,6 +29,10 @@ public class TransactionHistoryController {
         interactor.execute(input);
     }
 
+    /**
+     * L.
+     *
+     */
     public void loadPortfolioOptions() {
         interactor.loadPortfolioOptions();
     }

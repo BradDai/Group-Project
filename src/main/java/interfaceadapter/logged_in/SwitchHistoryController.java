@@ -10,6 +10,9 @@ public class SwitchHistoryController {
         this.switchHistoryUseCaseInteractor = switchHistoryUseCaseInteractor;
     }
 
+    /**
+     * I.
+     */
     public void switchToHistoryView() {
 
         switchHistoryUseCaseInteractor.switchToHistoryView();

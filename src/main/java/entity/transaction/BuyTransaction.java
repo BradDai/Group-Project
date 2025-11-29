@@ -26,27 +26,24 @@ public class BuyTransaction extends Transaction {
      * @param assetSymbol   symbol of the asset (e.g., "AAPL", "USD")
      * @param quantity      amount purchased
      * @param pricePerUnit  price per unit of asset
+     * @throws IllegalArgumentException .
      */
     public BuyTransaction(final String transactionId, final LocalDateTime date,
                           final String toPortfolio, final String assetType, final String assetSymbol,
                           final double quantity, final double pricePerUnit) {
 
-        // 🔴 OLD (wrong now, only 4 args):
-        // super(transactionId, date, null, toPortfolio);
-
-        // ✅ NEW: match Transaction constructor (12 args)
         super(
             transactionId,
             date,
-            null,                     // fromPortfolio
-            toPortfolio,              // toPortfolio
-            assetSymbol,              // assetSymbol
-            quantity,                 // quantity
-            pricePerUnit,             // priceAtTime
-            quantity * pricePerUnit,  // totalValue
-            null,                     // fromCurrency
-            null,                     // toCurrency
-            null,                     // rate
+            null,
+            toPortfolio,
+            assetSymbol,
+            quantity,
+            pricePerUnit,
+            quantity * pricePerUnit,
+            null,
+            null,
+            null,
             null
         );
 

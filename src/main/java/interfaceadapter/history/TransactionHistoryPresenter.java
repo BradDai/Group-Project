@@ -1,9 +1,10 @@
 package interfaceadapter.history;
 
+import java.util.ArrayList;
+
 import usecase.transaction_history.TransactionHistoryOutputBoundary;
 import usecase.transaction_history.TransactionHistoryOutputData;
 
-import java.util.ArrayList;
 
 public class TransactionHistoryPresenter implements TransactionHistoryOutputBoundary {
 
@@ -16,7 +17,7 @@ public class TransactionHistoryPresenter implements TransactionHistoryOutputBoun
     @Override
     public void present(final TransactionHistoryOutputData outputData) {
 
-        HistoryState state = historyViewModel.getState();
+        final HistoryState state = historyViewModel.getState();
         state.setRows(outputData.rows());
         state.setMessage(outputData.message());
 
@@ -27,7 +28,7 @@ public class TransactionHistoryPresenter implements TransactionHistoryOutputBoun
     @Override
     public void presentPortfolioOptions(final ArrayList<String> portfolioNames) {
 
-        HistoryState state = historyViewModel.getState();
+        final HistoryState state = historyViewModel.getState();
         state.setPortfolioOptions(portfolioNames);
 
         historyViewModel.setState(state);

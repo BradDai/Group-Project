@@ -15,6 +15,9 @@ public class SwitchExchangePresenter implements SwitchExchangeOutputBoundary {
         this.viewManagerModel = viewManagerModel;
     }
 
+    /**
+     * I.
+     */
     public void switchToExchangeView(final String username) {
         final ExchangeState exchangeState = exchangeViewModel.getExchangeState();
         exchangeState.setUsername(username);

@@ -10,6 +10,9 @@ public class SwitchExchangeController {
         this.switchExchangeUseCaseInteractor = switchExchangeUseCaseInteractor;
     }
 
+    /**
+     * I.
+     */
     public void switchToExchangeView(final String username) {
         switchExchangeUseCaseInteractor.switchToExchangeView(username);
     }

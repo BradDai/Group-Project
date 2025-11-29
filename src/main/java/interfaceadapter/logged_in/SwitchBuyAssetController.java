@@ -9,6 +9,9 @@ public class SwitchBuyAssetController {
     public SwitchBuyAssetController(final SwitchBuyAssetInputBoundary switchBuyAssetUseCaseInteractor) {
         this.switchBuyAssetUseCaseInteractor = switchBuyAssetUseCaseInteractor;
     }
+    /**
+     * I.
+     */
 
     public void switchToBuyAssetView() {
 

@@ -1,6 +1,5 @@
 package entity;
 
-
 public class Asset {
     private final String type;
     private double quantity;

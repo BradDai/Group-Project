@@ -11,6 +11,9 @@ public class SwitchLoggedInInteractor implements SwitchLoggedInInputBoundary {
         this.switchLoggedInPresenter = switchLoggedInOutputBoundary;
     }
 
+    /**
+     * Y.
+     */
     public void switchToLoggedInView() {
         switchLoggedInPresenter.switchToLoggedInView();
     }

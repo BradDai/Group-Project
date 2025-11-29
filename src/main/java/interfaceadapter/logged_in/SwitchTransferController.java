@@ -10,6 +10,10 @@ public class SwitchTransferController {
         this.switchTransferUseCaseInteractor = switchTransferUseCaseInteractor;
     }
 
+    /**
+     * L.
+     * @param username .
+     */
     public void switchToTransferView(final String username) {
         switchTransferUseCaseInteractor.switchToTransferView(username);
     }

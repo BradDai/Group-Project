@@ -15,6 +15,9 @@ public class SwitchBuyAssetPresenter implements SwitchBuyAssetOutputBoundary {
         this.viewManagerModel = viewManagerModel;
     }
 
+    /**
+     * I.
+     */
     public void switchToBuyAssetView() {
 
         viewManagerModel.setState(buyAssetViewModel.getViewName());

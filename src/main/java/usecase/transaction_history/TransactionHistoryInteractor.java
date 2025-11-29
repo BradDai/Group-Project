@@ -141,11 +141,11 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
         presenter.presentPortfolioOptions(result);
     }
 
-    private LocalDate parseDate(final String s) {
-        if (s == null || s.isBlank()) {
+    private LocalDate parseDate(final String sss) {
+        if (sss == null || sss.isBlank()) {
             return null;
         }
-        return LocalDate.parse(s);
+        return LocalDate.parse(sss);
     }
 }
 

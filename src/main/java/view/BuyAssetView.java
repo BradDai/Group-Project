@@ -38,8 +38,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
     private final JTextField quantityField;
     private final JLabel totalLabel;
 
-    private static final String API_KEY = "ebcea301f0ad46579daa6b6dea349164";
-
     public BuyAssetView(final BuyAssetViewModel buyAssetViewModel) {
         this.buyAssetViewModel = buyAssetViewModel;
         this.buyAssetViewModel.addPropertyChangeListener(this);
@@ -71,10 +69,7 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
 
         final JPanel assetMenu = new JPanel();
         assetMenu.add(new JLabel("Choose asset:"));
-        final String[] assetSymbols = {"", "AAPL", "MSFT", "TSLA", "AMZN", "GOOGL", "NVDA", "META",
-                "NFLX", "AMD", "INTC", "BABA", "SHOP", "UBER",
-                "SPY", "QQQ", "VTI",
-                "BTC/USD", "ETH/USD"};
+        final String[] assetSymbols = {"", "AAPL", "MSFT", "TSLA", "AMZN", "GOOGL", "NVDA", "META", "NFLX", "AMD", "INTC", "BABA", "SHOP", "UBER", "SPY", "QQQ", "VTI", "BTC/USD", "ETH/USD"};
         assetComboBox = new JComboBox<>(assetSymbols);
         assetMenu.add(assetComboBox);
         this.add(assetMenu);
@@ -129,7 +124,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
 
     private void onAssetSelected() {
         final String symbol = (String) assetComboBox.getSelectedItem();
-
         final BuyAssetState state = buyAssetViewModel.getState();
         state.selectedSymbol = (symbol == null) ? "" : symbol;
         buyAssetViewModel.setState(state);
@@ -137,7 +131,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         if (getPriceController != null && symbol != null && !symbol.isEmpty()) {
             getPriceController.execute(symbol);
         }
-
         System.out.println("Selected asset = " + symbol);
     }
 
@@ -261,6 +254,10 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         this.buyAssetController = controller;
     }
 
+    /**
+     * Set.
+     * @param loggedInViewModel .
+     */
     public void setLoggedInViewModel(final LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
 
@@ -280,6 +277,11 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         this.switchLoggedInController = controller;
     }
 
+    /**
+     * Get.
+     *
+     * @return .
+     */
     public String getViewName() {
         final String viewName = "buyasset";
         return viewName;

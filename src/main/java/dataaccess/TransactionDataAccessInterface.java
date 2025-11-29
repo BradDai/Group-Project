@@ -19,11 +19,6 @@ public interface TransactionDataAccessInterface {
      */
     void save(String userId, Transaction transaction);
 
-    /**
-     * Get all transactions related to a specific portfolio for a user.
-     * Returns transactions where this portfolio is either the source
-     * (fromPortfolio) or destination (toPortfolio).
-     */
     List<Transaction> getByPortfolio(String userId, String portfolioId);
 
     /**
@@ -35,9 +30,6 @@ public interface TransactionDataAccessInterface {
      * @param startDate   optional; if not null, include only dates >= startDate
      * @param endDate     optional; if not null, include only dates <= endDate
      */
-    List<Transaction> getByFilters(String userId,
-                                   String portfolioId,
-                                   String assetSymbol,
-                                   LocalDate startDate,
+    List<Transaction> getByFilters(String userId, String portfolioId, String assetSymbol, LocalDate startDate,
                                    LocalDate endDate);
 }

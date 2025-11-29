@@ -48,7 +48,12 @@ public class SubAccount {
         return Collections.unmodifiableList(assets);
     }
 
-    public void setBalanceUSD(final BigDecimal newBalance) {
+    /**
+     * I.
+     * @param newBalance .
+     * @throws IllegalArgumentException .
+     */
+    public void setBalanceUsd(final BigDecimal newBalance) {
         if (newBalance == null || newBalance.signum() < 0) {
             throw new IllegalArgumentException("balance must be >= 0");
         }
@@ -60,10 +65,21 @@ public class SubAccount {
         return Collections.unmodifiableMap(currencies);
     }
 
+    /**
+     * I.
+     * @param currencyCode .
+     * @return .
+     */
     public BigDecimal getBalanceOf(final String currencyCode) {
         return currencies.getOrDefault(currencyCode, BigDecimal.ZERO);
     }
 
+    /**
+     * I.
+     * @param currencyCode .
+     * @param amount .
+     * @throws IllegalArgumentException .
+     */
     public void setBalanceOf(final String currencyCode, final BigDecimal amount) {
         if (currencyCode == null || currencyCode.isBlank()) {
             throw new IllegalArgumentException("currencyCode required");
@@ -77,6 +93,10 @@ public class SubAccount {
         }
     }
 
+    /**
+     * L.
+     * @param newAsset .
+     */
     public void addOrIncreaseAsset(final Asset newAsset) {
         for (final Asset asset : assets) {
             if (asset.getClass().equals(newAsset.getClass())
@@ -90,6 +110,10 @@ public class SubAccount {
         assets.add(newAsset);
     }
 
+    /**
+     * I.
+     * @param asset .
+     */
     public void removeAsset(final Asset asset) {
         assets.remove(asset);
     }
@@ -167,7 +191,7 @@ public class SubAccount {
 
         // Add cash proceeds
         final BigDecimal newBalance = getBalanceUSD().add(BigDecimal.valueOf(saleProceeds));
-        setBalanceUSD(newBalance);
+        setBalanceUsd(newBalance);
     }
 
     /**

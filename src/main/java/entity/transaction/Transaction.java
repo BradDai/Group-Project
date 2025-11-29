@@ -13,32 +13,25 @@ import java.time.LocalDateTime;
  */
 public abstract class Transaction {
 
-    // === ORIGINAL FIELDS (unchanged) ===
     private final String transactionId;
     private final LocalDateTime date;
     private final String fromPortfolio;
     private final String toPortfolio;
 
-    // === NEW FIELDS FOR HISTORY PAGE (optional) ===
-    // These will be ignored for transaction types that don’t use them.
     private final String assetSymbol;
     private final Double quantity;
     private final Double priceAtTime;
     private final Double totalValue;
-
     private final String fromCurrency;
     private final String toCurrency;
     private final Double rate;
     private final Double amount;
 
-    // === CONSTRUCTOR (extended but keeps original parameters) ===
     protected Transaction(
         final String transactionId,
         final LocalDateTime date,
         final String fromPortfolio,
         final String toPortfolio,
-
-        //
         final String assetSymbol,
         final Double quantity,
         final Double priceAtTime,
@@ -48,7 +41,6 @@ public abstract class Transaction {
         final Double rate,
         final Double amount
     ) {
-        // Original validation kept exactly the same
         if (transactionId == null || transactionId.isEmpty()) {
             throw new IllegalArgumentException("Transaction ID cannot be empty");
         }
@@ -60,20 +52,16 @@ public abstract class Transaction {
         this.date = date;
         this.fromPortfolio = fromPortfolio;
         this.toPortfolio = toPortfolio;
-
-        // New fields can be null depending on type
         this.assetSymbol = assetSymbol;
         this.quantity = quantity;
         this.priceAtTime = priceAtTime;
         this.totalValue = totalValue;
-
         this.fromCurrency = fromCurrency;
         this.toCurrency = toCurrency;
         this.rate = rate;
         this.amount = amount;
     }
 
-    // === ORIGINAL GETTERS (unchanged) ===
     public String getTransactionId() {
         return transactionId;
     }
@@ -90,17 +78,14 @@ public abstract class Transaction {
         return toPortfolio;
     }
 
-    // === NEW GETTERS (safe defaults for null) ===
+    public abstract String getDescription();
+
     public String getAssetSymbol() {
         return assetSymbol;
     }
 
     public double getQuantity() {
         return quantity;
-    }
-
-    public Double getPriceAtTime() {
-        return priceAtTime;
     }
 
     public double getTotalValue() {
@@ -115,16 +100,8 @@ public abstract class Transaction {
         return toCurrency;
     }
 
-    public Double getRate() {
-        return rate;
-    }
-
     public Double getAmount() {
         return amount;
     }
 
-    // === ORIGINAL ABSTRACT METHODS (unchanged) ===
-    public abstract String getTransactionType();
-
-    public abstract String getDescription();
-}
+    public abstract String getTransactionType(); }

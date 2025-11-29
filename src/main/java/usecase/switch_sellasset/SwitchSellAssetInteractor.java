@@ -16,6 +16,10 @@ public class SwitchSellAssetInteractor implements SwitchSellAssetInputBoundary {
         this.dataAccess = dataAccess;
     }
 
+    /**
+     * L.
+     * @param username .
+     */
     public void switchToSellAssetView(final String username) {
         final String[] portfolios = dataAccess.getAvailablePortfolios(username);
         final Map<String, String[]> portfolioStocks = new HashMap<>();

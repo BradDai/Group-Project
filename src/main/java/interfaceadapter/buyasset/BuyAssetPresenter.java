@@ -10,14 +10,14 @@ public class BuyAssetPresenter implements BuyAssetOutputBoundary {
 
     private final BuyAssetViewModel buyAssetViewModel;
     private final LoggedInViewModel loggedInViewModel;
-    private final SubAccountDataAccessInterface subAccountDAO;
+    private final SubAccountDataAccessInterface subAccountDao;
 
     public BuyAssetPresenter(final BuyAssetViewModel buyAssetViewModel,
                              final LoggedInViewModel loggedInViewModel,
-                             final SubAccountDataAccessInterface subAccountDAO) {
+                             final SubAccountDataAccessInterface subAccountDao) {
         this.buyAssetViewModel = buyAssetViewModel;
         this.loggedInViewModel = loggedInViewModel;
-        this.subAccountDAO = subAccountDAO;
+        this.subAccountDao = subAccountDao;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class BuyAssetPresenter implements BuyAssetOutputBoundary {
         buyAssetViewModel.firePropertyChange();
         final String username = outputData.username();
         final LoggedInState loggedState = loggedInViewModel.getState();
-        loggedState.setSubAccounts(subAccountDAO.getSubAccountsOf(username));
+        loggedState.setSubAccounts(subAccountDao.getSubAccountsOf(username));
         loggedInViewModel.setState(loggedState);
         loggedInViewModel.firePropertyChange(LoggedInViewModel.SUBACCOUNTS_CHANGED);
     }

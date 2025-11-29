@@ -15,6 +15,9 @@ public class SwitchHistoryPresenter implements SwitchHistoryOutputBoundary {
         this.viewManagerModel = viewManagerModel;
     }
 
+    /**
+     * I.
+     */
     public void switchToHistoryView() {
 
         viewManagerModel.setState(historyViewModel.getViewName());

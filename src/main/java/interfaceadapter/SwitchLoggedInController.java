@@ -9,6 +9,9 @@ public class SwitchLoggedInController {
     public SwitchLoggedInController(final SwitchLoggedInInputBoundary switchLoggedInUseCaseInteractor) {
         this.switchLoggedInUseCaseInteractor = switchLoggedInUseCaseInteractor;
     }
+    /**
+     * I.
+     */
 
     public void switchToLoggedInView() {
 
