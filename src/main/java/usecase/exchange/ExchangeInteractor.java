@@ -12,14 +12,14 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
 
     private final ExchangeOutputBoundary exchangePresenter;
     private final ExchangeDataAccessInterface exchangeDataAccess;
-    private final TransactionDataAccessInterface transactionDAO;  // ⭐ NEW
+    private final TransactionDataAccessInterface transactionDAO;
 
     public ExchangeInteractor(final ExchangeOutputBoundary exchangePresenter,
                               final ExchangeDataAccessInterface exchangeDataAccess,
-                              final TransactionDataAccessInterface transactionDAO) { // ⭐ NEW
+                              final TransactionDataAccessInterface transactionDAO) {
         this.exchangePresenter = exchangePresenter;
         this.exchangeDataAccess = exchangeDataAccess;
-        this.transactionDAO = transactionDAO;  // ⭐ NEW
+        this.transactionDAO = transactionDAO;
     }
 
     @Override
@@ -96,7 +96,6 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
                 currencies
             );
 
-            //  NEW: record convert transaction in history
             final ConvertTransaction tx = new ConvertTransaction(
                 "TX-" + System.currentTimeMillis(),
                 LocalDateTime.now(),
