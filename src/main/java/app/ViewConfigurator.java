@@ -87,3 +87,4 @@ public class ViewConfigurator {
         return cardLayout;
     }
 }
+

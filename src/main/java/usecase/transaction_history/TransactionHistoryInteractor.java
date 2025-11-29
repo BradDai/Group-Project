@@ -1,8 +1,11 @@
+
 package usecase.transaction_history;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import dataaccess.TransactionDataAccessInterface;
 import entity.transaction.BuyTransaction;
@@ -35,27 +38,16 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
         final LocalDate start = parseDate(inputData.startDate());
         final LocalDate end = parseDate(inputData.endDate());
 
-        System.out.println("[Interactor] execute() called");
-        System.out.println("  portfolio = " + portfolio);
-        System.out.println("  asset     = " + asset);
-        System.out.println("  startDate = " + start);
-        System.out.println("  endDate   = " + end);
-
-        // use real logged-in username
         final String username = loggedInViewModel.getState().getUsername();
-        System.out.println("  username  = " + username);
 
         final List<Transaction> txList = transactionRepo.getByFilters(
-            username,
-            portfolio,
-            asset,
-            start,
-            end
+                username,
+                portfolio,
+                asset,
+                start,
+                end
         );
 
-        System.out.println("[Interactor] DAO returned " + txList.size() + " transactions");
-
-        // map to HistoryState.Row
         final List<HistoryState.Row> rows = new ArrayList<>();
         for (final Transaction tx : txList) {
             final HistoryState.Row row = new HistoryState.Row();
@@ -74,56 +66,89 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
                 row.quantity = st.getQuantity();
                 row.totalValue = st.getTotalValue();
             }
-            // ⭐ handle currency conversions
             else if (tx instanceof final ConvertTransaction ct) {
                 row.asset = ct.getFromCurrency() + "->" + ct.getToCurrency();
-                row.type = ct.getTransactionType();      // "CONVERT"
-                row.quantity = ct.getFromAmount();       // source amount
-                row.totalValue = ct.getToAmount();       // target amount
+                row.type = ct.getTransactionType();
+                row.quantity = ct.getFromAmount();
+                row.totalValue = ct.getToAmount();
             }
-            // ⭐ NEW: handle transfers
             else if (tx instanceof final TransferTransaction tt) {
-                row.asset = tt.getAssetSymbol();         // stock symbol or currency code
+                row.asset = tt.getAssetSymbol();
                 row.type = "TRANSFER";
-                row.quantity = tt.getQuantity();         // amount moved
-                row.totalValue = 0.0;                    // or whatever you decide
+                row.quantity = tt.getQuantity();
+                row.totalValue = 0.0;
             }
             else {
-                // any other future types
                 row.asset = "";
                 row.type = tx.getTransactionType();
                 row.quantity = 0.0;
                 row.totalValue = 0.0;
             }
+
             rows.add(row);
         }
 
-
-        // build output & send to presenter
         String msg = "Loaded " + rows.size() + " transactions for portfolio " + portfolio;
         if (start != null && end != null) {
             msg += " from " + start + " to " + end;
         }
 
         final TransactionHistoryOutputData output =
-            new TransactionHistoryOutputData(
-                rows,
-                msg,
-                inputData.startDate(),
-                inputData.endDate()
-            );
+                new TransactionHistoryOutputData(
+                        rows,
+                        msg,
+                        inputData.startDate(),
+                        inputData.endDate()
+                );
 
-        System.out.println("[Interactor] message = " + msg);
-        System.out.println("[Interactor] calling presenter.present(...)");
         presenter.present(output);
-        System.out.println("[Interactor] execute() finished");
+    }
+
+    @Override
+    public void loadPortfolioOptions() {
+
+        if (loggedInViewModel == null || loggedInViewModel.getState() == null) {
+            presenter.presentPortfolioOptions(new ArrayList<>());
+            return;
+        }
+
+        final String username = loggedInViewModel.getState().getUsername();
+
+        if (username == null || username.isBlank()) {
+            presenter.presentPortfolioOptions(new ArrayList<>());
+            return;
+        }
+
+        final List<Transaction> allTx = transactionRepo.getByFilters(
+                username,
+                null,
+                null,
+                null,
+                null
+        );
+
+        final Set<String> portfolioIds = new LinkedHashSet<>();
+        for (Transaction tx : allTx) {
+            if (tx.getFromPortfolio() != null && !tx.getFromPortfolio().isBlank()) {
+                portfolioIds.add(tx.getFromPortfolio());
+            }
+            if (tx.getToPortfolio() != null && !tx.getToPortfolio().isBlank()) {
+                portfolioIds.add(tx.getToPortfolio());
+            }
+        }
+
+        final ArrayList<String> result = new ArrayList<>(portfolioIds);
+        presenter.presentPortfolioOptions(result);
     }
 
     private LocalDate parseDate(final String s) {
         if (s == null || s.isBlank()) {
             return null;
         }
-        // expects yyyy-MM-dd
         return LocalDate.parse(s);
     }
 }
+
+
+
+

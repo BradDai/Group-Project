@@ -61,10 +61,7 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
     public List<Transaction> getByPortfolio(final String userId, final String portfolioId) {
         return loadUserTransactions(userId)
                 .stream()
-                .filter(ttx -> {
-                    return portfolioId.equals(ttx.getFromPortfolio())
-                            || portfolioId.equals(ttx.getToPortfolio());
-                })
+                .filter(ttx -> matchesPortfolio(ttx, portfolioId))
                 .collect(Collectors.toList());
     }
 
@@ -77,20 +74,22 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
 
         return loadUserTransactions(userId)
                 .stream()
-                .filter(ttx -> {
-                    return matchesPortfolio(ttx, portfolioId);
-                })
-                .filter(ttx -> {
-                    return matchesAssetFilter(ttx, assetSymbol);
-                })
-                .filter(ttx -> {
-                    return isWithinDateRange(ttx, startDate, endDate);
-                })
+                .filter(ttx -> matchesPortfolio(ttx, portfolioId))
+                .filter(ttx -> matchesAssetFilter(ttx, assetSymbol))
+                .filter(ttx -> isWithinDateRange(ttx, startDate, endDate))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Portfolio filter.
+     * If portfolioId is null/blank, we treat it as "no portfolio filter".
+     */
     private boolean matchesPortfolio(final Transaction ttx,
                                      final String portfolioId) {
+        if (portfolioId == null || portfolioId.isBlank()) {
+            // no filter: match everything
+            return true;
+        }
         return portfolioId.equals(ttx.getFromPortfolio())
                 || portfolioId.equals(ttx.getToPortfolio());
     }
@@ -105,7 +104,8 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
             result = st.getAssetSymbol();
         }
         else if (ttx instanceof final ConvertTransaction ct) {
-            result = ct.getFromCurrency() + "-> " + ct.getToCurrency();
+            // keep consistent with toCsvLine: "FROM->TO" (no extra space)
+            result = ct.getFromCurrency() + "->" + ct.getToCurrency();
         }
         else if (ttx instanceof final TransferTransaction tt) {
             result = tt.getAssetSymbol();
@@ -118,7 +118,7 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                                        final String assetSymbol) {
 
         if (assetSymbol == null || assetSymbol.isBlank()) {
-            // No asset filter applied
+            // no asset filter
             return true;
         }
 
@@ -188,9 +188,9 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         }
         try {
             Files.write(file, lines, StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING,
-                StandardOpenOption.WRITE);
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING,
+                    StandardOpenOption.WRITE);
         }
         catch (final IOException e) {
             throw new RuntimeException("Failed to write transactions for user " + userId, e);
@@ -199,6 +199,7 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
 
     /**
      * Parse a CSV line into the correct Transaction subclass.
+     *
      * @param line A string.
      */
     private Transaction parseCsvLine(final String line) {
@@ -218,22 +219,22 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
 
         return switch (type) {
             case "BUY" -> new BuyTransaction(
-                transactionId,
-                dateTime,
-                toPortfolio,      // portfolio receiving the asset
-                assetType,
-                assetSymbol,
-                quantity,
-                pricePerUnit
+                    transactionId,
+                    dateTime,
+                    toPortfolio,      // portfolio receiving the asset
+                    assetType,
+                    assetSymbol,
+                    quantity,
+                    pricePerUnit
             );
             case "SELL" -> new SellTransaction(
-                transactionId,
-                dateTime,
-                fromPortfolio,    // portfolio selling the asset
-                assetType,
-                assetSymbol,
-                quantity,
-                pricePerUnit
+                    transactionId,
+                    dateTime,
+                    fromPortfolio,
+                    assetType,
+                    assetSymbol,
+                    quantity,
+                    pricePerUnit
             );
             case "CONVERT" -> {
                 // assetSymbol stored as "FROM->TO"
@@ -246,26 +247,26 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                 }
 
                 yield new ConvertTransaction(
-                    transactionId,
-                    dateTime,
-                    fromPortfolio != null ? fromPortfolio : toPortfolio,
-                    fromCurrency,
-                    toCurrency,
-                    quantity,
-                    pricePerUnit
+                        transactionId,
+                        dateTime,
+                        fromPortfolio != null ? fromPortfolio : toPortfolio,
+                        fromCurrency,
+                        toCurrency,
+                        quantity,
+                        pricePerUnit
                 );
             }
             case "TRANSFER" -> {
                 final TransferTransactionBuilder builder = new TransferTransactionBuilder();
                 yield builder
-                    .setTransactionId(transactionId)
-                    .setDate(dateTime)
-                    .setFromPortfolio(fromPortfolio)
-                    .setToPortfolio(toPortfolio)
-                    .setAssetType(assetType)
-                    .setAssetSymbol(assetSymbol)
-                    .setQuantity(quantity)
-                    .build();
+                        .setTransactionId(transactionId)
+                        .setDate(dateTime)
+                        .setFromPortfolio(fromPortfolio)
+                        .setToPortfolio(toPortfolio)
+                        .setAssetType(assetType)
+                        .setAssetSymbol(assetSymbol)
+                        .setQuantity(quantity)
+                        .build();
             }
             default -> null; // unknown types are ignored
         };
@@ -306,23 +307,21 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
             assetType = nullToEmpty(tt.getAssetType());
             assetSymbol = nullToEmpty(tt.getAssetSymbol());
             quantity = tt.getQuantity();
-            // transfer typically doesn’t have a price/total; leave them as 0
             pricePerUnit = 0.0;
             totalValue = 0.0;
         }
 
-
         return String.join(",",
-            nullToEmpty(tx.getTransactionId()),
-            tx.getDate().toString(),
-            nullToEmpty(tx.getFromPortfolio()),
-            nullToEmpty(tx.getToPortfolio()),
-            transactionType,
-            assetType,
-            assetSymbol,
-            Double.toString(quantity),
-            Double.toString(pricePerUnit),
-            Double.toString(totalValue)
+                nullToEmpty(tx.getTransactionId()),
+                tx.getDate().toString(),
+                nullToEmpty(tx.getFromPortfolio()),
+                nullToEmpty(tx.getToPortfolio()),
+                transactionType,
+                assetType,
+                assetSymbol,
+                Double.toString(quantity),
+                Double.toString(pricePerUnit),
+                Double.toString(totalValue)
         );
     }
 
