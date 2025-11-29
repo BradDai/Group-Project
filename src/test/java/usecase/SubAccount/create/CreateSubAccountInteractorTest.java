@@ -72,18 +72,13 @@ class CreateSubAccountInteractorTest {
         String username = "alice";
         CreateSubAccountInputData input =
                 new CreateSubAccountInputData(username, "Growth Portfolio");
-
         interactor.execute(input);
-
-        // DAO 里真的有这个账户
         List<SubAccount> accounts = dao.getSubAccountsOf(username);
         assertEquals(1, accounts.size());
         SubAccount sa = accounts.get(0);
         assertEquals("Growth Portfolio", sa.getName());
         assertEquals(BigDecimal.ZERO, sa.getBalanceUSD());
         assertFalse(sa.isUndeletable());
-
-        // Presenter 收到成功数据
         assertNotNull(presenter.successData);
         assertNull(presenter.errorMessage);
         assertEquals(username, presenter.successData.username());
@@ -96,9 +91,7 @@ class CreateSubAccountInteractorTest {
         TestPresenter presenter = new TestPresenter();
         CreateSubAccountInteractor interactor =
                 new CreateSubAccountInteractor(dao, presenter);
-
         interactor.execute(new CreateSubAccountInputData("bob", "  "));
-
         assertEquals(0, dao.countByUser("bob"));
         assertNull(presenter.successData);
         assertEquals("Subaccount name cannot be empty.", presenter.errorMessage);
@@ -108,17 +101,13 @@ class CreateSubAccountInteractorTest {
     void execute_maxLimitReached_presentsError() {
         InMemorySubAccountDAO dao = new InMemorySubAccountDAO();
         String user = "carol";
-        // 先塞满 5 个账户
         for (int i = 0; i < 5; i++) {
             dao.save(user, new SubAccount("P" + i, BigDecimal.ZERO, false));
         }
-
         TestPresenter presenter = new TestPresenter();
         CreateSubAccountInteractor interactor =
                 new CreateSubAccountInteractor(dao, presenter);
-
         interactor.execute(new CreateSubAccountInputData(user, "NewOne"));
-
         assertEquals(5, dao.countByUser(user));
         assertEquals("Maximum subaccount limit reached (5).", presenter.errorMessage);
         assertNull(presenter.successData);
@@ -129,13 +118,10 @@ class CreateSubAccountInteractorTest {
         InMemorySubAccountDAO dao = new InMemorySubAccountDAO();
         String user = "dave";
         dao.save(user, new SubAccount("Main USD Portfolio", BigDecimal.ZERO, true));
-
         TestPresenter presenter = new TestPresenter();
         CreateSubAccountInteractor interactor =
                 new CreateSubAccountInteractor(dao, presenter);
-
         interactor.execute(new CreateSubAccountInputData(user, "Main USD Portfolio"));
-
         assertEquals(1, dao.countByUser(user));
         assertEquals("Subaccount with this name already exists.", presenter.errorMessage);
         assertNull(presenter.successData);

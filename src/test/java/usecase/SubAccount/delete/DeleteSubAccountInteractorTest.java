@@ -64,10 +64,9 @@ class DeleteSubAccountInteractorTest {
         InMemorySubAccountDAO dao = new InMemorySubAccountDAO();
         String user = "brad";
         dao.save(user, new SubAccount("Main USD Portfolio",
-                new BigDecimal("1000000"), true)); // 不可删
+                new BigDecimal("1000000"), true));
         dao.save(user, new SubAccount("Temp",
-                BigDecimal.ZERO, false));          // 可以删
-
+                BigDecimal.ZERO, false));
         TestPresenter presenter = new TestPresenter();
         DeleteSubAccountInteractor interactor =
                 new DeleteSubAccountInteractor(dao, presenter);
