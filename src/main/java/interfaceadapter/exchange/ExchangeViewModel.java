@@ -6,6 +6,9 @@ import java.beans.PropertyChangeSupport;
 public class ExchangeViewModel {
 
     private String exchangeRate = "N/A";
+
+    private double rawRate = 0.0;
+
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
     private ExchangeState exchangeState = new ExchangeState();
 
@@ -15,6 +18,14 @@ public class ExchangeViewModel {
 
     public void setExchangeRate(final String rate) {
         this.exchangeRate = rate;
+    }
+
+    public void setRawRate(double rate) {
+        this.rawRate = rate;
+    }
+
+    public double getRawRate() {
+        return rawRate;
     }
 
     public void firePropertyChangedRate() {

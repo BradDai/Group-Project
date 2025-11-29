@@ -16,6 +16,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -31,16 +34,18 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     private transient ExchangeController exchangeController;
     private transient SwitchLoggedInController switchLoggedInController;
 
-    private final JComboBox<String> firstCurrency;
-    private final JComboBox<String> secondCurrency;
     private final JLabel resultLabel;
     private final JTextField amountField;
+
     private final JComboBox<String> selectedAccount;
     private final JComboBox<String> givenCurrency;
     private final JComboBox<String> gottenCurrency;
+
     private final JLabel balanceLabel;
     private final JLabel errorLabel;
     private final JLabel confirmationLabel;
+    private final JLabel summaryLabel;
+
     private static final String ACCOUNT_DATA = "subaccounts.json";
 
     public ExchangeView(final ExchangeViewModel exchangeViewModel) {
@@ -48,15 +53,10 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         this.exchangeViewModel.addPropertyChangeListener(this);
 
         final JPanel buttons = new JPanel();
-
         final JButton back = new JButton("Cancel");
         final JButton confirmExchange = new JButton("Confirm Exchange");
         buttons.add(confirmExchange);
         buttons.add(back);
-
-        firstCurrency = new JComboBox<>();
-        secondCurrency = new JComboBox<>();
-        loadGlobalCurrencies(firstCurrency, secondCurrency);
 
         final JLabel selectedAccountLabel = new JLabel("Select Account:");
         selectedAccount = new JComboBox<>();
@@ -66,25 +66,27 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         final JLabel givenCurrencyLabel = new JLabel("Convert:");
         final JLabel gottenCurrencyLabel = new JLabel("To:");
         balanceLabel = new JLabel(" ");
+
         final JLabel amountLabel = new JLabel("Amount Of Currency To Be Converted:");
         amountField = new JTextField(15);
 
+        amountField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent e) { updatePreview(); }
+            @Override public void removeUpdate(DocumentEvent e) { updatePreview(); }
+            @Override public void changedUpdate(DocumentEvent e) { updatePreview(); }
+        });
+
+        summaryLabel = new JLabel(" ");
         errorLabel = new JLabel(" ");
         confirmationLabel = new JLabel(" ");
-
-        final JPanel currencyPanel = new JPanel();
-        currencyPanel.add(new JLabel("From:"));
-        currencyPanel.add(firstCurrency);
-        currencyPanel.add(new JLabel("To:"));
-        currencyPanel.add(secondCurrency);
 
         final JPanel balancePanel = new JPanel();
         balancePanel.add(balanceLabel);
 
-        final JPanel resultPanel = new JPanel();
-        resultPanel.add(new JLabel("Rate:"));
+        final JPanel ratePanel = new JPanel();
+        ratePanel.add(new JLabel("Rate:"));
         resultLabel = new JLabel("N/A");
-        resultPanel.add(resultLabel);
+        ratePanel.add(resultLabel);
 
         final JPanel selectedAccountPanel = new JPanel();
         selectedAccountPanel.add(selectedAccountLabel);
@@ -100,12 +102,16 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         amountInputPanel.add(amountLabel);
         amountInputPanel.add(amountField);
 
+        final JPanel summaryPanel = new JPanel();
+        summaryPanel.add(summaryLabel);
+
         final JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
         inputPanel.add(selectedAccountPanel);
         inputPanel.add(currencyInputPanel);
+        inputPanel.add(ratePanel);
         inputPanel.add(balancePanel);
         inputPanel.add(amountInputPanel);
-        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
 
         final JPanel confirmPanel = new JPanel();
         confirmPanel.add(confirmationLabel);
@@ -113,43 +119,28 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         final JPanel errorPanel = new JPanel();
         errorPanel.add(errorLabel);
 
-        this.add(currencyPanel);
-        this.add(resultPanel);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(inputPanel);
+        this.add(summaryPanel);
         this.add(confirmPanel);
         this.add(errorPanel);
         this.add(buttons);
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         back.addActionListener(evt -> switchLoggedInController.switchToLoggedInView());
-
         selectedAccount.addActionListener(actionEvent -> loadCurrenciesForSelectedAccount());
 
-        final ActionListener updateSelection = evt -> triggerRateQuery();
-        firstCurrency.addActionListener(updateSelection);
-        secondCurrency.addActionListener(updateSelection);
+        givenCurrency.addActionListener(e -> {
+            updateBalance();
+            triggerRateQuery();
+            updatePreview();
+        });
+
+        gottenCurrency.addActionListener(e -> {
+            triggerRateQuery();
+            updatePreview();
+        });
 
         confirmExchange.addActionListener(actionEvent -> handleConfirmExchange());
-
-        givenCurrency.addActionListener(evt -> updateBalance());
-    }
-
-    private void loadGlobalCurrencies(final JComboBox<String> first, final JComboBox<String> second) {
-        try {
-            final String json = Files.readString(Paths.get("currencies.json"), StandardCharsets.UTF_8);
-            final JSONArray arr = new JSONArray(json);
-
-            first.removeAllItems();
-            second.removeAllItems();
-
-            for (int i = 0; i < arr.length(); i++) {
-                first.addItem(arr.getString(i));
-                second.addItem(arr.getString(i));
-            }
-        }
-        catch (final Exception exception) {
-            exception.printStackTrace();
-        }
     }
 
     private void loadAccounts() {
@@ -176,11 +167,13 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     }
 
     private void loadCurrenciesForSelectedAccount() {
+
         givenCurrency.removeAllItems();
         gottenCurrency.removeAllItems();
 
         final String username = exchangeViewModel.getExchangeState().getUsername();
         final String accountName = (String) selectedAccount.getSelectedItem();
+
         if (accountName != null) {
             try {
                 final String json = Files.readString(Paths.get(ACCOUNT_DATA), StandardCharsets.UTF_8);
@@ -196,16 +189,18 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
                         break;
                     }
                 }
+
                 if (accountObject != null) {
                     final JSONObject ownedCurrencies = accountObject.getJSONObject("currencies");
+
                     for (final String key : ownedCurrencies.keySet()) {
                         givenCurrency.addItem(key);
                     }
+
                     final String currencyJson = Files.readString(Paths.get("currencies.json"));
                     final JSONArray allCurrencies = new JSONArray(currencyJson);
                     for (int i = 0; i < allCurrencies.length(); i++) {
-                        final String code = allCurrencies.getString(i);
-                        gottenCurrency.addItem(code);
+                        gottenCurrency.addItem(allCurrencies.getString(i));
                     }
                 }
 
@@ -214,12 +209,12 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
                 System.err.println("Error loading currencies: " + exception.getMessage());
             }
         }
-
     }
 
     private void triggerRateQuery() {
-        final String from = (String) firstCurrency.getSelectedItem();
-        final String to = (String) secondCurrency.getSelectedItem();
+
+        final String from = (String) givenCurrency.getSelectedItem();
+        final String to = (String) gottenCurrency.getSelectedItem();
 
         if (from != null && to != null) {
             exchangeController.getExchangeRate(from, to);
@@ -227,9 +222,8 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     }
 
     private void handleConfirmExchange() {
-        boolean finished = false;
 
-        final String username = exchangeViewModel.getExchangeState().getUsername();
+        boolean finished = false;
         final String accountName = (String) selectedAccount.getSelectedItem();
         final String from = (String) givenCurrency.getSelectedItem();
         final String to = (String) gottenCurrency.getSelectedItem();
@@ -247,21 +241,15 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
                 errorLabel.setText("Amount must be a valid number.");
                 finished = true;
             }
-            if (!finished) {
-                if (exchangeController == null) {
-                    errorLabel.setText("Exchange controller not set.");
-                }
-                else {
-//                    exchangeController.convert(username, accountName, from, to, amount);
-                    exchangeController.convert(accountName, from, to, amount);
 
-                }
+            if (!finished) {
+                exchangeController.convert(accountName, from, to, amount);
             }
         }
-
     }
 
     private void updateBalance() {
+
         balanceLabel.setText(" ");
         final String username = exchangeViewModel.getExchangeState().getUsername();
         final String accountName = (String) selectedAccount.getSelectedItem();
@@ -302,10 +290,52 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
         }
     }
 
+    private void updatePreview() {
+
+        final String text = amountField.getText().trim();
+
+        if (text.isEmpty()) {
+            summaryLabel.setText(" ");
+            return;
+        }
+
+        double amount;
+        try {
+            amount = Double.parseDouble(text);
+        }
+        catch (NumberFormatException e) {
+            summaryLabel.setText("Enter a valid number.");
+            return;
+        }
+
+        double rate = exchangeViewModel.getRawRate();
+        if (rate <= 0) {
+            summaryLabel.setText("Waiting for valid exchange rate...");
+            return;
+        }
+
+        final String from = (String) givenCurrency.getSelectedItem();
+        final String to = (String) gottenCurrency.getSelectedItem();
+
+        if (from == null || to == null) {
+            summaryLabel.setText("Select currencies first.");
+            return;
+        }
+
+        final double converted = amount * rate;
+
+        summaryLabel.setText(String.format(
+                "%.4f %s converts to %.8f %s",
+                amount, from, converted, to
+        ));
+    }
+
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
+
         if ("exchangeRate".equals(evt.getPropertyName())) {
-            resultLabel.setText(evt.getNewValue().toString());
+            resultLabel.setText(evt.getNewValue().toString()); // ✔ show formatted rate
+            updatePreview();                                  // ✔ uses rawRate
         }
         else if ("exchangeState".equals(evt.getPropertyName())) {
             final ExchangeState state = exchangeViewModel.getExchangeState();
@@ -326,12 +356,11 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
 
     public void setExchangeController(final ExchangeController exchangeController) {
         this.exchangeController = exchangeController;
-
         triggerRateQuery();
     }
 
     @Override
     public void actionPerformed(final ActionEvent evt) {
-        // This method is not needed to be used.
+        // Not used.
     }
 }
