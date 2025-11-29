@@ -24,7 +24,7 @@ class CreateSubAccountInteractorTest {
         @Override
         public void save(String username, SubAccount subAccount) {
             List<SubAccount> list = data.computeIfAbsent(username, u -> new ArrayList<>());
-            list.remove(subAccount); // 根据 equals(name) 去重
+            list.remove(subAccount);
             list.add(subAccount);
         }
 
