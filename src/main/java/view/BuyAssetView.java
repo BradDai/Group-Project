@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import entity.SubAccount;
 import interfaceadapter.SwitchLoggedInController;
@@ -34,7 +35,7 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
     private final JComboBox<String> portfolioComboBox;
     private final JComboBox<String> assetComboBox;
     private final JLabel priceLabel;
-    private final JComboBox<Integer> quantityComboBox;
+    private final JTextField quantityField;
     private final JLabel totalLabel;
 
     // (Not really needed, but keeping since it was in your original file)
@@ -83,13 +84,30 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         assetMenu.add(assetComboBox);
         this.add(assetMenu);
 
-        // ---- Quantity chooser ----
+        // ---- Quantity input (JTextField instead of JComboBox) ----
         final JPanel quantityMenu = new JPanel();
         quantityMenu.add(new JLabel("Quantity:"));
-        final Integer[] quantities = {null, 1, 2, 3, 4, 5, 10};
-        quantityComboBox = new JComboBox<>(quantities);
-        quantityMenu.add(quantityComboBox);
+        quantityField = new JTextField(10);
+        quantityMenu.add(quantityField);
         this.add(quantityMenu);
+
+        // Instant updates while typing
+        quantityField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                onQuantityChanged();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                onQuantityChanged();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                onQuantityChanged();
+            }
+        });
 
         // ---- Price / total labels ----
         priceLabel = new JLabel("Price: -");
@@ -107,13 +125,6 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 onAssetSelected();
-            }
-        });
-
-        quantityComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                onQuantitySelected();
             }
         });
 
@@ -141,13 +152,25 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         System.out.println("Selected asset = " + symbol);
     }
 
-    private void onQuantitySelected() {
-        final Integer qty = (Integer) quantityComboBox.getSelectedItem();
+    private void onQuantityChanged() {
+        final String text = quantityField.getText();
         final BuyAssetState state = buyAssetViewModel.getState();
+
+        Integer qty = null;
+        if (text != null && !text.isBlank()) {
+            try {
+                qty = Integer.valueOf(text.trim());
+            }
+            catch (final NumberFormatException ex) {
+                qty = null;
+            }
+        }
+
         state.selectedQuantity = qty;
 
-        if (qty != null && state.price > 0) {
-            state.total = state.price * qty;
+        if (qty != null && qty > 0 && state.price > 0) {
+            final double rawTotal = state.price * qty;
+            state.total = Math.round(rawTotal * 100.0) / 100.0;
         }
         else {
             state.total = 0.0;
@@ -158,13 +181,16 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
     }
 
     private void onPurchase() {
+        // Make sure we read the latest quantity from the text field.
+        onQuantityChanged();
+
         final BuyAssetState state = buyAssetViewModel.getState();
         final String symbol = state.selectedSymbol;
         final Integer qty = state.selectedQuantity;
         final String portfolioName = (String) portfolioComboBox.getSelectedItem();
         final String username = (loggedInViewModel != null)
-            ? loggedInViewModel.getState().getUsername()
-            : null;
+                ? loggedInViewModel.getState().getUsername()
+                : null;
 
         if (buyAssetController == null) {
             JOptionPane.showMessageDialog(this, "Buy controller not set.");
@@ -188,7 +214,7 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
         }
 
         if (qty == null || qty <= 0) {
-            JOptionPane.showMessageDialog(this, "Please choose a valid quantity.");
+            JOptionPane.showMessageDialog(this, "Please enter a valid quantity (positive integer).");
             return;
         }
 
@@ -199,11 +225,11 @@ public class BuyAssetView extends JPanel implements PropertyChangeListener {
 
         // ---- Call interactor through controller ----
         buyAssetController.execute(
-            username,
-            portfolioName,
-            symbol,
-            qty,
-            state.price
+                username,
+                portfolioName,
+                symbol,
+                qty,
+                state.price
         );
     }
 
