@@ -33,6 +33,10 @@ public class DeleteSubAccountInteractor implements DeleteSubAccountInputBoundary
             .filter(ssa -> ssa.getName().equalsIgnoreCase(name))
             .findFirst()
             .orElse(null);
+        if (target == null) {
+            presenter.prepareFailView("Subaccount not found.");
+            return;
+        }
         if (target.isUndeletable()) {
             presenter.prepareFailView("This subaccount cannot be deleted.");
             return;
