@@ -216,13 +216,19 @@ public class FileSubAccountDataAccessJSON implements
     @Override
     public void save(final String username,
                      final SubAccount subAccount) {
-
         final List<SubAccount> list =
-                data.computeIfAbsent(
-                        username,
-                        uuu -> new ArrayList<>());
-        list.remove(subAccount);
-        list.add(subAccount);
+                data.computeIfAbsent(username, u -> new ArrayList<>());
+        boolean replaced = false;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getName().equalsIgnoreCase(subAccount.getName())) {
+                list.set(i, subAccount);
+                replaced = true;
+                break;
+            }
+        }
+        if (!replaced) {
+            list.add(subAccount);
+        }
         saveToFile();
     }
 
