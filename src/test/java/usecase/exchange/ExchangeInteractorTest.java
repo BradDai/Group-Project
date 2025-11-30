@@ -238,17 +238,17 @@ class ExchangeInteractorTest {
 
             @Override
             public void presentConversionSuccess(ExchangeConversionOutputData outputData) {
-                assertEquals("Main", outputData.getAccountName());
-                assertEquals("USD", outputData.getFrom());
-                assertEquals("EUR", outputData.getTo());
+                assertEquals("Main", outputData.accountName());
+                assertEquals("USD", outputData.from());
+                assertEquals("EUR", outputData.to());
 
-                assertEquals(20.0, outputData.getAmountGiven());
-                assertEquals(10.0, outputData.getAmountReceived());
-                assertEquals(0.5, outputData.getRateUsed());
+                assertEquals(20.0, outputData.amountGiven());
+                assertEquals(10.0, outputData.amountReceived());
+                assertEquals(0.5, outputData.rateUsed());
 
                 // Updated balances
-                assertEquals(80.0, outputData.getFromBalanceAfter());
-                assertEquals(10.0, outputData.getToBalanceAfter());
+                assertEquals(80.0, outputData.fromBalanceAfter());
+                assertEquals(10.0, outputData.toBalanceAfter());
 
                 // DAO mutated state
                 assertEquals(80.0, dao.currenciesByAccount.get("Main").get("USD"));
