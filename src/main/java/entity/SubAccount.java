@@ -25,21 +25,18 @@ public class SubAccount {
         this.name = name.trim();
         this.balanceUsd = balanceUsd;
         this.undeletable = undeletable;
-        currencies.put("USD ", balanceUsd);
+        currencies.put("USD", balanceUsd);
     }
 
     public String getName() {
-
         return name;
     }
 
     public BigDecimal getBalanceUsd() {
-
         return balanceUsd;
     }
 
     public boolean isUndeletable() {
-
         return undeletable;
     }
 
