@@ -166,7 +166,7 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
     private boolean checkPriceLoaded(final double price) {
         boolean valid = true;
         if (price <= 0) {
-            sellAssetOutputBoundary.prepareFailureView("Price not loaded.");
+            sellAssetPriceOutputBoundary.preparePriceFailureView("Price not loaded.");
             valid = false;
         }
         return valid;
