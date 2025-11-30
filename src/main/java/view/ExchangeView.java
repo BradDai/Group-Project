@@ -160,7 +160,7 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
                 final JSONArray accounts = root.getJSONArray(username);
                 for (int i = 0; i < accounts.length(); i++) {
                     final JSONObject acc = accounts.getJSONObject(i);
-                    selectedAccount.addItem(acc.getString("Name"));
+                    selectedAccount.addItem(acc.getString("name"));
                 }
             }
 
