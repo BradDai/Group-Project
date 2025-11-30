@@ -8,12 +8,14 @@ import dataaccess.TransactionDataAccessInterface;
 import entity.SubAccount;
 import entity.transaction.TransferTransaction;
 import entity.transaction.TransferTransactionBuilder;
+import usecase.transfer.validation.*;
 
 public class TransferInteractor implements TransferInputBoundary {
     private final TransferDataAccessInterface transferDataAccess;
     private final TransferOutputBoundary transferPresenter;
     private final TransferTransactionBuilder transactionBuilder;
     private final TransactionDataAccessInterface transactionRepo;
+    private final TransferValidationHandler validationChain;
 
     public TransferInteractor(final TransferDataAccessInterface transferDataAccess,
                               final TransferOutputBoundary transferPresenter,
@@ -22,6 +24,7 @@ public class TransferInteractor implements TransferInputBoundary {
         this.transferPresenter = transferPresenter;
         this.transactionBuilder = new TransferTransactionBuilder();
         this.transactionRepo = transactionRepo;
+        this.validationChain = buildValidationChain();
     }
 
     @Override
@@ -33,28 +36,24 @@ public class TransferInteractor implements TransferInputBoundary {
         final String assetSymbol = transferInputData.assetSymbol();
         final double amount = transferInputData.amount();
 
-        if (!invalidTransfer(username, fromPortfolio, toPortfolio, assetSymbol)) {
-            final double availableBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
-            if (availableBalance < amount) {
-                transferPresenter.prepareFailView(
-                    String.format("Insufficient balance. Available: %.2f", availableBalance));
-            }
-            else {
-                transferDataAccess.transferAsset(username, fromPortfolio, toPortfolio, assetSymbol, amount);
-
-                final String transactionId = UUID.randomUUID().toString();
-                final TransferTransaction transaction = transactionConstructor(fromPortfolio, toPortfolio, transferType,
-                        assetSymbol, transactionId, amount);
-
-                transactionRepo.save(username, transaction);
-
-                final List<SubAccount> updatedAccounts = transferDataAccess.getSubAccountsOf(username);
-                final TransferOutputData outputData = new TransferOutputData(transactionId, fromPortfolio, toPortfolio,
-                    assetSymbol, amount, true, updatedAccounts);
-
-                transferPresenter.prepareSuccessView(outputData);
-            }
+        if (!validationChain.validate(transferInputData, transferDataAccess, transferPresenter)) {
+            return;
         }
+
+        transferDataAccess.transferAsset(username, fromPortfolio, toPortfolio, assetSymbol, amount);
+
+        final String transactionId = UUID.randomUUID().toString();
+        final TransferTransaction transaction = transactionConstructor(fromPortfolio, toPortfolio, transferType,
+                assetSymbol, transactionId, amount);
+
+        transactionRepo.save(username, transaction);
+
+        final List<SubAccount> updatedAccounts = transferDataAccess.getSubAccountsOf(username);
+        final TransferOutputData outputData = new TransferOutputData(transactionId, fromPortfolio, toPortfolio,
+            assetSymbol, amount, true, updatedAccounts);
+
+        transferPresenter.prepareSuccessView(outputData);
+
     }
 
     private TransferTransaction transactionConstructor(
@@ -104,6 +103,21 @@ public class TransferInteractor implements TransferInputBoundary {
         }
 
         return result;
+    }
+
+    private TransferValidationHandler buildValidationChain() {
+        final TransferValidationHandler sourceExists = new SourcePortfolioExistHandler();
+        final TransferValidationHandler destExists = new DestinationPortfolioExistHandler();
+        final TransferValidationHandler different = new DifferentPortfolioHandler();
+        final TransferValidationHandler assetExists = new AssetExistsHandler();
+        final TransferValidationHandler sufficientBalance = new SufficientBalanceHandler();
+
+        sourceExists.setNext(destExists);
+        destExists.setNext(different);
+        different.setNext(assetExists);
+        assetExists.setNext(sufficientBalance);
+
+        return sourceExists;
     }
 
     @Override
