@@ -33,51 +33,77 @@ public class TransferInteractor implements TransferInputBoundary {
         final String assetSymbol = transferInputData.assetSymbol();
         final double amount = transferInputData.amount();
 
-        if (!transferDataAccess.portfolioExists(username, fromPortfolio)) {
-            transferPresenter.prepareFailView("Source portfolio does not exist: " + fromPortfolio);
-        }
-        else if (!transferDataAccess.portfolioExists(username, toPortfolio)) {
-            transferPresenter.prepareFailView("Destination portfolio does not exist: " + toPortfolio);
-        }
-        else if (fromPortfolio.equals(toPortfolio)) {
-            transferPresenter.prepareFailView("Cannot transfer to the same portfolio");
-        }
-        else if (!transferDataAccess.hasAsset(username, fromPortfolio, assetSymbol)) {
-            transferPresenter.prepareFailView("Source portfolio does not contain asset: " + assetSymbol);
-        }
-        else {
-            final double availableBalance =
-                transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
+        if (!invalidTransfer(username, fromPortfolio, toPortfolio, assetSymbol)) {
+            final double availableBalance = transferDataAccess.getAssetBalance(username, fromPortfolio, assetSymbol);
             if (availableBalance < amount) {
                 transferPresenter.prepareFailView(
                     String.format("Insufficient balance. Available: %.2f", availableBalance));
             }
             else {
-                transferDataAccess.transferAsset(
-                    username, fromPortfolio, toPortfolio, assetSymbol, amount);
+                transferDataAccess.transferAsset(username, fromPortfolio, toPortfolio, assetSymbol, amount);
 
                 final String transactionId = UUID.randomUUID().toString();
-                final TransferTransaction transaction = transactionBuilder
-                    .setTransactionId(transactionId)
-                    .setDate(LocalDateTime.now())
-                    .setFromPortfolio(fromPortfolio)
-                    .setToPortfolio(toPortfolio)
-                    .setAssetType(transferType)
-                    .setAssetSymbol(assetSymbol)
-                    .setQuantity(amount)
-                    .build();
+                final TransferTransaction transaction = transactionConstructor(fromPortfolio, toPortfolio, transferType,
+                        assetSymbol, transactionId, amount);
 
                 transactionRepo.save(username, transaction);
 
-                final List<SubAccount> updatedAccounts =
-                    transferDataAccess.getSubAccountsOf(username);
-                final TransferOutputData outputData = new TransferOutputData(
-                    transactionId, fromPortfolio, toPortfolio,
+                final List<SubAccount> updatedAccounts = transferDataAccess.getSubAccountsOf(username);
+                final TransferOutputData outputData = new TransferOutputData(transactionId, fromPortfolio, toPortfolio,
                     assetSymbol, amount, true, updatedAccounts);
 
                 transferPresenter.prepareSuccessView(outputData);
             }
         }
+    }
+
+    private TransferTransaction transactionConstructor(
+        final String fromPortfolio,
+        final String toPortfolio,
+        final String transferType,
+        final String assetSymbol,
+        final String transactionId,
+        final double amount) {
+
+        return transactionBuilder
+            .setTransactionId(transactionId)
+            .setDate(LocalDateTime.now())
+            .setFromPortfolio(fromPortfolio)
+            .setToPortfolio(toPortfolio)
+            .setAssetType(transferType)
+            .setAssetSymbol(assetSymbol)
+            .setQuantity(amount)
+            .build();
+    }
+
+    private boolean invalidTransfer(
+        final String username,
+        final String fromPortfolio,
+        final String toPortfolio,
+        final String assetSymbol) {
+        boolean result = true;
+
+        if (!transferDataAccess.portfolioExists(username, fromPortfolio)) {
+            transferPresenter.prepareFailView(
+                "Source portfolio does not exist: " + fromPortfolio);
+        }
+        else if (!transferDataAccess.portfolioExists(username, toPortfolio)) {
+            transferPresenter.prepareFailView(
+                "Destination portfolio does not exist: " + toPortfolio);
+        }
+        else if (fromPortfolio.equals(toPortfolio)) {
+            transferPresenter.prepareFailView(
+                "Cannot transfer to the same portfolio");
+        }
+        else if (!transferDataAccess.hasAsset(username, fromPortfolio, assetSymbol)) {
+            transferPresenter.prepareFailView(
+                "Source portfolio does not contain asset: " + assetSymbol);
+        }
+        else {
+            result = false;
+        }
+
+        return result;
     }
 
     @Override
