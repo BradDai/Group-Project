@@ -171,49 +171,63 @@ public class ExchangeView extends JPanel implements ActionListener, PropertyChan
     }
 
     private void loadCurrenciesForSelectedAccount() {
-
         givenCurrency.removeAllItems();
         gottenCurrency.removeAllItems();
 
         final String username = exchangeViewModel.getExchangeState().getUsername();
         final String accountName = (String) selectedAccount.getSelectedItem();
 
-        if (accountName != null) {
-            try {
-                final String json = Files.readString(Paths.get(ACCOUNT_DATA), StandardCharsets.UTF_8);
-                final JSONObject root = new JSONObject(json);
+        if (accountName == null) {
+            return;
+        }
 
-                final JSONArray accounts = root.getJSONArray(username);
+        try {
+            final String json = Files.readString(Paths.get(ACCOUNT_DATA), StandardCharsets.UTF_8);
+            final JSONObject root = new JSONObject(json);
 
-                JSONObject accountObject = null;
-                for (int i = 0; i < accounts.length(); i++) {
-                    final JSONObject obj = accounts.getJSONObject(i);
-                    if (accountName.equals(obj.getString("name"))) {
-                        accountObject = obj;
-                        break;
-                    }
-                }
+            JSONObject accountObject = findAccountObject(root, username, accountName);
 
-                if (accountObject != null) {
-                    final JSONObject ownedCurrencies = accountObject.getJSONObject("currencies");
-
-                    for (final String key : ownedCurrencies.keySet()) {
-                        givenCurrency.addItem(key);
-                    }
-
-                    final String currencyJson = Files.readString(Paths.get("currencies.json"));
-                    final JSONArray allCurrencies = new JSONArray(currencyJson);
-                    for (int i = 0; i < allCurrencies.length(); i++) {
-                        gottenCurrency.addItem(allCurrencies.getString(i));
-                    }
-                }
-
+            if (accountObject != null) {
+                loadGivenAndGottenCurrencies(accountObject);
             }
-            catch (final Exception exception) {
-                System.err.println("Error loading currencies: " + exception.getMessage());
-            }
+
+        } catch (final Exception exception) {
+            System.err.println("Error loading currencies: " + exception.getMessage());
         }
     }
+
+    private JSONObject findAccountObject(JSONObject root, String username, String accountName) {
+        if (!root.has(username)) {
+            return null;
+        }
+
+        final JSONArray accounts = root.getJSONArray(username);
+
+        for (int i = 0; i < accounts.length(); i++) {
+            final JSONObject obj = accounts.getJSONObject(i);
+            if (accountName.equals(obj.getString("name"))) {
+                return obj;
+            }
+        }
+        return null;
+    }
+
+    private void loadGivenAndGottenCurrencies(JSONObject accountObject) throws IOException {
+        final JSONObject ownedCurrencies = accountObject.getJSONObject("currencies");
+
+        // Fill "given" currencies
+        for (final String key : ownedCurrencies.keySet()) {
+            givenCurrency.addItem(key);
+        }
+
+        // Fill "gotten" currencies
+        final String currencyJson = Files.readString(Paths.get("currencies.json"));
+        final JSONArray allCurrencies = new JSONArray(currencyJson);
+        for (int i = 0; i < allCurrencies.length(); i++) {
+            gottenCurrency.addItem(allCurrencies.getString(i));
+        }
+    }
+
 
     private void triggerRateQuery() {
 
