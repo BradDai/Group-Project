@@ -1,4 +1,3 @@
-
 package usecase.transaction_history;
 
 import java.time.LocalDate;
@@ -12,6 +11,7 @@ import entity.transaction.BuyTransaction;
 import entity.transaction.ConvertTransaction;
 import entity.transaction.SellTransaction;
 import entity.transaction.Transaction;
+import entity.transaction.TransactionUtility;
 import entity.transaction.TransferTransaction;
 import interfaceadapter.history.HistoryState;
 import interfaceadapter.logged_in.LoggedInViewModel;
@@ -41,11 +41,11 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
         final String username = loggedInViewModel.getState().getUsername();
 
         final List<Transaction> txList = transactionRepo.getByFilters(
-                username,
-                portfolio,
-                asset,
-                start,
-                end
+            username,
+            portfolio,
+            asset,
+            start,
+            end
         );
 
         final List<HistoryState.Row> rows = new ArrayList<>();
@@ -94,12 +94,12 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
         }
 
         final TransactionHistoryOutputData output =
-                new TransactionHistoryOutputData(
-                        rows,
-                        msg,
-                        inputData.startDate(),
-                        inputData.endDate()
-                );
+            new TransactionHistoryOutputData(
+                rows,
+                msg,
+                inputData.startDate(),
+                inputData.endDate()
+            );
 
         presenter.present(output);
     }
@@ -120,20 +120,24 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
         }
 
         final List<Transaction> allTx = transactionRepo.getByFilters(
-                username,
-                null,
-                null,
-                null,
-                null
+            username,
+            null,
+            null,
+            null,
+            null
         );
 
         final Set<String> portfolioIds = new LinkedHashSet<>();
         for (Transaction tx : allTx) {
-            if (tx.getFromPortfolio() != null && !tx.getFromPortfolio().isBlank()) {
-                portfolioIds.add(tx.getFromPortfolio());
+            // Updated to use TransactionUtility
+            final String from = TransactionUtility.getFromPortfolio(tx);
+            if (from != null && !from.isBlank()) {
+                portfolioIds.add(from);
             }
-            if (tx.getToPortfolio() != null && !tx.getToPortfolio().isBlank()) {
-                portfolioIds.add(tx.getToPortfolio());
+
+            final String to = TransactionUtility.getToPortfolio(tx);
+            if (to != null && !to.isBlank()) {
+                portfolioIds.add(to);
             }
         }
 

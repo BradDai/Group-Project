@@ -1,4 +1,3 @@
-
 package usecase.transaction_history;
 
 import dataaccess.TransactionDataAccessInterface;
@@ -40,9 +39,9 @@ class TransactionHistoryInteractorTest {
         when(mockLoggedInState.getUsername()).thenReturn("testuser");
 
         interactor = new TransactionHistoryInteractor(
-                mockTransactionRepo,
-                mockPresenter,
-                mockLoggedInViewModel
+            mockTransactionRepo,
+            mockPresenter,
+            mockLoggedInViewModel
         );
     }
 
@@ -51,18 +50,18 @@ class TransactionHistoryInteractorTest {
     void testRetrieveAllTransactionsForPortfolio() {
         String portfolio = "Portfolio1";
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                portfolio, null, null, null
+            portfolio, null, null, null
         );
 
         List<Transaction> mockTransactions = createMockTransactions();
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"), eq(portfolio), isNull(), isNull(), isNull()
+            eq("testuser"), eq(portfolio), isNull(), isNull(), isNull()
         )).thenReturn(mockTransactions);
 
         interactor.execute(inputData);
 
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         TransactionHistoryOutputData output = captor.getValue();
@@ -76,21 +75,21 @@ class TransactionHistoryInteractorTest {
     void testFilterTransactionsByAsset() {
         String asset = "BTC";
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", asset, null, null
+            "Portfolio1", asset, null, null
         );
 
         BuyTransaction btcTransaction = createBuyTransaction("BTC", 100.0, 5000.0);
         List<Transaction> mockTransactions = List.of(btcTransaction);
 
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"), eq("Portfolio1"), eq(asset), isNull(), isNull()
+            eq("testuser"), eq("Portfolio1"), eq(asset), isNull(), isNull()
         )).thenReturn(mockTransactions);
 
         interactor.execute(inputData);
 
         verify(mockTransactionRepo).getByFilters("testuser", "Portfolio1", asset, null, null);
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         TransactionHistoryOutputData output = captor.getValue();
@@ -104,68 +103,65 @@ class TransactionHistoryInteractorTest {
         String startDate = "2024-01-01";
         String endDate = "2024-12-31";
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, startDate, endDate
+            "Portfolio1", null, startDate, endDate
         );
 
         List<Transaction> mockTransactions = createMockTransactions();
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"),
-                eq("Portfolio1"),
-                isNull(),
-                eq(LocalDate.parse(startDate)),
-                eq(LocalDate.parse(endDate))
+            eq("testuser"),
+            eq("Portfolio1"),
+            isNull(),
+            eq(LocalDate.parse(startDate)),
+            eq(LocalDate.parse(endDate))
         )).thenReturn(mockTransactions);
 
         interactor.execute(inputData);
 
         verify(mockTransactionRepo).getByFilters(
-                "testuser",
-                "Portfolio1",
-                null,
-                LocalDate.parse(startDate),
-                LocalDate.parse(endDate)
+            "testuser",
+            "Portfolio1",
+            null,
+            LocalDate.parse(startDate),
+            LocalDate.parse(endDate)
         );
 
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         TransactionHistoryOutputData output = captor.getValue();
         assertTrue(output.message().contains("from 2024-01-01 to 2024-12-31"));
     }
 
-    // NEW TEST #1 – only start date, no end date
     @Test
     @DisplayName("TH-013: Only start date provided (no end date)")
     void testOnlyStartDateProvided_noEndDate() {
         String startDate = "2024-04-01";
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, startDate, null
+            "Portfolio1", null, startDate, null
         );
 
         List<Transaction> mockTransactions = createMockTransactions();
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"),
-                eq("Portfolio1"),
-                isNull(),
-                eq(LocalDate.parse(startDate)),
-                isNull()
+            eq("testuser"),
+            eq("Portfolio1"),
+            isNull(),
+            eq(LocalDate.parse(startDate)),
+            isNull()
         )).thenReturn(mockTransactions);
 
         interactor.execute(inputData);
 
-        // Verify DAO call uses start date but null end date
         verify(mockTransactionRepo).getByFilters(
-                "testuser",
-                "Portfolio1",
-                null,
-                LocalDate.parse(startDate),
-                null
+            "testuser",
+            "Portfolio1",
+            null,
+            LocalDate.parse(startDate),
+            null
         );
 
-        // Message should NOT contain "from ... to ..." because end is null
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         TransactionHistoryOutputData output = captor.getValue();
@@ -178,16 +174,16 @@ class TransactionHistoryInteractorTest {
     void testHandleBuyTransaction() {
         BuyTransaction buyTx = createBuyTransaction("ETH", 50.0, 3000.0);
         when(mockTransactionRepo.getByFilters(anyString(), anyString(), any(), any(), any()))
-                .thenReturn(List.of(buyTx));
+            .thenReturn(List.of(buyTx));
 
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, null, null
+            "Portfolio1", null, null, null
         );
 
         interactor.execute(inputData);
 
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         HistoryState.Row row = captor.getValue().rows().get(0);
@@ -202,16 +198,16 @@ class TransactionHistoryInteractorTest {
     void testHandleSellTransaction() {
         SellTransaction sellTx = createSellTransaction("BTC", 25.0, 2500.0);
         when(mockTransactionRepo.getByFilters(anyString(), anyString(), any(), any(), any()))
-                .thenReturn(List.of(sellTx));
+            .thenReturn(List.of(sellTx));
 
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, null, null
+            "Portfolio1", null, null, null
         );
 
         interactor.execute(inputData);
 
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         HistoryState.Row row = captor.getValue().rows().get(0);
@@ -226,16 +222,16 @@ class TransactionHistoryInteractorTest {
     void testHandleConvertTransaction() {
         ConvertTransaction convertTx = createConvertTransaction("USD", "EUR", 1000.0, 850.0);
         when(mockTransactionRepo.getByFilters(anyString(), anyString(), any(), any(), any()))
-                .thenReturn(List.of(convertTx));
+            .thenReturn(List.of(convertTx));
 
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, null, null
+            "Portfolio1", null, null, null
         );
 
         interactor.execute(inputData);
 
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         HistoryState.Row row = captor.getValue().rows().get(0);
@@ -250,16 +246,16 @@ class TransactionHistoryInteractorTest {
     void testHandleTransferTransaction() {
         TransferTransaction transferTx = createTransferTransaction("BTC", 10.0);
         when(mockTransactionRepo.getByFilters(anyString(), anyString(), any(), any(), any()))
-                .thenReturn(List.of(transferTx));
+            .thenReturn(List.of(transferTx));
 
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, null, null
+            "Portfolio1", null, null, null
         );
 
         interactor.execute(inputData);
 
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         HistoryState.Row row = captor.getValue().rows().get(0);
@@ -278,16 +274,16 @@ class TransactionHistoryInteractorTest {
         when(unknownTx.getTransactionType()).thenReturn("UNKNOWN");
 
         when(mockTransactionRepo.getByFilters(anyString(), anyString(), any(), any(), any()))
-                .thenReturn(List.of(unknownTx));
+            .thenReturn(List.of(unknownTx));
 
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, null, null
+            "Portfolio1", null, null, null
         );
 
         interactor.execute(inputData);
 
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         HistoryState.Row row = captor.getValue().rows().get(0);
@@ -301,16 +297,16 @@ class TransactionHistoryInteractorTest {
     @DisplayName("TH-009: Empty Result Set")
     void testEmptyResultSet() {
         when(mockTransactionRepo.getByFilters(anyString(), anyString(), any(), any(), any()))
-                .thenReturn(new ArrayList<>());
+            .thenReturn(new ArrayList<>());
 
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "EmptyPortfolio", null, null, null
+            "EmptyPortfolio", null, null, null
         );
 
         interactor.execute(inputData);
 
         ArgumentCaptor<TransactionHistoryOutputData> captor =
-                ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
+            ArgumentCaptor.forClass(TransactionHistoryOutputData.class);
         verify(mockPresenter).present(captor.capture());
 
         TransactionHistoryOutputData output = captor.getValue();
@@ -322,21 +318,21 @@ class TransactionHistoryInteractorTest {
     @DisplayName("TH-010: Parse Valid Date Strings")
     void testParseValidDateStrings() {
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, "2024-03-15", "2024-03-20"
+            "Portfolio1", null, "2024-03-15", "2024-03-20"
         );
 
         when(mockTransactionRepo.getByFilters(
-                anyString(), anyString(), any(),
-                eq(LocalDate.of(2024, 3, 15)),
-                eq(LocalDate.of(2024, 3, 20))
+            anyString(), anyString(), any(),
+            eq(LocalDate.of(2024, 3, 15)),
+            eq(LocalDate.of(2024, 3, 20))
         )).thenReturn(new ArrayList<>());
 
         assertDoesNotThrow(() -> interactor.execute(inputData));
 
         verify(mockTransactionRepo).getByFilters(
-                anyString(), anyString(), any(),
-                eq(LocalDate.of(2024, 3, 15)),
-                eq(LocalDate.of(2024, 3, 20))
+            anyString(), anyString(), any(),
+            eq(LocalDate.of(2024, 3, 15)),
+            eq(LocalDate.of(2024, 3, 20))
         );
     }
 
@@ -344,17 +340,17 @@ class TransactionHistoryInteractorTest {
     @DisplayName("TH-011: Parse Null Date String")
     void testParseNullDateString() {
         TransactionHistoryInputData inputData = new TransactionHistoryInputData(
-                "Portfolio1", null, null, null
+            "Portfolio1", null, null, null
         );
 
         when(mockTransactionRepo.getByFilters(
-                anyString(), anyString(), any(), isNull(), isNull()
+            anyString(), anyString(), any(), isNull(), isNull()
         )).thenReturn(new ArrayList<>());
 
         assertDoesNotThrow(() -> interactor.execute(inputData));
 
         verify(mockTransactionRepo).getByFilters(
-                anyString(), anyString(), any(), isNull(), isNull()
+            anyString(), anyString(), any(), isNull(), isNull()
         );
     }
 
@@ -362,28 +358,28 @@ class TransactionHistoryInteractorTest {
     @DisplayName("TH-012: Parse Empty/Blank Date String")
     void testParseEmptyBlankDateString() {
         TransactionHistoryInputData inputData1 = new TransactionHistoryInputData(
-                "Portfolio1", null, "", "   "
+            "Portfolio1", null, "", "   "
         );
 
         when(mockTransactionRepo.getByFilters(
-                anyString(), anyString(), any(), isNull(), isNull()
+            anyString(), anyString(), any(), isNull(), isNull()
         )).thenReturn(new ArrayList<>());
 
         assertDoesNotThrow(() -> interactor.execute(inputData1));
 
         verify(mockTransactionRepo).getByFilters(
-                anyString(), anyString(), any(), isNull(), isNull()
+            anyString(), anyString(), any(), isNull(), isNull()
         );
     }
 
     @Test
     @DisplayName("TH-014: Load Portfolio Options Successfully")
     void testLoadPortfolioOptionsSuccessfully() {
-        BuyTransaction tx1 = createBuyTransactionWithPortfolio("tx1", "Portfolio1", "Portfolio2");
-        SellTransaction tx2 = createSellTransactionWithPortfolio("tx2", "Portfolio2", "Portfolio3");
+        TransferTransaction tx1 = createTransferTransactionWithPortfolios("Portfolio1", "Portfolio2");
+        TransferTransaction tx2 = createTransferTransactionWithPortfolios("Portfolio2", "Portfolio3");
 
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"), isNull(), isNull(), isNull(), isNull()
+            eq("testuser"), isNull(), isNull(), isNull(), isNull()
         )).thenReturn(Arrays.asList(tx1, tx2));
 
         interactor.loadPortfolioOptions();
@@ -404,7 +400,7 @@ class TransactionHistoryInteractorTest {
         TransferTransaction tx = createTransferTransactionWithPortfolios("A", "B");
 
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"), isNull(), isNull(), isNull(), isNull()
+            eq("testuser"), isNull(), isNull(), isNull(), isNull()
         )).thenReturn(List.of(tx));
 
         interactor.loadPortfolioOptions();
@@ -420,12 +416,13 @@ class TransactionHistoryInteractorTest {
     @Test
     @DisplayName("TH-016: Handle Null Portfolio Names")
     void testHandleNullPortfolioNames() {
-        Transaction tx = mock(Transaction.class);
+        // Must mock TransferTransaction as generic Transaction no longer has portfolio getters
+        TransferTransaction tx = mock(TransferTransaction.class);
         when(tx.getFromPortfolio()).thenReturn(null);
         when(tx.getToPortfolio()).thenReturn("ValidPortfolio");
 
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"), isNull(), isNull(), isNull(), isNull()
+            eq("testuser"), isNull(), isNull(), isNull(), isNull()
         )).thenReturn(List.of(tx));
 
         interactor.loadPortfolioOptions();
@@ -441,12 +438,13 @@ class TransactionHistoryInteractorTest {
     @Test
     @DisplayName("TH-017: Handle Blank Portfolio Names")
     void testHandleBlankPortfolioNames() {
-        Transaction tx = mock(Transaction.class);
+        // Must mock TransferTransaction as generic Transaction no longer has portfolio getters
+        TransferTransaction tx = mock(TransferTransaction.class);
         when(tx.getFromPortfolio()).thenReturn("   ");
         when(tx.getToPortfolio()).thenReturn("ValidPortfolio");
 
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"), isNull(), isNull(), isNull(), isNull()
+            eq("testuser"), isNull(), isNull(), isNull(), isNull()
         )).thenReturn(List.of(tx));
 
         interactor.loadPortfolioOptions();
@@ -463,9 +461,9 @@ class TransactionHistoryInteractorTest {
     @DisplayName("TH-018: Load Options with Null LoggedInViewModel")
     void testLoadOptionsWithNullViewModel() {
         TransactionHistoryInteractor nullViewModelInteractor = new TransactionHistoryInteractor(
-                mockTransactionRepo,
-                mockPresenter,
-                null
+            mockTransactionRepo,
+            mockPresenter,
+            null
         );
 
         nullViewModelInteractor.loadPortfolioOptions();
@@ -517,7 +515,7 @@ class TransactionHistoryInteractorTest {
     @DisplayName("TH-022: Load Options with No Transactions")
     void testLoadOptionsWithNoTransactions() {
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"), isNull(), isNull(), isNull(), isNull()
+            eq("testuser"), isNull(), isNull(), isNull(), isNull()
         )).thenReturn(new ArrayList<>());
 
         interactor.loadPortfolioOptions();
@@ -527,20 +525,20 @@ class TransactionHistoryInteractorTest {
         assertTrue(captor.getValue().isEmpty());
     }
 
-    // NEW TEST #2 – cover branches where toPortfolio is null / blank
     @Test
     @DisplayName("TH-023: Ignore null and blank 'to' portfolio names")
     void testIgnoreNullAndBlankToPortfolios() {
-        Transaction tx1 = mock(Transaction.class);
+        // Use TransferTransaction because it has both from/to fields
+        TransferTransaction tx1 = mock(TransferTransaction.class);
         when(tx1.getFromPortfolio()).thenReturn("From1");
         when(tx1.getToPortfolio()).thenReturn(null);   // should be ignored
 
-        Transaction tx2 = mock(Transaction.class);
+        TransferTransaction tx2 = mock(TransferTransaction.class);
         when(tx2.getFromPortfolio()).thenReturn("From2");
         when(tx2.getToPortfolio()).thenReturn("   ");  // also ignored
 
         when(mockTransactionRepo.getByFilters(
-                eq("testuser"), isNull(), isNull(), isNull(), isNull()
+            eq("testuser"), isNull(), isNull(), isNull(), isNull()
         )).thenReturn(List.of(tx1, tx2));
 
         interactor.loadPortfolioOptions();
@@ -559,8 +557,8 @@ class TransactionHistoryInteractorTest {
 
     private List<Transaction> createMockTransactions() {
         return Arrays.asList(
-                createBuyTransaction("BTC", 100.0, 5000.0),
-                createSellTransaction("ETH", 50.0, 3000.0)
+            createBuyTransaction("BTC", 100.0, 5000.0),
+            createSellTransaction("ETH", 50.0, 3000.0)
         );
     }
 
@@ -575,14 +573,6 @@ class TransactionHistoryInteractorTest {
         return tx;
     }
 
-    private BuyTransaction createBuyTransactionWithPortfolio(String id, String from, String to) {
-        BuyTransaction tx = createBuyTransaction("BTC", 100.0, 5000.0);
-        when(tx.getTransactionId()).thenReturn(id);
-        when(tx.getFromPortfolio()).thenReturn(from);
-        when(tx.getToPortfolio()).thenReturn(to);
-        return tx;
-    }
-
     private SellTransaction createSellTransaction(String asset, double quantity, double totalValue) {
         SellTransaction tx = mock(SellTransaction.class);
         when(tx.getTransactionId()).thenReturn("sell-" + asset);
@@ -591,14 +581,6 @@ class TransactionHistoryInteractorTest {
         when(tx.getQuantity()).thenReturn(quantity);
         when(tx.getTotalValue()).thenReturn(totalValue);
         when(tx.getTransactionType()).thenReturn("SELL");
-        return tx;
-    }
-
-    private SellTransaction createSellTransactionWithPortfolio(String id, String from, String to) {
-        SellTransaction tx = createSellTransaction("ETH", 50.0, 3000.0);
-        when(tx.getTransactionId()).thenReturn(id);
-        when(tx.getFromPortfolio()).thenReturn(from);
-        when(tx.getToPortfolio()).thenReturn(to);
         return tx;
     }
 

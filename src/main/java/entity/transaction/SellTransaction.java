@@ -2,45 +2,18 @@ package entity.transaction;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a sell transaction where an asset is sold.
- */
 public class SellTransaction extends Transaction {
+    private final String fromPortfolio;
     private final String assetType;
+    private final String assetSymbol;
     private final double quantity;
     private final double pricePerUnit;
     private final double totalValue;
-    private final String assetSymbol;
 
-    /**
-     * Creates a new sell transaction.
-     *
-     * @param transactionId unique identifier
-     * @param date          transaction date
-     * @param fromPortfolio portfolio selling the asset
-     * @param assetType     type of asset
-     * @param assetSymbol   symbol of the asset
-     * @param quantity      amount sold
-     * @param pricePerUnit  price per unit of asset
-     * @throws IllegalArgumentException .
-     */
     public SellTransaction(final String transactionId, final LocalDateTime date,
                            final String fromPortfolio, final String assetType, final String assetSymbol,
                            final double quantity, final double pricePerUnit) {
-        super(
-            transactionId,
-            date,
-            fromPortfolio,
-            null,
-            assetSymbol,
-            quantity,
-            pricePerUnit,
-            quantity * pricePerUnit,
-            null,
-            null,
-            null,
-            null
-        );
+        super(transactionId, date);
 
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be positive");
@@ -48,6 +21,8 @@ public class SellTransaction extends Transaction {
         if (pricePerUnit <= 0) {
             throw new IllegalArgumentException("Price must be positive");
         }
+
+        this.fromPortfolio = fromPortfolio;
         this.assetType = assetType;
         this.assetSymbol = assetSymbol;
         this.quantity = quantity;
@@ -66,16 +41,22 @@ public class SellTransaction extends Transaction {
             quantity, assetType, assetSymbol, pricePerUnit);
     }
 
-    public String getAssetType() {
-        return assetType;
-    }
-
+    @Override
     public String getAssetSymbol() {
         return assetSymbol;
     }
 
+    @Override
     public double getQuantity() {
         return quantity;
+    }
+
+    public String getFromPortfolio() {
+        return fromPortfolio;
+    }
+
+    public String getAssetType() {
+        return assetType;
     }
 
     public double getPricePerUnit() {

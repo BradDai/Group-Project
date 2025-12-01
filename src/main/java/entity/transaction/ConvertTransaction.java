@@ -2,46 +2,19 @@ package entity.transaction;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a currency conversion transaction.
- */
 public class ConvertTransaction extends Transaction {
+    private final String portfolio;
     private final String fromCurrency;
     private final String toCurrency;
     private final double fromAmount;
     private final double toAmount;
     private final double exchangeRate;
 
-    /**
-     * Creates a new convert transaction.
-     *
-     * @param transactionId unique identifier
-     * @param date          transaction date/time
-     * @param portfolio     portfolio where conversion occurs
-     * @param fromCurrency  source currency symbol
-     * @param toCurrency    destination currency symbol
-     * @param fromAmount    amount of source currency
-     * @param exchangeRate  conversion rate (toCurrency per 1 fromCurrency)
-     * @throws IllegalArgumentException .
-     */
     public ConvertTransaction(final String transactionId, final LocalDateTime date,
                               final String portfolio, final String fromCurrency,
                               final String toCurrency, final double fromAmount,
                               final double exchangeRate) {
-        super(
-                transactionId,
-                date,
-                portfolio,
-                portfolio,
-                null,
-                0.0,
-                null,
-                null,
-                fromCurrency,
-                toCurrency,
-                exchangeRate,
-                fromAmount
-        );
+        super(transactionId, date);
 
         if (fromAmount <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
@@ -49,6 +22,8 @@ public class ConvertTransaction extends Transaction {
         if (exchangeRate <= 0) {
             throw new IllegalArgumentException("Exchange rate must be positive");
         }
+
+        this.portfolio = portfolio;
         this.fromCurrency = fromCurrency;
         this.toCurrency = toCurrency;
         this.fromAmount = fromAmount;
@@ -64,25 +39,21 @@ public class ConvertTransaction extends Transaction {
     @Override
     public String getDescription() {
         return String.format("Converted %.2f %s to %.2f %s (rate: %.4f)",
-                fromAmount, fromCurrency, toAmount, toCurrency, exchangeRate);
+            fromAmount, fromCurrency, toAmount, toCurrency, exchangeRate);
     }
 
     @Override
     public String getAssetSymbol() {
-        // Show the currency pair in the Asset column, e.g. "USD->CAD"
         return fromCurrency + "->" + toCurrency;
     }
 
     @Override
     public double getQuantity() {
-        // Quantity = amount of source currency spent
         return fromAmount;
     }
 
-    @Override
-    public double getTotalValue() {
-        // Total = amount of target currency received
-        return toAmount;
+    public String getPortfolio() {
+        return portfolio;
     }
 
     public String getFromCurrency() {
@@ -103,5 +74,9 @@ public class ConvertTransaction extends Transaction {
 
     public double getExchangeRate() {
         return exchangeRate;
+    }
+
+    public double getTotalValue() {
+        return toAmount;
     }
 }
