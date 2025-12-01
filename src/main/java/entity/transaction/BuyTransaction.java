@@ -2,46 +2,18 @@ package entity.transaction;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a buy transaction where an asset is purchased.
- */
 public class BuyTransaction extends Transaction {
+    private final String toPortfolio;
     private final String assetType;
+    private final String assetSymbol;
     private final double quantity;
     private final double pricePerUnit;
     private final double totalValue;
-    private final String assetSymbol;
 
-    /**
-     * Creates a new buy transaction.
-     *
-     * @param transactionId unique identifier
-     * @param date          transaction date
-     * @param toPortfolio   portfolio receiving the asset
-     * @param assetType     type of asset (e.g., "Stock", "Currency")
-     * @param assetSymbol   symbol of the asset (e.g., "AAPL", "USD")
-     * @param quantity      amount purchased
-     * @param pricePerUnit  price per unit of asset
-     * @throws IllegalArgumentException .
-     */
     public BuyTransaction(final String transactionId, final LocalDateTime date,
                           final String toPortfolio, final String assetType, final String assetSymbol,
                           final double quantity, final double pricePerUnit) {
-
-        super(
-            transactionId,
-            date,
-            null,
-            toPortfolio,
-            assetSymbol,
-            quantity,
-            pricePerUnit,
-            quantity * pricePerUnit,
-            null,
-            null,
-            null,
-            null
-        );
+        super(transactionId, date);
 
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be positive");
@@ -49,6 +21,8 @@ public class BuyTransaction extends Transaction {
         if (pricePerUnit <= 0) {
             throw new IllegalArgumentException("Price must be positive");
         }
+
+        this.toPortfolio = toPortfolio;
         this.assetType = assetType;
         this.assetSymbol = assetSymbol;
         this.quantity = quantity;
@@ -67,16 +41,22 @@ public class BuyTransaction extends Transaction {
             quantity, assetType, assetSymbol, pricePerUnit);
     }
 
-    public String getAssetType() {
-        return assetType;
-    }
-
+    @Override
     public String getAssetSymbol() {
         return assetSymbol;
     }
 
+    @Override
     public double getQuantity() {
         return quantity;
+    }
+
+    public String getToPortfolio() {
+        return toPortfolio;
+    }
+
+    public String getAssetType() {
+        return assetType;
     }
 
     public double getPricePerUnit() {

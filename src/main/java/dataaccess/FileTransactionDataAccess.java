@@ -16,6 +16,7 @@ import entity.transaction.BuyTransaction;
 import entity.transaction.ConvertTransaction;
 import entity.transaction.SellTransaction;
 import entity.transaction.Transaction;
+import entity.transaction.TransactionUtility;
 import entity.transaction.TransferTransaction;
 import entity.transaction.TransferTransactionBuilder;
 
@@ -31,7 +32,7 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
      * For file transaction.
      *
      * @param directoryPath directory where transaction files are stored,
-     *                      e.g. "data/transactions"
+     * e.g. "data/transactions"
      * @throws RuntimeException happens if a directory cant be created.
      */
     public FileTransactionDataAccess(final String directoryPath) {
@@ -60,9 +61,9 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
     @Override
     public List<Transaction> getByPortfolio(final String userId, final String portfolioId) {
         return loadUserTransactions(userId)
-                .stream()
-                .filter(ttx -> matchesPortfolio(ttx, portfolioId))
-                .collect(Collectors.toList());
+            .stream()
+            .filter(ttx -> matchesPortfolio(ttx, portfolioId))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -73,11 +74,11 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                                           final LocalDate endDate) {
 
         return loadUserTransactions(userId)
-                .stream()
-                .filter(ttx -> matchesPortfolio(ttx, portfolioId))
-                .filter(ttx -> matchesAssetFilter(ttx, assetSymbol))
-                .filter(ttx -> isWithinDateRange(ttx, startDate, endDate))
-                .collect(Collectors.toList());
+            .stream()
+            .filter(ttx -> matchesPortfolio(ttx, portfolioId))
+            .filter(ttx -> matchesAssetFilter(ttx, assetSymbol))
+            .filter(ttx -> isWithinDateRange(ttx, startDate, endDate))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -91,8 +92,8 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         if (portfolioId == null || portfolioId.isBlank()) {
             return true;
         }
-        return portfolioId.equals(ttx.getFromPortfolio())
-                || portfolioId.equals(ttx.getToPortfolio());
+        return portfolioId.equals(TransactionUtility.getFromPortfolio(ttx))
+            || portfolioId.equals(TransactionUtility.getToPortfolio(ttx));
     }
 
     private String extractAssetKey(final Transaction ttx) {
@@ -126,8 +127,8 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         final String txAsset = extractAssetKey(ttx);
 
         return txAsset != null
-                && !txAsset.isBlank()
-                && txAsset.equalsIgnoreCase(assetSymbol);
+            && !txAsset.isBlank()
+            && txAsset.equalsIgnoreCase(assetSymbol);
     }
 
     private boolean isWithinDateRange(final Transaction ttx,
@@ -183,15 +184,15 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         final Path file = getUserFilePath(userId);
         final List<String> lines = new ArrayList<>();
         lines.add("transactionId,dateTime,fromPortfolio,toPortfolio,transactionType,"
-                + "assetType,assetSymbol,quantity,pricePerUnit,totalValue");
+            + "assetType,assetSymbol,quantity,pricePerUnit,totalValue");
         for (final Transaction tx : transactions) {
             lines.add(toCsvLine(tx));
         }
         try {
             Files.write(file, lines, StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING,
-                    StandardOpenOption.WRITE);
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.WRITE);
         }
         catch (final IOException evt) {
             throw new RuntimeException("Failed to write transactions for user " + userId, evt);
@@ -220,22 +221,22 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
 
         return switch (type) {
             case "BUY" -> new BuyTransaction(
-                    transactionId,
-                    dateTime,
-                    toPortfolio,
-                    assetType,
-                    assetSymbol,
-                    quantity,
-                    pricePerUnit
+                transactionId,
+                dateTime,
+                toPortfolio,
+                assetType,
+                assetSymbol,
+                quantity,
+                pricePerUnit
             );
             case "SELL" -> new SellTransaction(
-                    transactionId,
-                    dateTime,
-                    fromPortfolio,
-                    assetType,
-                    assetSymbol,
-                    quantity,
-                    pricePerUnit
+                transactionId,
+                dateTime,
+                fromPortfolio,
+                assetType,
+                assetSymbol,
+                quantity,
+                pricePerUnit
             );
             case "CONVERT" -> {
                 // assetSymbol stored as "FROM->TO"
@@ -248,26 +249,26 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
                 }
 
                 yield new ConvertTransaction(
-                        transactionId,
-                        dateTime,
-                        fromPortfolio != null ? fromPortfolio : toPortfolio,
-                        fromCurrency,
-                        toCurrency,
-                        quantity,
-                        pricePerUnit
+                    transactionId,
+                    dateTime,
+                    fromPortfolio != null ? fromPortfolio : toPortfolio,
+                    fromCurrency,
+                    toCurrency,
+                    quantity,
+                    pricePerUnit
                 );
             }
             case "TRANSFER" -> {
                 final TransferTransactionBuilder builder = new TransferTransactionBuilder();
                 yield builder
-                        .setTransactionId(transactionId)
-                        .setDate(dateTime)
-                        .setFromPortfolio(fromPortfolio)
-                        .setToPortfolio(toPortfolio)
-                        .setAssetType(assetType)
-                        .setAssetSymbol(assetSymbol)
-                        .setQuantity(quantity)
-                        .build();
+                    .setTransactionId(transactionId)
+                    .setDate(dateTime)
+                    .setFromPortfolio(fromPortfolio)
+                    .setToPortfolio(toPortfolio)
+                    .setAssetType(assetType)
+                    .setAssetSymbol(assetSymbol)
+                    .setQuantity(quantity)
+                    .build();
             }
             default -> null;
         };
@@ -313,16 +314,16 @@ public class FileTransactionDataAccess implements TransactionDataAccessInterface
         }
 
         return String.join(",",
-                nullToEmpty(ttx.getTransactionId()),
-                ttx.getDate().toString(),
-                nullToEmpty(ttx.getFromPortfolio()),
-                nullToEmpty(ttx.getToPortfolio()),
-                transactionType,
-                assetType,
-                assetSymbol,
-                Double.toString(quantity),
-                Double.toString(pricePerUnit),
-                Double.toString(totalValue)
+            nullToEmpty(ttx.getTransactionId()),
+            ttx.getDate().toString(),
+            nullToEmpty(TransactionUtility.getFromPortfolio(ttx)),
+            nullToEmpty(TransactionUtility.getToPortfolio(ttx)),
+            transactionType,
+            assetType,
+            assetSymbol,
+            Double.toString(quantity),
+            Double.toString(pricePerUnit),
+            Double.toString(totalValue)
         );
     }
 
