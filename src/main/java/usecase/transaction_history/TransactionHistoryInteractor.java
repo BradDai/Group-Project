@@ -30,16 +30,18 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
         this.loggedInViewModel = loggedInViewModel;
     }
 
+    // This currently has a Checkstyle error: "Executable statement count is 37 (max allowed is 30)". After doing some
+    // of the suggested fixes, this should be solved.
     @Override
     public void execute(final TransactionHistoryInputData inputData) {
 
+        // All these variables are being used less than 3 times. They could be made as inline variables to improve
+        // code quality.
         final String portfolio = inputData.portfolio();
         final String asset = inputData.asset();
         final LocalDate start = parseDate(inputData.startDate());
         final LocalDate end = parseDate(inputData.endDate());
-
         final String username = loggedInViewModel.getState().getUsername();
-
         final List<Transaction> txList = transactionRepo.getByFilters(
             username,
             portfolio,
@@ -48,12 +50,18 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
             end
         );
 
+        // This list is being used only at the end of this method. For refactoring, it would be better to use the
+        // "Slide statements" technique, as it is not very useful to have this variable here with no uses.
         final List<HistoryState.Row> rows = new ArrayList<>();
         for (final Transaction tx : txList) {
             final HistoryState.Row row = new HistoryState.Row();
             row.id = tx.getTransactionId();
             row.dateTime = tx.getDate().toString();
 
+            // The next 5 conditions are being used to check what type of row to create, with very similar lines. This
+            // could be improved with a Factory design pattern, as it would separate the creation of these objects, and
+            // handle all of that data. Also, the types seem to be a "magic" string, so you could maybe add at the
+            // Constants file, and reuse them here.
             if (tx instanceof final BuyTransaction bt) {
                 row.asset = bt.getAssetSymbol();
                 row.type = "BUY";
@@ -93,6 +101,8 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
             msg += " from " + start + " to " + end;
         }
 
+        // The output variable is also being used only once. Making it as inline variable would improve the code
+        // quality.
         final TransactionHistoryOutputData output =
             new TransactionHistoryOutputData(
                 rows,
@@ -109,46 +119,46 @@ public class TransactionHistoryInteractor implements TransactionHistoryInputBoun
 
         if (loggedInViewModel == null || loggedInViewModel.getState() == null) {
             presenter.presentPortfolioOptions(new ArrayList<>());
-            return;
         }
-
-        final String username = loggedInViewModel.getState().getUsername();
-
-        if (username == null || username.isBlank()) {
-            presenter.presentPortfolioOptions(new ArrayList<>());
-            return;
-        }
-
-        final List<Transaction> allTx = transactionRepo.getByFilters(
-            username,
-            null,
-            null,
-            null,
-            null
-        );
-
-        final Set<String> portfolioIds = new LinkedHashSet<>();
-        for (Transaction tx : allTx) {
-            // Updated to use TransactionUtility
-            final String from = TransactionUtility.getFromPortfolio(tx);
-            if (from != null && !from.isBlank()) {
-                portfolioIds.add(from);
+        else {
+            final String username = loggedInViewModel.getState().getUsername();
+            if (username == null || username.isBlank()) {
+                presenter.presentPortfolioOptions(new ArrayList<>());
             }
+            else {
 
-            final String to = TransactionUtility.getToPortfolio(tx);
-            if (to != null && !to.isBlank()) {
-                portfolioIds.add(to);
+                // this variable is also being used only once, so making it as an inline variable would be good.
+                final List<Transaction> allTx = transactionRepo.getByFilters(
+                    username,
+                    null,
+                    null,
+                    null,
+                    null
+                );
+                final Set<String> portfolioIds = new LinkedHashSet<>();
+                for (Transaction tx : allTx) {
+                    final String from = TransactionUtility.getFromPortfolio(tx);
+                    if (from != null && !from.isBlank()) {
+                        portfolioIds.add(from);
+                    }
+                    final String to = TransactionUtility.getToPortfolio(tx);
+                    if (to != null && !to.isBlank()) {
+                        portfolioIds.add(to);
+                    }
+                }
+                // This variable is being used only once, so it would be better to have it as an inline variable.
+                final ArrayList<String> result = new ArrayList<>(portfolioIds);
+                presenter.presentPortfolioOptions(result);
             }
         }
 
-        final ArrayList<String> result = new ArrayList<>(portfolioIds);
-        presenter.presentPortfolioOptions(result);
     }
 
     private LocalDate parseDate(final String sss) {
-        if (sss == null || sss.isBlank()) {
-            return null;
+        LocalDate result = null;
+        if (sss != null && !sss.isBlank()) {
+            result = LocalDate.parse(sss);
         }
-        return LocalDate.parse(sss);
+        return result;
     }
 }
