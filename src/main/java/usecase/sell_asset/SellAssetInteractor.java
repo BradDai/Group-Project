@@ -49,19 +49,8 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
             return;
         }
 
-        // 3. Check if portfolio has the stock
-        if (!portfolio.hasStock(stockName)) {
-            sellAssetOutputBoundary.prepareFailureView("Stock not found in portfolio.");
-            return;
-        }
-
-        final Stock stock = portfolio.findStock(stockName);
-
-        // 4. Validate using entity business logic
-        if (!stock.canSell(quantityToSell)) {
-            sellAssetOutputBoundary.prepareFailureView(
-                    "Cannot sell " + quantityToSell + " units. Available: " + stock.getQuantity()
-            );
+        // 3 & 4. Validate stock existence and sale eligibility
+        if (!checkStockAndQuantity(portfolio, stockName, quantityToSell)) {
             return;
         }
 
@@ -170,6 +159,26 @@ public class SellAssetInteractor implements SellAssetInputBoundary {
             valid = false;
         }
         return valid;
+    }
+
+    private boolean checkStockAndQuantity(final SubAccount portfolio,
+                                          final String stockName,
+                                          final double quantityToSell) {
+        if (!portfolio.hasStock(stockName)) {
+            sellAssetOutputBoundary.prepareFailureView("Stock not found in portfolio.");
+            return false;
+        }
+
+        final Stock stock = portfolio.findStock(stockName);
+
+        if (!stock.canSell(quantityToSell)) {
+            sellAssetOutputBoundary.prepareFailureView(
+                    "Cannot sell " + quantityToSell + " units. Available: " + stock.getQuantity()
+            );
+            return false;
+        }
+
+        return true;
     }
 
     private void saveTransaction(final String username,
