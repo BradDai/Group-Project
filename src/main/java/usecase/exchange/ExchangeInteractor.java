@@ -23,8 +23,6 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
     }
 
     @Override
-    // This could be improved by using some refactoring techniques. For example, the rates and rate variable could be
-    // made inline, as the rates is only being used once, and rate twice.
     public void fetchExchangeRate(final ExchangeInputData inputData) {
         final Map<String, Double> rates = exchangeDataAccess.getRates(inputData.from());
         final Double rate = rates.get(inputData.to());
@@ -43,10 +41,6 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
     }
 
     @Override
-    // This code has a lot of nested conditions at the beginning, and this could definitely be improved. One example is
-    // implementing a design pattern, like the Chain of Responsibility behavioral pattern. This has been implemented
-    // in the TransferInteractor to check for all the conditions and validation required, and this could be done here
-    // as well.
     public void convert(final ExchangeConversionInputData inputData) {
 
         if (inputData.amount() <= 0) {
@@ -77,8 +71,6 @@ public class ExchangeInteractor implements ExchangeInputBoundary {
                     exchangePresenter.presentConversionFailure("Invalid target currency.");
                 }
                 else {
-                    // All variables are being used less than 3 times, so you could apply refactoring techniques such
-                    // as inline variable, to improve the code quality.
                     final double amountGiven = inputData.amount();
                     final double amountReceived = amountGiven * rate;
                     final double fromAfter = fromBalance - amountGiven;
